@@ -1,0 +1,37 @@
+import { DataTypes, Model } from 'sequelize';
+import sequelize from "../db_connection";
+import { Course } from './Course';
+
+export class Module extends Model {
+  id!: number;
+  moduleName!: string;
+  courseId!: number;
+}
+
+Module.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  moduleName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  courseId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Course,
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  },
+}, {
+  sequelize,
+  modelName: 'Module',
+  tableName: 'Modules',
+  timestamps: true,
+});
