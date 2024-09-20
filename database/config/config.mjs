@@ -1,4 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
+import 'ts-node/register';
 export const options = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
