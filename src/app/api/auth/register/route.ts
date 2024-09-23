@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import User from '@/models/User'; // Import your User model
-import sequelize from '../../../../db_connection';
+import { User } from '@/db/models/User'; // Import your User model
+import sequelize from '@/db/db_connection';
 
 // POST request handler for user registration
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, email, password } = body;
+    const { username, email, password, roleId} = body;
 
     // Validate required fields
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !roleId) {
       return NextResponse.json({ message: 'All fields are required.' }, { status: 400 });
     }
 
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
       username,
       email,
       password: hashedPassword, // Store hashed password
+      roleId,
     });
 
     // Send a success response with the created user info
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
+        roleId: newUser.roleId
       },
     }, { status: 201 });
 

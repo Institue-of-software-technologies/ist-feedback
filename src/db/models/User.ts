@@ -4,7 +4,7 @@ import { Role } from './Role';
 
 export class User extends Model {
   id!: number;
-  name!: string;
+  username!: string;
   email!: string;
   password!: string;
   roleId!: number;
@@ -17,7 +17,7 @@ User.init({
     primaryKey: true,
     allowNull: false,
   },
-  name: {
+  username: {
     type: DataTypes.STRING,
     allowNull: false,
   },
