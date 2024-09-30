@@ -1,8 +1,7 @@
 'use client'
 
-export default function ErrorBoundary({error,reset}:{
+export default function ErrorBoundary({error}:{
     error:Error,
-    reset:()=>void;
 }){
     return(
         <>

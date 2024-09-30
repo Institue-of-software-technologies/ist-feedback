@@ -8,9 +8,9 @@ export const options = {
   port: Number(process.env.DB_PORT),
   dialect: "mysql",
   dialectOptions: {
-    ssl: {
-      rejectUnauthorized: false,
-    },
+    // ssl: {
+    //   rejectUnauthorized: false,
+    // },
   },
   logging: process.env.NODE_ENV === "development" ? console.log : false,
   migrationStorageTableName: "migrations",
