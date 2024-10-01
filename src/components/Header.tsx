@@ -5,7 +5,7 @@ import React from 'react';
 import Link from 'next/link';
 import { FaSignInAlt } from 'react-icons/fa'; // Login icon
 import Image from 'next/image';
-import logo from '/public/assets/images/logo.png'; // Update this path to your logo
+import logo from '../../public/assets/image/logo.png'; // Update this path to your logo
 
 const Header: React.FC = () => {
   return (

@@ -1,5 +1,4 @@
 // src/app/loading.tsx
-
 "use client"; // Optional, depending on your use case
 
 const Loading: React.FC = () => {

@@ -6,6 +6,9 @@ import { Permission } from './Permission';
 export class RolePermission extends Model {
   roleId!: number;
   permissionId!: number;
+
+  // This tells TypeScript that RolePermission has a 'permission' field when associated
+  permission?: Permission;
 }
 
 RolePermission.init({
@@ -33,3 +36,7 @@ RolePermission.init({
   tableName: 'Role_Permissions',
   timestamps: false,
 });
+
+// Define associations between RolePermission and Permission, Role
+RolePermission.belongsTo(Permission, { foreignKey: 'permissionId', as: 'permission' });
+RolePermission.belongsTo(Role, { foreignKey: 'roleId', as: 'role' });
