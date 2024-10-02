@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
       <h1>Welcome to the Dashboard</h1>
 
       {/* Conditionally render admin-specific components based on user permissions */}
-      {user.permissions.includes('view_users') && (
+      {user.permissions.includes('user_management') && (
         <div>
           <h2>Admin User Management</h2>
           <AdminUsers /> {/* AdminUsers component to manage users */}
@@ -26,16 +26,59 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Add more conditional components based on other permissions if necessary */}
-      {user.permissions.includes('view_reports') && (
+      {user.permissions.includes('permission_management') && (
         <div>
-          <h2>Reports</h2>
+          <h2>permissions</h2>
           {/* Render report-related components here */}
         </div>
       )}
 
-      {user.permissions.includes('manage_settings') && (
+      {/* Add more conditional components based on other permissions if necessary */}
+      {user.permissions.includes('feedback_management') && (
         <div>
-          <h2>Settings</h2>
+          <h2>Feedback</h2>
+          {/* Render report-related components here */}
+        </div>
+      )}
+
+      {user.permissions.includes('intake_management') && (
+        <div>
+          <h2>intake management</h2>
+          {/* Render settings-related components here */}
+        </div>
+      )}
+
+      {user.permissions.includes('role_management') && (
+        <div>
+          <h2>role management</h2>
+          {/* Render settings-related components here */}
+        </div>
+      )}
+
+      {user.permissions.includes('class_time_management') && (
+        <div>
+          <h2>class time management</h2>
+          {/* Render settings-related components here */}
+        </div>
+      )}
+
+      {user.permissions.includes('course_management') && (
+        <div>
+          <h2>class time management</h2>
+          {/* Render settings-related components here */}
+        </div>
+      )}
+
+      {user.permissions.includes('trainer_management') && (
+        <div>
+          <h2>trainer management</h2>
+          {/* Render settings-related components here */}
+        </div>
+      )}
+      
+      {user.permissions.includes('trainer_management') && (
+        <div>
+          <h2>trainer management</h2>
           {/* Render settings-related components here */}
         </div>
       )}
