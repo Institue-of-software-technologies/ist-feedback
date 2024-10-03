@@ -13,22 +13,24 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
   const { setUser } = useUser();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading when the form is submitted
     try {
       const response = await api.post('/auth/login', {
         email: email,
         password: password,
         rememberMe: rememberMe
-      })
-      const useRolesPermissions =response.data.client
-      localStorage.setItem('userRolesPermissions', JSON.stringify(useRolesPermissions))
+      });
 
+      const useRolesPermissions = response.data.client;
+      localStorage.setItem('userRolesPermissions', JSON.stringify(useRolesPermissions));
       setUser(useRolesPermissions);
 
-      router.push('/dashboard')
+      router.push('/dashboard');
 
       if (response.status !== 200) {
         throw new Error(`error: ${response.data.message}`);
@@ -37,8 +39,11 @@ export default function LoginPage() {
     } catch (error) {
       console.error('Login failed', error);
       alert('Invalid credentials');
+    } finally {
+      setIsLoading(false); // Stop loading once the request is done
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-md rounded-lg p-8 max-w-sm w-full">
@@ -47,7 +52,7 @@ export default function LoginPage() {
           <div className="mb-1">
             <Image
               className="mx-auto w-[100px] h-[75px]"
-              src={istLogo} // Update with the correct path to your logo
+              src={istLogo}
               alt="ist_logo"
               width={100}
               height={100}
@@ -119,11 +124,39 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Submit Button with Spinner */}
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isLoading} // Disable button when loading
           >
-            Sign In
+            {isLoading ? (
+              <div className="flex items-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Logging in...
+              </div>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
@@ -135,7 +168,5 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
-
-
   );
 }
