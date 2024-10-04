@@ -45,8 +45,8 @@ export default function RootLayout({
             </UserProvider>
           </main>
           
-          {/* Render Footer only if not on the dashboard */}
-          {!isDashboard && <Footer />}
+          {/* Render Footer on both the home and dashboard */}
+          <Footer />
         </div>
       </body>
     </html>
