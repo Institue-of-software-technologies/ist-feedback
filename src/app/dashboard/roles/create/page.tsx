@@ -1,13 +1,13 @@
 import React from 'react';
 
-const RoleManagement: React.FC = () => {
+const CreateRole: React.FC = () => {
   // Feedback management logic (CRUD operations)
   return (
     <div>
-      <h3>All Role</h3>
+      <h3>CreateRole</h3>
       {/* Implement Create, View, Edit, Delete feedback questions functionality */}
     </div>
   );
 };
 
-export default RoleManagement;
+export default CreateRole;

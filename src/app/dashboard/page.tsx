@@ -1,87 +1,102 @@
-"use client";
+"use client"; // Ensures it's a client component
 import React from 'react';
+import { usePathname } from 'next/navigation'; // Import usePathname from next/navigation
 import AdminUsers from '@/components/AdminUsers'; // Assuming you have an AdminUsers component
-import { useUser } from '@/context/UserContext'; // Import the useUser hook
+import { useUser } from '@/context/UserContext';
 
 const Dashboard: React.FC = () => {
-  const { user } = useUser(); // Get the user from context
-  console.log(user);
-  
+  const { user } = useUser(); // Get the user context
+  const pathname = usePathname(); // Get the current pathname
 
-  // Check if the user is available and has the permission to view the dashboard
-  if (!user || !user.permissions.includes('view_dashboard')) {
+  // Check if the user has permission to view the dashboard
+  if (!user?.permissions.includes('view_dashboard')) {
     return <div>You do not have access to this page.</div>;
   }
 
   return (
     <div>
-      <h1>Welcome to the Dashboard</h1>
+      <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
 
-      {/* Conditionally render admin-specific components based on user permissions */}
-      {user.permissions.includes('user_management') && (
-        <div>
-          <h2>Admin User Management</h2>
-          <AdminUsers /> {/* AdminUsers component to manage users */}
-        </div>
+      {/* Admin User Management */}
+      {pathname === '/dashboard/users' && user.permissions.includes('view_users') && (
+        <>
+          
+        </>
       )}
 
-      {/* Add more conditional components based on other permissions if necessary */}
-      {user.permissions.includes('permission_management') && (
+      {/* Role Management */}
+      {pathname === '/dashboard/roles' && user.permissions.includes('view_roles') && (
         <div>
-          <h2>permissions</h2>
-          {/* Render report-related components here */}
-        </div>
-      )}
-
-      {/* Add more conditional components based on other permissions if necessary */}
-      {user.permissions.includes('feedback_management') && (
-        <div>
-          <h2>Feedback</h2>
-          {/* Render report-related components here */}
+          <h2 className="text-xl font-semibold"> All Roles</h2>
+          <AdminUsers />
         </div>
       )}
 
-      {user.permissions.includes('intake_management') && (
+      {/* Course Management */}
+      {pathname === '/dashboard/courses/view' && user.permissions.includes('view_courses') && (
         <div>
-          <h2>intake management</h2>
-          {/* Render settings-related components here */}
+          <h2 className="text-xl font-semibold">Course Management</h2>
+          {/* Course management component goes here */}
         </div>
       )}
 
-      {user.permissions.includes('role_management') && (
+      {/* Create New User */}
+      {pathname === '/dashboard/users/create' && user.permissions.includes('create_users') && (
         <div>
-          <h2>role management</h2>
-          {/* Render settings-related components here */}
+          <h2 className="text-xl font-semibold">Create New User</h2>
+          {/* Form to create a new user goes here */}
         </div>
       )}
 
-      {user.permissions.includes('class_time_management') && (
+      {/* Create New Role */}
+      {pathname === '/dashboard/roles/create' && user.permissions.includes('create_roless') && (
         <div>
-          <h2>class time management</h2>
-          {/* Render settings-related components here */}
+          <h2 className="text-xl font-semibold">Create New Role</h2>
+          {/* Form to create a new user goes here */}
         </div>
       )}
 
-      {user.permissions.includes('course_management') && (
+      {/* Feedback Management */}
+      {pathname === '/dashboard/feedback/view' && user.permissions.includes('view_feedback_questions') && (
         <div>
-          <h2>class time management</h2>
-          {/* Render settings-related components here */}
+          <h2 className="text-xl font-semibold">Feedback Management</h2>
+          {/* Feedback management component goes here */}
         </div>
       )}
 
-      {user.permissions.includes('trainer_management') && (
+      {/* Intake Management */}
+      {pathname === '/dashboard/intakes/view' && user.permissions.includes('view_intakes') && (
         <div>
-          <h2>trainer management</h2>
-          {/* Render settings-related components here */}
+          <h2 className="text-xl font-semibold">Intake Management</h2>
+          {/* Intake management component goes here */}
         </div>
       )}
-      
-      {user.permissions.includes('trainer_management') && (
+
+      {/* Class Time Management */}
+      {pathname === '/dashboard/class-times/view' && user.permissions.includes('view_class_times') && (
         <div>
-          <h2>trainer management</h2>
-          {/* Render settings-related components here */}
+          <h2 className="text-xl font-semibold">Class Time Management</h2>
+          {/* Class time management component goes here */}
         </div>
       )}
+
+      {/* Trainer Management */}
+      {pathname === '/dashboard/trainers/view' && user.permissions.includes('view_trainers') && (
+        <div>
+          <h2 className="text-xl font-semibold">Trainer Management</h2>
+          {/* Trainer management component goes here */}
+        </div>
+      )}
+
+      {/* Feedback Results */}
+      {pathname === '/dashboard/feedback-results/view' && user.permissions.includes('view_feedback_results') && (
+        <div>
+          <h2 className="text-xl font-semibold">Feedback Results</h2>
+          {/* Feedback results component goes here */}
+        </div>
+      )}
+
+      {/* Additional routes and their permissions can be added similarly */}
     </div>
   );
 };
