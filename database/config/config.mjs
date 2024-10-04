@@ -1,4 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
+import 'ts-node/register';
 export const options = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
@@ -7,9 +8,9 @@ export const options = {
   port: Number(process.env.DB_PORT),
   dialect: "mysql",
   dialectOptions: {
-    ssl: {
-      rejectUnauthorized: false,
-    },
+    // ssl: {
+    //   rejectUnauthorized: false,
+    // },
   },
   logging: process.env.NODE_ENV === "development" ? console.log : false,
   migrationStorageTableName: "migrations",
