@@ -1,8 +1,20 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // App Router useRouter
+import { redirect, useRouter } from 'next/navigation'; // App Router useRouter
 import { useUser } from '@/context/UserContext';
+import { RiDashboard2Fill } from "react-icons/ri";
+import { FaUsers } from "react-icons/fa";
+import { FaGraduationCap } from "react-icons/fa";
+import { FaUsersCog } from "react-icons/fa";
+import { FaUserLock } from "react-icons/fa6";
+import { FaPowerOff } from "react-icons/fa";
+import { VscFeedback } from "react-icons/vsc";
+import { FaBookReader } from "react-icons/fa";
+import { PiChalkboardTeacherFill } from "react-icons/pi";
+import { SiGoogleforms } from "react-icons/si";
+import api from '../../../lib/axios';
+import { toast,ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -15,9 +27,22 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [currentView, setCurrentView] = useState<string>('view'); // For toggling between view/create
 
   // Function to handle logout
-  const handleLogout = () => {
-    console.log("User logged out");
+  const handleLogout = async() => {
     // Add your logout logic here
+   try {
+    localStorage.clear();
+    const response = await api.post('/auth/logout');
+    if(response.status === 200){
+
+      setTimeout(function() {
+        router.push('/login')
+      }, 3000);
+      
+      toast.success('Logout successfully', { position: "top-right", autoClose: 3000 });
+    }
+   } catch (error) {
+    toast.error('Failed to logout', { position: "top-right", autoClose: 3000 });
+   }
   };
 
   // Main tabs data with view/create links
@@ -26,6 +51,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       name: "Dashboard",
       permission: "view_dashboard", // A common permission for all users
       viewLabel: "Dashboard",
+      icon: <RiDashboard2Fill size={"70px"}/>,
       viewLink: "/dashboard",
     },
     {
@@ -34,6 +60,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Users",
       createLabel: "Create User",
       viewLink: "/dashboard/users",
+      icon: <FaUsers size={"70px"}/>,
       createLink: "/dashboard/users/create",
     },
     {
@@ -42,6 +69,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Courses",
       createLabel: "Create Course",
       viewLink: "/dashboard/courses/view",
+      icon: <FaGraduationCap size={"70px"}/>,
       createLink: "/dashboard/courses/create",
     },
     {
@@ -50,6 +78,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Roles",
       createLabel: "Create Role",
       viewLink: "/dashboard/roles",
+      icon: <FaUsersCog size={"70px"}/>,
       createLink: "/dashboard/roles/create",
     },
     {
@@ -58,6 +87,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Permissions",
       createLabel: "Create Permission",
       viewLink: "/dashboard/permissions/view",
+      icon: <FaUserLock size={"70px"}/>,
       createLink: "/dashboard/permissions/create",
     },
     {
@@ -66,6 +96,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Feedback",
       createLabel: "Create Feedback",
       viewLink: "/dashboard/feedback/view",
+      icon: <VscFeedback size={"70px"}/>,
       createLink: "/dashboard/feedback/create",
     },
     {
@@ -74,6 +105,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
       viewLink: "/dashboard/intakes/view",
+      icon: <FaBookReader size={"70px"}/>,
       createLink: "/dashboard/intakes/create",
     },
     {
@@ -82,6 +114,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
       viewLink: "/dashboard/class-times/view",
+      icon: <PiChalkboardTeacherFill size={"70px"}/>,
       createLink: "/dashboard/class-times/create",
     },
     {
@@ -90,6 +123,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Trainers",
       createLabel: "Create Trainer",
       viewLink: "/dashboard/trainers/view",
+      icon: <FaUsers size={"70px"}/>,
       createLink: "/dashboard/trainers/create",
     },
     {
@@ -98,6 +132,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Feedback Reports",
       createLabel: "Send Feedback Report",
       viewLink: "/dashboard/feedback-reports/view",
+      icon: <SiGoogleforms size={"70px"}/>,
       createLink: "/dashboard/feedback-reports/send",
     },
   ];
@@ -139,7 +174,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      <ToastContainer />
       {/* Header */}
       <header className="bg-red-600 text-white p-5 text-center">
         <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
@@ -147,20 +183,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
       {/* Navigation */}
       <nav className="bg-gray-800 text-white p-4 shadow-lg">
-        <ul className="flex space-x-6">
+        <ul className="flex justify-between items-center space-x-6">
           {tabs.map((tab) => (
             user.permissions.includes(tab.permission) && (
               <li key={tab.name}>
-                <button
-                  onClick={() => handleTabChange(tab.name, 'view')} // Navigate to view mode
-                  className={`p-2 rounded ${activeTab === tab.name ? 'bg-gray-600' : 'hover:bg-gray-700'} transition-colors`}>
-                  {tab.name}
-                </button>
+                <div className="relative group inline-block">
+                  <button
+                    onClick={() => handleTabChange(tab.name, 'view')} // Navigate to view mode
+                    className={`p-2 rounded ${activeTab === tab.name ? 'bg-gray-600' : 'hover:bg-gray-700'} transition-colors`}>
+                     {tab.icon}
+                  </button>
+                  <div className="absolute hidden group-hover:block bg-white text-black text-sm rounded px-2 py-1 whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-2">
+                    {tab.name}
+                  </div>
+                </div>
               </li>
             )
           ))}
           <li>
-            <button onClick={handleLogout} className="bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded transition-colors">Logout</button>
+          <div className="relative group inline-block">
+            <button onClick={handleLogout} className="bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded transition-colors"> <FaPowerOff size={"50px"}/></button>
+            <div className="absolute hidden group-hover:block bg-white text-black text-sm rounded px-2 py-1 whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-2">
+                Logout
+            </div>
+          </div>
           </li>
         </ul>
       </nav>
@@ -186,7 +232,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-grow p-5 overflow-y-auto">
+      <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
         {currentView === 'view' && (
           <div>
             <h2 className="text-xl font-bold">{activeTabDetails?.viewLabel}</h2>
