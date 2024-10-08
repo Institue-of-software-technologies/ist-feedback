@@ -15,3 +15,5 @@ export interface User {
   updatedAt: string;
   role: Role; // Add role object here
 }
+
+
