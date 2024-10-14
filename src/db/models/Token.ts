@@ -10,4 +10,23 @@ export class Token extends Model {
 Token.init({
   id: {
     type: DataTypes.INTEGER,
-    autoIncrement
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+    },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      unique: true,
+    },
+  }, {
+    sequelize,
+    modelName: 'Token',
+    tableName: 'Token',
+    timestamps: true,
+  });

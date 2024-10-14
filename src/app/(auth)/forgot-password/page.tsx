@@ -1,7 +1,5 @@
 "use client"
-import Image from "next/image";
 import { useState } from "react";
-import istLogo from '../../../../public/assets/image/cropedImag.png';
 import { ToastContainer,toast } from "react-toastify";
 import api from "../../../../lib/axios";
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +10,7 @@ export default function ForgotPassword(){
     const [email, setEmail] = useState('');
     const router = useRouter();
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true); // Start loading when the form is submitted
     
@@ -55,7 +53,7 @@ export default function ForgotPassword(){
           </h1>
 
           <h5 className="text-gray-600 mt-2">
-            We'll email you instructions on how to reset your password
+            We will email you instructions on how to reset your password
           </h5>
         </div>
 
