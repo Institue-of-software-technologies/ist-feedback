@@ -171,7 +171,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         router.push('/dashboard'); // Ensure URL is set to dashboard on load
       }
     }
-  }, [user]);
+  }, [router, user]);
 
   if (!user || !user.permissions.includes('view_dashboard')) {
     return <div className="text-red-600 text-center mt-20">You do not have access to this page.</div>;

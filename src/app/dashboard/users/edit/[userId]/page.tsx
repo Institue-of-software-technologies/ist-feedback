@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const EditUser = () => {
   const router = useRouter();
   const { userId } = useParams(); // Get the `userId` from the URL
-  const [user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({ username: '', email: '', roleId: '' });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
