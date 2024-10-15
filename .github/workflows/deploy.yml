@@ -48,6 +48,6 @@ jobs:
       - name: Run docker container
         run: docker run -d -p 3000:3000 --name nextjs-app-container kirarwa/ist-feedback
       - name: Run migrations
-        run: docker exec -it nextjs-app-container npm run migrate
+        run: docker exec nextjs-app-container npm run migrate
       - name: Run seeders
-        run: docker exec -it nextjs-app-container npm run seed 
+        run: docker exec nextjs-app-container npm run seed 
