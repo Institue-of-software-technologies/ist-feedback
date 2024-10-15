@@ -3,7 +3,7 @@ import istLogo from '../../../../public/assets/image/cropedImag.png';
 import '../../../css/loginPage.css';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUser } from '@/context/UserContext';
 import api from '../../../../lib/axios';
@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false); // Add loading state
   const { setUser } = useUser();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true); // Start loading when the form is submitted
     try {

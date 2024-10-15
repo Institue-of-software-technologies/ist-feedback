@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model} from 'sequelize';
 import sequelize from "../db_connection";
 import { Role } from './Role';
 

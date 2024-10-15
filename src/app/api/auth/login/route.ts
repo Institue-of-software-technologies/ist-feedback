@@ -1,6 +1,6 @@
 import { User } from "@/db/models/User";
 import bcrypt from 'bcrypt';
-import { cookies, headers } from "next/headers";
+import { cookies} from "next/headers";
 import { encrypt } from "../../authToken/createToken";
 import { NextResponse } from "next/server";
 import { Role } from "@/db/models/Role";
@@ -57,6 +57,9 @@ export async function POST(req: Request) {
     
 
     const permissions = rolePermissions.map((rp) => rp.permission?.permissionName || '');
+    
+    // expires session if true 30 days if false 1 hour 
+    const expires = new Date(Date.now() +(rememberMe ? 30 * 24 * 60 * 60 * 1000 :1 * 60 * 60 * 1000));
 
     //create a custom payload
     const payLoad = {
@@ -64,7 +67,8 @@ export async function POST(req: Request) {
         username: findUser.username,
         email: findUser.email,
         roleId: findUser.roleId,
-        permissions:permissions
+        permissions:permissions,
+        expires:expires
     }
 
     //return the user role and permission to the client
@@ -76,9 +80,7 @@ export async function POST(req: Request) {
     }
 
     // Create session
-    // expires session if true 30 days if false 1 hour 
-    const expires = new Date(Date.now() +(rememberMe ? 30 * 24 * 60 * 60 * 1000 :1 * 60 * 60 * 1000));
-    const session = await encrypt({ payLoad, expires });
+    const session = await encrypt(payLoad);
 
     // Set cookie with secure flag (optional but recommended)
     cookies().set('session', session, { expires, httpOnly: true });
