@@ -4,7 +4,7 @@ import '../../../css/loginPage.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { useUser } from '@/context/UserContext';
 import api from '../../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Add loading state
   const { setUser } = useUser();
-
+ 
   const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true); // Start loading when the form is submitted
@@ -29,10 +29,11 @@ export default function LoginPage() {
       });
 
       const useRolesPermissions = response.data.client;
+      
+      router.push('/dashboard');
       localStorage.setItem('userRolesPermissions', JSON.stringify(useRolesPermissions));
       setUser(useRolesPermissions);
 
-      router.push('/dashboard');
 
       if (response.status !== 200) {
         throw new Error(`error: ${response.data.message}`);
