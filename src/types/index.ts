@@ -10,6 +10,11 @@ export interface Permission {
   permissionName:string;
 }
 
+export interface Course {
+  id: number;
+  courseName:string;
+}
+
 export interface User {
   id: number;
   username: string;
