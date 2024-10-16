@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // App Router useRouter
 import { useUser } from '@/context/UserContext';
 import {
@@ -21,7 +21,6 @@ import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Loading from './loading';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -92,7 +91,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       permission: "manage_permissions",
       viewLabel: "View Permissions",
       createLabel: "Create Permission",
-      viewLink: "/dashboard/permissions",
+      viewLink: "/dashboard/permissions/view",
       icon: <FaUserLock size={"20px"} />,
       createLink: "/dashboard/permissions/create",
     },
@@ -179,7 +178,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }
 
   return (
-  <Suspense fallback={<Loading/>}>
     <div className="flex h-screen bg-background text-foreground">
       <ToastContainer />
 
@@ -300,27 +298,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         )}
 
         {/* Main Content */}
-          <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
-            {currentView === 'view' && (
-              <div>
-                <h2 className="text-xl font-bold">{activeTabDetails?.viewLabel}</h2>
-                {/* Render the content for viewing */}
-                {children}
-              </div>
-            )}
+        <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
+          {currentView === 'view' && (
+            <div>
+              <h2 className="text-xl font-bold">{activeTabDetails?.viewLabel}</h2>
+              {/* Render the content for viewing */}
+              {children}
+            </div>
+          )}
 
-            {currentView === 'create' && (
-              <div>
-                <h2 className="text-xl font-bold">{activeTabDetails?.createLabel}</h2>
-                {/* Render the content for creating */}
-                {children}
-              </div>
-            )}
-          </main>
-        
+          {currentView === 'create' && (
+            <div>
+              <h2 className="text-xl font-bold">{activeTabDetails?.createLabel}</h2>
+              {/* Render the content for creating */}
+              {children}
+            </div>
+          )}
+        </main>
       </div>
     </div>
-    </Suspense>
   );
 };
 

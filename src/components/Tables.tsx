@@ -99,6 +99,12 @@ const Table = <T,>({ columns, data, onEdit, onDelete,onSearch }: TableProps<T>):
                                 <path d="m21 21-4.3-4.3"></path>
                             </svg>
                         </div>
+                        {/* Search Button */}
+                        <button
+                            className="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+                        >
+                            Search
+                        </button>
                     </div>
                     <div className="w-full sm:w-auto">
                         <label htmlFor="rowsPerPage" className="mr-2">

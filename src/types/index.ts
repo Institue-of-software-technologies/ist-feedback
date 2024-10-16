@@ -5,11 +5,6 @@ export interface Role {
   updatedAt: string;
 }
 
-export interface Permission {
-  id: number;
-  permissionName:string;
-}
-
 export interface User {
   id: number;
   username: string;
