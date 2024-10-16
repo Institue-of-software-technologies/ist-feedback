@@ -43,6 +43,7 @@ const UserManagement: React.FC = () => {
       try {
         await api.delete(`/users/${confirmDelete.id}`);
         setUsers(users.filter(user => user.id !== confirmDelete.id));
+        setFilteredUsers(filteredUsers.filter(user => user.id !== confirmDelete.id));
         toast.success('User deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
         toast.error('Failed to delete user', { position: "top-right", autoClose: 3000 });
