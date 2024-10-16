@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { UserProvider } from '@/context/UserContext';
 import { usePathname } from 'next/navigation'; // Get the current pathname
+import PrelineScript from "@/components/PrelineScript";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -48,6 +49,8 @@ export default function RootLayout({
           <Footer />
         </div>
       </body>
+      <PrelineScript />
     </html>
+    
   );
 }
