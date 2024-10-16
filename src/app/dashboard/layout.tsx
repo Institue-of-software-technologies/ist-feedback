@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // App Router useRouter
 import { useUser } from '@/context/UserContext';
 import {
@@ -21,7 +21,6 @@ import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Loading from './loading';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -179,7 +178,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }
 
   return (
-  <Suspense fallback={<Loading/>}>
     <div className="flex h-screen bg-background text-foreground">
       <ToastContainer />
 
@@ -320,7 +318,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         
       </div>
     </div>
-    </Suspense>
   );
 };
 
