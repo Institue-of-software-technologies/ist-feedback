@@ -57,7 +57,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       name: "Dashboard",
       permission: "view_dashboard", // A common permission for all users
       viewLabel: "Dashboard",
-      icon: <RiDashboard2Fill size={"20px"} />,
+      icon: <RiDashboard2Fill size={"55px"} />,
       viewLink: "/dashboard",
     },
     {
@@ -66,7 +66,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Users",
       createLabel: "Create User",
       viewLink: "/dashboard/users",
-      icon: <FaUsers size={"20px"} />,
+      icon: <FaUsers size={"55px"} />,
       createLink: "/dashboard/users/create",
     },
     {
@@ -74,36 +74,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       permission: "manage_courses",
       viewLabel: "View Courses",
       createLabel: "Create Course",
-      viewLink: "/dashboard/courses/view",
-      icon: <FaGraduationCap size={"20px"} />,
+      viewLink: "/dashboard/courses",
+      icon: <FaGraduationCap size={"55px"} />,
       createLink: "/dashboard/courses/create",
-    },
-    {
-      name: "Role Management",
-      permission: "manage_roles",
-      viewLabel: "View Roles",
-      createLabel: "Create Role",
-      viewLink: "/dashboard/roles",
-      icon: <FaUsersCog size={"20px"} />,
-      createLink: "/dashboard/roles/create",
-    },
-    {
-      name: "Permission Management",
-      permission: "manage_permissions",
-      viewLabel: "View Permissions",
-      createLabel: "Create Permission",
-      viewLink: "/dashboard/permissions",
-      icon: <FaUserLock size={"20px"} />,
-      createLink: "/dashboard/permissions/create",
-    },
-    {
-      name: "Feedback Management",
-      permission: "manage_feedback",
-      viewLabel: "View Feedback",
-      createLabel: "Create Feedback",
-      viewLink: "/dashboard/feedback/view",
-      icon: <VscFeedback size={"20px"} />,
-      createLink: "/dashboard/feedback/create",
     },
     {
       name: "Intake Management",
@@ -111,7 +84,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
       viewLink: "/dashboard/intakes/view",
-      icon: <FaBookReader size={"20px"} />,
+      icon: <FaBookReader size={"55px"} />,
       createLink: "/dashboard/intakes/create",
     },
     {
@@ -120,8 +93,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
       viewLink: "/dashboard/class-times/view",
-      icon: <PiChalkboardTeacherFill size={"20px"} />,
+      icon: <PiChalkboardTeacherFill size={"55px"} />,
       createLink: "/dashboard/class-times/create",
+    },
+    {
+      name: "Role Management",
+      permission: "manage_roles",
+      viewLabel: "View Roles",
+      createLabel: "Create Role",
+      viewLink: "/dashboard/roles",
+      icon: <FaUsersCog size={"55px"} />,
+      createLink: "/dashboard/roles/create",
+    },
+    {
+      name: "Permission Management",
+      permission: "manage_permissions",
+      viewLabel: "View Permissions",
+      createLabel: "Create Permission",
+      viewLink: "/dashboard/permissions",
+      icon: <FaUserLock size={"55px"} />,
+      createLink: "/dashboard/permissions/create",
     },
     {
       name: "Trainer Management",
@@ -129,8 +120,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Trainers",
       createLabel: "Create Trainer",
       viewLink: "/dashboard/trainers/view",
-      icon: <FaUsers size={"20px"} />,
+      icon: <FaUsers size={"55px"} />,
       createLink: "/dashboard/trainers/create",
+    },
+    {
+      name: "Feedback Management",
+      permission: "manage_feedback",
+      viewLabel: "View Feedback",
+      createLabel: "Create Feedback",
+      viewLink: "/dashboard/feedback/view",
+      icon: <VscFeedback size={"55px"} />,
+      createLink: "/dashboard/feedback/create",
     },
     {
       name: "Feedback Reports",
@@ -138,7 +138,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLabel: "View Feedback Reports",
       createLabel: "Send Feedback Report",
       viewLink: "/dashboard/feedback-reports/view",
-      icon: <SiGoogleforms size={"20px"} />,
+      icon: <SiGoogleforms size={"55px"} />,
       createLink: "/dashboard/feedback-reports/send",
     },
   ];
@@ -179,127 +179,131 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   }
 
   return (
-  <Suspense fallback={<Loading/>}>
-    <div className="flex h-screen bg-background text-foreground">
-      <ToastContainer />
+    <Suspense fallback={<Loading />}>
+      <div className="flex h-screen bg-background text-foreground">
+        <ToastContainer />
 
-      {/* Sidebar for Mobile */}
-      {/* Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
-      >
-        <div className="flex items-center justify-between p-4 bg-red-600">
-          <h2 className="text-lg font-semibold">Dashboard</h2>
-          <button
-            className="text-white focus:outline-none"
+        {/* Sidebar for Mobile */}
+        {/* Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
-          >
-            <FaTimes size={20} />
-          </button>
-        </div>
-        <nav className="p-4">
-          <ul className="space-y-2">
-            {tabs.map((tab) => (
-              user.permissions.includes(tab.permission) && (
-                <li key={tab.name}>
-                  <button
-                    onClick={() => handleTabChange(tab.name, 'view')}
-                    className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''
-                      } transition-colors`}
-                  >
-                    {tab.icon}
-                    <span className="ml-2">{tab.name}</span>
-                  </button>
-                </li>
-              )
-            ))}
-            <li>
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                <FaPowerOff size={20} />
-                <span className="ml-2">Logout</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex flex-col flex-1">
-        {/* Header */}
-        <header className="flex items-center justify-between bg-red-600 text-white p-4 lg:hidden">
-          <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
-          <button
-            className="text-white focus:outline-none"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <FaBars size={24} />
-          </button>
-        </header>
-
-        {/* Top Navigation for Large Screens */}
-        <nav className="hidden lg:flex items-center bg-gray-800 text-white p-4 shadow-lg">
-          <ul className="flex space-x-6">
-            {tabs.map((tab) => (
-              user.permissions.includes(tab.permission) && (
-                <li key={tab.name}>
-                  <button
-                    onClick={() => handleTabChange(tab.name, 'view')}
-                    className={`flex items-center p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''
-                      } transition-colors`}
-                  >
-                    {tab.icon}
-                    <span className="ml-2">{tab.name}</span>
-                  </button>
-                </li>
-              )
-            ))}
-            <li>
-              <button
-                onClick={handleLogout}
-                className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                <FaPowerOff size={20} />
-                <span className="ml-2">Logout</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
-
-        {/* Sub-tabs for View/Create */}
-        {activeTabDetails && (
-          <div className="bg-gray-200 p-4 flex space-x-2">
-            {activeTabDetails.viewLabel && (
-              <button
-                onClick={() => handleTabChange(activeTab, 'view')} // Switch to view mode
-                className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
-              >
-                {activeTabDetails.viewLabel}
-              </button>
-            )}
-            {activeTabDetails.createLabel && (
-              <button
-                onClick={() => handleTabChange(activeTab, 'create')} // Switch to create mode
-                className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
-              >
-                {activeTabDetails.createLabel}
-              </button>
-            )}
-          </div>
+          ></div>
         )}
 
+        {/* Sidebar */}
+        <div
+          className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+        >
+          <div className="flex items-center justify-between p-4 bg-red-600">
+            <h2 className="text-lg font-semibold">Dashboard</h2>
+            <button
+              className="text-white focus:outline-none"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <FaTimes size={20} />
+            </button>
+          </div>
+          <nav className="p-4">
+            <ul className="space-y-2">
+              {tabs.map((tab) => (
+                user.permissions.includes(tab.permission) && (
+                  <li key={tab.name}>
+                    <button
+                      onClick={() => handleTabChange(tab.name, 'view')}
+                      className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''
+                        } transition-colors`}
+                    >
+                      {tab.icon}
+                      <span className="ml-2">{tab.name}</span>
+                    </button>
+                  </li>
+                )
+              ))}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full p-2 rounded hover:bg-gray-700 transition-colors"
+                >
+                  <FaPowerOff size={20} />
+                  <span className="ml-2">Logout</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
         {/* Main Content */}
+        <div className="flex flex-col flex-1">
+          {/* Header */}
+          <header className="flex items-center justify-between bg-red-600 text-white p-4 lg:hidden">
+            <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
+            <button
+              className="text-white focus:outline-none"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <FaBars size={24} />
+            </button>
+          </header>
+
+          {/* Top Navigation for Large Screens */}
+          <nav className="hidden lg:flex justify-between bg-gray-800 text-white p-4 shadow-lg">
+            <ul className="flex w-full items-center justify-between">
+              {tabs.map((tab) => (
+                user.permissions.includes(tab.permission) && (
+                  <li key={tab.name}>
+                    <div className="relative group inline-block">
+                      <button
+                        onClick={() => handleTabChange(tab.name, 'view')} // Navigate to view mode
+                        className={`p-2 rounded ${activeTab === tab.name ? 'bg-gray-600' : 'hover:bg-gray-700'} transition-colors`}
+                      >
+                        {tab.icon}
+                      </button>
+                      <div className="absolute hidden group-hover:block bg-white text-black text-sm rounded px-2 py-1 whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-2">
+                        {tab.name}
+                      </div>
+                    </div>
+                  </li>
+                )
+              ))}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
+                >
+                  <FaPowerOff size={20} />
+                  <span className="ml-2">Logout</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
+
+
+          {/* Sub-tabs for View/Create */}
+          {activeTabDetails && (
+            <div className="bg-gray-200 p-4 flex space-x-2">
+              {activeTabDetails.viewLabel && (
+                <button
+                  onClick={() => handleTabChange(activeTab, 'view')} // Switch to view mode
+                  className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
+                >
+                  {activeTabDetails.viewLabel}
+                </button>
+              )}
+              {activeTabDetails.createLabel && (
+                <button
+                  onClick={() => handleTabChange(activeTab, 'create')} // Switch to create mode
+                  className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
+                >
+                  {activeTabDetails.createLabel}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Main Content */}
           <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
             {currentView === 'view' && (
               <div>
@@ -317,9 +321,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               </div>
             )}
           </main>
-        
+
+        </div>
       </div>
-    </div>
     </Suspense>
   );
 };
