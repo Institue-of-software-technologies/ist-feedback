@@ -19,11 +19,11 @@ const NewPermissionForm: React.FC = () => {
           toast.success("Permission created successfully!", { position: "top-right", autoClose: 3000 });
           // Delay the redirect to allow the toast to display
           setTimeout(() => {
-            router.push('/dashboard/permissions'); // Redirect to the user list
+            router.push('/dashboard/permissions'); // Redirect to the permissions list
           }, 2000);
         } catch (error) {
-          console.error("Failed to create user", error);
-          toast.error("Failed to create user", { position: "top-right", autoClose: 3000 });
+          console.error("Failed to create permissions", error);
+          toast.error("Failed to create permissions", { position: "top-right", autoClose: 3000 });
         }
       };
 
@@ -34,7 +34,7 @@ const NewPermissionForm: React.FC = () => {
   return (
       <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
         <ToastContainer />
-          <h2 className="text-2xl font-bold mb-4">Create New User</h2>
+          <h2 className="text-2xl font-bold mb-4">Create New permissions</h2>
           <Form<FormData>
               Input={inputs} 
               onSubmit={onSubmit} 
