@@ -9,6 +9,7 @@ interface Input {
   value?: string;
   options?: { label: string; value: number }[]; 
 }
+console.log()
 
 interface FormProps<T extends FieldValues> {
   Input: Input[]; 
@@ -42,6 +43,7 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
               </select>
             ) : input.type === "multiple"?(
               <select
+                {...register(input.label as Path<T>, { required: `${input.label} is required` })}
                 multiple={true}
                 data-hs-select={`{
                   "placeholder": "Select multiple options...",
@@ -51,7 +53,7 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
                   "optionTemplate": "<div class='flex justify-between items-center w-full'><span data-title></span><span class='hidden hs-selected:block'><svg class='shrink-0 size-3.5 text-blue-600' xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg></span></div>",
                   "extraMarkup": "<div class='absolute top-1/2 end-3 -translate-y-1/2'><svg class='shrink-0 size-3.5 text-gray-500' xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m7 15 5 5 5-5'/><path d='m7 9 5-5 5 5'/></svg></div>"
                 }`}
-                className="hidden"
+                
               >
                   <option value="">Select {input.label}</option>
                   {input.options?.map((option) => (

@@ -7,7 +7,7 @@ export interface Role {
 
 export interface Permission {
   id: number;
-  permissionName:string;
+  permissionName: string;
 }
 
 export interface Course {
