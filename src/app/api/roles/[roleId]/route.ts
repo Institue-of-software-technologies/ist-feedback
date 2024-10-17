@@ -2,25 +2,44 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Role } from '@/db/models/Role';
+import { RolePermission } from '@/db/models/RolePermissions';
+import { Permission } from '@/db/models/Permission';
 
 interface Context {
   params: { roleId: string };
 }
 
-// GET /api/roles/[roleId] - Fetch a role by ID
+// GET /api/roles/[roleId] - Fetch a role by ID and the permissions 
 export async function GET(req: NextRequest, context: Context) {
   try {
     const { roleId } = context.params;
     const role = await Role.findByPk(roleId);
 
+    const permissions = await RolePermission.findAll({
+      where: {
+        roleId: roleId, 
+      },
+      include: [
+        {
+          model: Permission, 
+          as: "permission", 
+          attributes: ["id", "permissionName"], 
+        },
+      ],
+    });
+
     if (!role) {
-      return NextResponse.json({ message: 'Role not found' }, { status: 404 });
+      return NextResponse.json({ message: "Role not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ role });
+    return NextResponse.json({ role, permissions });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ message: 'Error fetching role', error: errorMessage }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { message: "Error fetching role", error: errorMessage },
+      { status: 500 }
+    );
   }
 }
 
