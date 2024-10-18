@@ -18,6 +18,7 @@ interface FormProps<T extends FieldValues> {
 
 const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Element => {
   const { register, handleSubmit } = useForm<T>();
+  console.log('Current data:', Input);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

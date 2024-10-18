@@ -40,6 +40,14 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Module Management */}
+      {pathname === '/dashboard/modules' && user.permissions.includes('view_courses') && (
+        <div>
+          <h2 className="text-xl font-semibold">Course Management</h2>
+          {/* Course management component goes here */}
+        </div>
+      )}
+
       {/* Create New User */}
       {pathname === '/dashboard/users/create' && user.permissions.includes('create_users') && (
         <div>
