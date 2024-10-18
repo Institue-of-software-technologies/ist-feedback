@@ -8,6 +8,7 @@ import {
 import {
   FaUsers,
   FaGraduationCap,
+  FaWpforms,
   FaUsersCog,
   FaUserLock,
   FaPowerOff,
@@ -77,6 +78,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       viewLink: "/dashboard/courses",
       icon: <FaGraduationCap size={"55px"} />,
       createLink: "/dashboard/courses/create",
+    },
+    {
+      name: "Module Management",
+      permission: "manage_modules",
+      viewLabel: "View Modules",
+      createLabel: "Create Module",
+      viewLink: "/dashboard/modules",
+      icon: <FaWpforms size={"55px"} />,
+      createLink: "/dashboard/modules/create",
     },
     {
       name: "Intake Management",
