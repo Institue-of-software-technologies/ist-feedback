@@ -31,6 +31,7 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
             {input.type === "select" ? (
               <select
                 id={input.label}
+                defaultValue={input.value}
                 {...register(input.label as Path<T>, { required: `${input.label} is required` })}
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
