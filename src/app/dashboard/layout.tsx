@@ -93,7 +93,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       permission: "manage_intakes",
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
-      viewLink: "/dashboard/intakes/view",
+      viewLink: "/dashboard/intakes",
       icon: <FaBookReader size={"55px"} />,
       createLink: "/dashboard/intakes/create",
     },

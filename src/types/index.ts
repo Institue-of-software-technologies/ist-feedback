@@ -23,6 +23,12 @@ export interface Module {
   updatedAt: string;
 }
 
+export interface Intake {
+  id: number;
+  intakeName:string;
+  intakeYear:string;
+}
+
 export interface User {
   id: number;
   username: string;
