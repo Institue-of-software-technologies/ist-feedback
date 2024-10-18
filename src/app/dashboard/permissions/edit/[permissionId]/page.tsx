@@ -38,7 +38,6 @@ const EditPermission = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
-    console.log(data)
     try {
       await api.put(`/permissions/${permissionId}`, data);
       toast.success('permissions updated successfully!', {
@@ -63,7 +62,7 @@ const EditPermission = () => {
 
   const inputs= [
     { label: "permissionName", type: "text",value: permission?.permissionName}
-];
+  ];
 
   return (
     <div className="p-6">

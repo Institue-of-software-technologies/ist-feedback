@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Role } from '@/db/models/Role';
-import { Permission } from '@/db/models/Permission';
 import { RolePermission } from '@/db/models/RolePermissions';
 
 // GET /api/roles - Fetch all roles
@@ -14,22 +13,18 @@ export async function GET() {
   }
 }
 
-// POST /api/roles - Create a new role with the permissions to be assigned
+// POST /api/roles - Create a new role with the role to be assigned
 export async function POST(req: NextRequest) {
   try {
-    const { roleName, Permissions } = await req.json(); 
+    const { roleName, multiSelectField} = await req.json(); 
     const role = await Role.create({ roleName });
-    const permissions = await Permission.findAll({
-      where: {
-        id: Permissions,
-      },
-    });
+    
 
     //insert into the RolePermission table with the needed ids
-    for (const permission of permissions) {
+    for (const permission of multiSelectField) {
       await RolePermission.create({
         roleId: role.id,
-        permissionId: permission.id,
+        permissionId: permission
       });
     }
 
