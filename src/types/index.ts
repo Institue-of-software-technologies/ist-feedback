@@ -15,6 +15,12 @@ export interface Course {
   courseName:string;
 }
 
+export interface Intake {
+  id: number;
+  intakeName:string;
+  intakeYear:string;
+}
+
 export interface User {
   id: number;
   username: string;
