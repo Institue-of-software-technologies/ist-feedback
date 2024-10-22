@@ -26,9 +26,12 @@ import Loading from './loading';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
+  overview: React.ReactNode;
+  reports: React.ReactNode;
+  analytics: React.ReactNode;
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, reports, analytics }) => {
   const { user } = useUser();
   const router = useRouter(); // Router instance for programmatic navigation
   const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
@@ -208,7 +211,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             }`}
         >
           <div className="flex items-center justify-between p-4 bg-red-600">
-            <h2 className="text-lg font-semibold">Dashboard</h2>
+            <h2 className="text-lg font-semibold">Dashboard - Side bar</h2>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(false)}
@@ -249,7 +252,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <div className="flex flex-col flex-1">
           {/* Header */}
           <header className="flex items-center justify-between bg-red-600 text-white p-4 lg:hidden">
-            <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
+            <h1 className="text-2xl font-bold">Welcome to the Dashboard - Top Header</h1>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(true)}
@@ -317,7 +320,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
             {currentView === 'view' && (
               <div>
-                <h2 className="text-xl font-bold">{activeTabDetails?.viewLabel}</h2>
+              
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {overview}
+                  </div>
+                )} 
+
+                {activeTab === 'Dashboard' && (
+              <div>
+                {reports}
+              </div>
+            )}
+
+            {activeTab === 'Dashboard' && (
+              <div>
+                {analytics}
+              </div>
+            )}
                 {/* Render the content for viewing */}
                 {children}
               </div>
