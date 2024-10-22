@@ -31,7 +31,7 @@ const OverviewPage = () => {
                 </h3>
                 <ul className="list-disc list-inside">
                     <li>User John Doe enrolled in Web3 Course</li>
-                    <li>New course "AI for Beginners" added</li>
+                    <li>New course &quot;AI for Beginners &quot; added</li>
                     <li>Feedback report submitted for July intake</li>
                 </ul>
             </div>
