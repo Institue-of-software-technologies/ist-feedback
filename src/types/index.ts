@@ -26,4 +26,9 @@ export interface User {
   role: Role; // Add role object here
 }
 
+export interface FeedbackQuestion {
+  id: number;
+  questionText: string;
+}
+
 
