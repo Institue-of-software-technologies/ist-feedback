@@ -7,7 +7,7 @@ import { Path, useForm, FieldValues, PathValue } from "react-hook-form";
 interface Input {
   label: string;
   type: string;
-  value?: string;
+  value?: string | number;
   defultSelect?: number[];
   options?: { label: string; value: number }[];
 }
@@ -27,7 +27,6 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
     // Set default values for the multi-select if provided
     Input.forEach((input) => {
       if (input.type === "multiple" && input.defultSelect) {
-        console.log(input.defultSelect);
         setSelectedValue(input.defultSelect);
         setValue(input.label as Path<T>, input.defultSelect as unknown as PathValue<T, Path<T>>);
       }
@@ -49,19 +48,22 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
             </label>
 
             {input.type === "select" ? (
-              <select
-                id={input.label}
-                defaultValue={input.value}
-                {...register(input.label as Path<T>, { required: `${input.label} is required` })}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="">Select {input.label}</option>
-                {input.options?.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+               <select
+               id={input.label}
+               defaultValue={input.value} 
+               {...register(input.label as Path<T>, { required: `${input.label} is required` })}
+               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+             >
+               <option value=""> 
+               {input.value?` 
+  ${input.value}`:`select  
+  ${input.label}`}</option>
+               {input.options?.map((option) => (
+                 <option key={option.value} value={option.value}>
+                   {option.label}
+                 </option>
+               ))}
+             </select> 
             ) : input.type === "multiple" ? (
               <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
                 <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">

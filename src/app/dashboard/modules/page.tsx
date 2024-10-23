@@ -78,7 +78,7 @@ const ModuleManagement: React.FC = () => {
 
   const columns = [
     { header: 'Module Name', accessor: 'moduleName' },
-    { header: 'Course ID', accessor: 'courseId' },
+    { header: 'Course ID', accessor: 'course.courseName' },
   ];
 
   return (

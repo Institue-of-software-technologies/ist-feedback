@@ -1,3 +1,4 @@
+import { Course } from '@/db/models/Course';
 import { Module } from '@/db/models/Module';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -9,7 +10,18 @@ interface Context {
 export async function GET(req: NextRequest, context: Context) {
   try {
     const { moduleId } = context.params;
-    const courseModule = await Module.findByPk(moduleId);
+    const courseModule = await Module.findOne({
+      where: {
+        id: moduleId, 
+      },
+      include: [
+          {
+            model: Course, 
+            as: "course", 
+            attributes: ["id", "courseName"], 
+          },
+        ],
+    });
 
     if (!courseModule) {
       return NextResponse.json({ message: 'Module not found' }, { status: 404 });
@@ -26,7 +38,7 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { moduleId } = context.params;
-    const { moduleName } = await req.json();
+    const { moduleName,course } = await req.json();
 
     const courseModule = await Module.findByPk(moduleId);
 
@@ -35,6 +47,7 @@ export async function PUT(req: NextRequest, context: Context) {
     }
 
     courseModule.moduleName = moduleName;
+    courseModule.courseId = course;
     await courseModule.save();
 
     return NextResponse.json({ message: 'Module updated successfully', courseModule });

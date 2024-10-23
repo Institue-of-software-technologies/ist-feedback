@@ -1,19 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios"; // Adjust the path as needed
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { Course } from "@/types";
 
 interface FormData {
   moduleName: string;
-  courseId: number;
+  courseName: string;
 }
 
 const NewModuleForm: React.FC = () => {
     const router = useRouter();
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    useEffect(() => {
+      const fetchPermissions = async () => {
+        try {
+          const response = await api.get(`/courses`);
+          setCourses(response.data.course);
+          setLoading(false);
+        } catch (err) {
+          console.log(err)
+        };
+      }
+      fetchPermissions()
+    }, []);
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -29,11 +44,20 @@ const NewModuleForm: React.FC = () => {
           toast.error("Failed to create module", { position: "top-right", autoClose: 3000 });
         }
     };
+    if (loading) return <div>Loading...</div>;
 
     const inputs = [
       { label: "moduleName", type: "text" },
-      { label: "courseId", type: "number" } // Assuming you link the module to a course
+      {
+        label: "course",
+        type: "select", // Assuming your Form component supports this type correctly.
+        options: courses.map((course) => ({
+          label: course.courseName,
+          value: course.id,
+        })),
+      }, // Assuming you link the module to a course
     ];
+    
 
     return (
       <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
