@@ -4,6 +4,7 @@ import sequelize from "../db_connection";
 export class Intake extends Model {
   id!: number;
   intakeName!: string;
+  intakeYear!: string;
 }
 
 Intake.init({
@@ -16,6 +17,10 @@ Intake.init({
   intakeName: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  intakeYear: {
+    type: DataTypes.STRING,
+    allowNull:false,
   },
 }, {
   sequelize,

@@ -6,7 +6,6 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { UserProvider } from '@/context/UserContext';
 import { usePathname } from 'next/navigation'; // Get the current pathname
-import PrelineScript from "@/components/PrelineScript";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,6 +30,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname(); // Determine the current path
   const isDashboard = pathname?.startsWith('/dashboard'); // Check if the path is the dashboard
+  
 
   return (
     <html lang="en">
@@ -38,19 +38,18 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           {/* Render Header only if not on the dashboard */}
           {!isDashboard && <Header />}
-          
+
           <main className="flex-grow">
             <UserProvider>
               {children}
             </UserProvider>
           </main>
-          
+
           {/* Render Footer on both the home and dashboard */}
           <Footer />
         </div>
       </body>
-      <PrelineScript />
     </html>
-    
+
   );
 }
