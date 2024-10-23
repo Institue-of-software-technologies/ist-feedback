@@ -1,9 +1,11 @@
+import { Feedback } from "@/db/models/Feedback";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
     // Your logic to handle the request
-    return NextResponse.json({ message: "Feedback retrieved successfully" });
+    const feedback = await Feedback.findAll();
+    return NextResponse.json({ feedback });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to retrieve feedback" },
