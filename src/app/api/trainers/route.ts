@@ -1,41 +1,44 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import { Trainer } from '@/db/models/Trainer';
+import { Course } from '@/db/models/Course';
 
+// GET /api/trainer - Fetch all roles
 export async function GET() {
   try {
-    // Logic to retrieve trainers, for example, fetching from a database
-    const trainers = [
-      { id: 1, name: "John Doe", expertise: "JavaScript" },
-      { id: 2, name: "Jane Smith", expertise: "React" },
-    ];
-
-    // Return the list of trainers as a JSON response
-    return NextResponse.json(trainers);
+    const trainer = await Trainer.findAll({
+      include: [
+        {
+          model: Course,
+          as: 'course',
+          attributes: ['id', 'courseName'],
+        },
+      ],
+    });
+    return NextResponse.json({ trainer });
   } catch (error) {
-    // Return an error response if something goes wrong
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: "Failed to retrieve trainers" },
+      { message: 'Error fetching trainer', error: errorMessage },
       { status: 500 }
     );
   }
 }
 
-export async function POST(request: Request) {
+// POST /api/trainer - Create a new trainer
+export async function POST(req: NextRequest) {
   try {
-    const data = await request.json();
-
-    // Logic to add a new trainer, e.g., save to a database
-    const newTrainer = {
-      id: 3, // This should come from the database or generated dynamically
-      name: data.name,
-      expertise: data.expertise,
-    };
-
-    // Return the newly created trainer as a JSON response
-    return NextResponse.json(newTrainer, { status: 201 });
-  } catch (error) {
-    // Return an error response if something goes wrong
+    const { trainerName,courseId  } = await req.json();
+    const trainer = await Trainer.create({ trainerName,courseId });
     return NextResponse.json(
-      { error: "Failed to add trainer" },
+      { message: 'Trainer created successfully', trainer },
+      { status: 201 }
+    );
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json(
+      { message: 'Error creating trainer', error: errorMessage },
       { status: 500 }
     );
   }

@@ -14,7 +14,7 @@ Trainer.init({
     primaryKey: true,
     allowNull: false,
   },
-  name: {
+  trainerName: {
     type: DataTypes.STRING,
     allowNull: false,
   },

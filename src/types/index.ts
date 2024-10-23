@@ -40,4 +40,9 @@ export interface User {
   role: Role; // Add role object here
 }
 
+export interface Trainer {
+  id: number;
+  trainerName: string;
+  courseId: number;
+}
 
