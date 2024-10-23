@@ -4,6 +4,7 @@ import sequelize from "../db_connection";
 export class FeedbackQuestion extends Model {
   id!: number;
   questionText!: string;
+  questionType!: 'open-ended' | 'closed-ended' | 'rating';
 }
 
 FeedbackQuestion.init({
@@ -16,6 +17,11 @@ FeedbackQuestion.init({
   questionText: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  questionType: {
+    type: DataTypes.ENUM('open-ended', 'closed-ended', 'rating'),
+    allowNull: false,
+    defaultValue: 'open-ended',
   },
 }, {
   sequelize,

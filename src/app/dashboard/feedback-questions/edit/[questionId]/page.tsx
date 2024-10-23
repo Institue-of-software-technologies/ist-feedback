@@ -5,11 +5,12 @@ import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Form from '@/components/Forms';
+import Form, { Input } from '@/components/Forms';
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
 
 interface FormData {
-  permissionName: string;
+  questionText: string;
+  questionType: 'open-ended' | 'closed-ended' | 'rating';
 }
 
 const EditQuestion = () => {
@@ -22,7 +23,7 @@ const EditQuestion = () => {
   // Fetch feedback question data on mount
   useEffect(() => {
     if (questionId) {
-      const fetchUser = async () => {
+      const fetchQuestion = async () => {
         try {
           const response = await api.get(`/feedback-questions/${questionId}`);
           setQuestion(response.data.question);
@@ -32,7 +33,7 @@ const EditQuestion = () => {
           setLoading(false);
         }
       };
-      fetchUser();
+      fetchQuestion();
     }
   }, [questionId]);
 
@@ -61,9 +62,25 @@ const EditQuestion = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
-  const inputs= [
-    { label: "questionText", type: "text",value: question?.questionText}
-];
+  const inputs: Input[] = [
+    { 
+      label: "questionText", 
+      type: "text", 
+      value: question?.questionText,
+      name: "questionText"
+    },
+    { 
+      label: "questionType", 
+      type: "select", 
+      value: question?.questionType,
+      name: "questionType",
+      options: [
+        { label: "Open Ended", value: "open-ended" }, 
+        { label: "Closed Ended", value: "closed-ended" }, 
+        { label: "Rating", value: "rating" }
+      ] 
+    }
+  ];   
 
   return (
     <div className="p-6">

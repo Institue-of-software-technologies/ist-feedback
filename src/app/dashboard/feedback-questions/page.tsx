@@ -9,7 +9,6 @@ import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 
-
 const FeedbackQuestions: React.FC = () => {
   const { user } = useUser();
   const [questions, setQuestions] = useState<FeedbackQuestion[]>([]);
@@ -26,8 +25,8 @@ const FeedbackQuestions: React.FC = () => {
           method: 'GET',
         });
         console.log(response);
-        setQuestions(response.data.question);
-        setFilteredquestion(response.data.question);
+        setQuestions(response.data.questions);
+        setFilteredquestion(response.data.questions);
       } catch (err) {
         toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
       } finally {
@@ -61,7 +60,7 @@ const FeedbackQuestions: React.FC = () => {
       setFilteredquestion(questions);  // Show all if search is empty
     } else {
       const filtered = questions.filter(question =>
-        question.questionText.toLowerCase().includes(value.toLowerCase())
+        question.questionText.toLowerCase().includes(value.toLowerCase()) || question.questionType.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredquestion(filtered);
     }
@@ -78,7 +77,8 @@ const FeedbackQuestions: React.FC = () => {
   }
 
   const columns = [
-    { header: 'questionText', accessor: 'questionText' }
+    { header: 'questionText', accessor: 'questionText' },
+    { header: 'questionType', accessor: 'questionType'}
   ];
 
   return (

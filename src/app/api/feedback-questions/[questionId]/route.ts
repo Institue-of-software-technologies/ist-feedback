@@ -26,7 +26,16 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
-    const { questionText } = await req.json();
+    const { questionText, questionType } = await req.json();
+
+    // Validate questionType if provided
+    const validTypes = ['open-ended', 'closed-ended', 'rating'];
+    if (questionType && !validTypes.includes(questionType)) {
+      return NextResponse.json(
+        { message: 'Invalid questionType. Must be one of: open-ended, closed-ended, or rating.' },
+        { status: 400 }
+      );
+    }
 
     const question = await FeedbackQuestion.findByPk(questionId);
 
@@ -34,7 +43,8 @@ export async function PUT(req: NextRequest, context: Context) {
       return NextResponse.json({ message: 'Feedback question not found' }, { status: 404 });
     }
 
-    question.questionText = questionText;
+    question.questionText = questionText ?? question.questionText;
+    question.questionType = questionType ?? question.questionType;
     await question.save();
 
     return NextResponse.json({ message: 'Feedback question updated successfully', question });

@@ -29,6 +29,7 @@ export interface User {
 export interface FeedbackQuestion {
   id: number;
   questionText: string;
+  questionType: 'open-ended' | 'closed-ended' | 'rating';
 }
 
 
