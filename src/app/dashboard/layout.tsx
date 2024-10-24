@@ -102,7 +102,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       permission: "manage_class_time",
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
-      viewLink: "/dashboard/class-times/view",
+      viewLink: "/dashboard/class-times",
       icon: <PiChalkboardTeacherFill size={"55px"} />,
       createLink: "/dashboard/class-times/create",
     },
