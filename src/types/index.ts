@@ -23,6 +23,13 @@ export interface Module {
   updatedAt: string;
 }
 
+export interface ClassTime{
+  id: number;
+  classTime:string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Intake {
   id: number;
   intakeName:string;
