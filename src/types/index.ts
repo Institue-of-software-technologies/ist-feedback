@@ -32,4 +32,9 @@ export interface FeedbackQuestion {
   questionType: 'open-ended' | 'closed-ended' | 'rating';
 }
 
+export interface AnswerOptions {
+  id: number;
+  optionText: string;
+}
+
 

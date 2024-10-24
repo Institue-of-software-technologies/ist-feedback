@@ -5,7 +5,7 @@ import { Path, useForm, FieldValues } from "react-hook-form";
 
 export interface Input {
   label: string;
-  type: "text" | "select" | "multiple";
+  type: "text" | "select" | "multiple" | "hidden";
   value?: string;
   name: string;
   options?: { label: string; value: string }[]; 

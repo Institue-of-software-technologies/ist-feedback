@@ -1,4 +1,5 @@
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
+import { AnswerOption } from '@/db/models/AnswerOption';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET /api/feedback-questions - Fetch all Feedback Questions
@@ -12,10 +13,10 @@ export async function GET() {
   }
 }
 
-// POST /api/feedback-questions - Create a new Feedback Question
+// POST /api/feedback-questions - Create a new Feedback Question with options (if closed-ended)
 export async function POST(req: NextRequest) {
   try {
-    const { questionText, questionType } = await req.json();
+    const { questionText, questionType, options } = await req.json();
 
     // Validate the questionType to ensure it's one of the valid options
     const validTypes = ['open-ended', 'closed-ended', 'rating'];
@@ -30,6 +31,16 @@ export async function POST(req: NextRequest) {
       questionText,
       questionType,
     });
+
+    // If the question type is 'closed-ended', handle answer options
+    if (questionType === 'closed-ended' && Array.isArray(options) && options.length > 0) {
+      const answerOptions = options.map((optionText: string) => ({
+        optionText,
+        feedbackQuestionId: question.id,
+      }));
+
+      await AnswerOption.bulkCreate(answerOptions);
+    }
 
     return NextResponse.json(
       { message: 'Feedback Question created successfully', question },
