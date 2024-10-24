@@ -28,8 +28,8 @@ export async function GET() {
 // POST /api/trainer - Create a new trainer
 export async function POST(req: NextRequest) {
   try {
-    const { trainerName,courseId  } = await req.json();
-    const trainer = await Trainer.create({ trainerName,courseId });
+    const { trainerName,course  } = await req.json();
+    const trainer = await Trainer.create({ trainerName:trainerName, courseId:course });
     return NextResponse.json(
       { message: 'Trainer created successfully', trainer },
       { status: 201 }

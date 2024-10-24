@@ -1,15 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Trainer } from '@/db/models/Trainer';
+import { Course } from '@/db/models/Course';
 
 interface Context {
-  params: { id: number };
+  params: { trainerId: number };
 }
 
-// GET /api/trainers/[trainerId] - Fetch a trainer by ID
-export async function GET(req: NextRequest, context: Context) {
+// GET: Fetch user by ID
+export async function GET(req: Request, context: Context) {
   try {
-    const { id } = context.params;
-    const trainer = await Trainer.findByPk(id);
+    const { trainerId } = context.params;
+    const trainer = await Trainer.findOne({
+      where: { id: trainerId },
+      include: [
+        {
+          model: Course,
+          as: 'course',
+          attributes: ['id', 'courseName'],
+        },
+      ],
+    });
+    if (trainer) {
+      return NextResponse.json(trainer, { status: 200 });
+    } else {
+      return NextResponse.json(
+        { message: 'Trainer not found - *' },
+        { status: 404 }
+      );
+    }
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Error fetching Trainer', error },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: NextRequest, context: Context) {
+  try {
+    const { trainerId } = context.params;
+    const { trainerName, course } = await req.json();
+
+    const trainer = await Trainer.findByPk(trainerId);
 
     if (!trainer) {
       return NextResponse.json(
@@ -18,30 +50,16 @@ export async function GET(req: NextRequest, context: Context) {
       );
     }
 
-    return NextResponse.json({ trainer });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      { message: 'Error fetching trainer', error: errorMessage },
-      { status: 500 }
-    );
-  }
-}
-
-// PUT /api/trainers/[trainerId] - Update a trainer by ID
-export async function PUT(req: NextRequest, context: Context) {
-  try {
-    const { id } = context.params;
-    const { name } = await req.json();
-
-    const trainer = await Trainer.findByPk(id);
-
-    if (!trainer) {
-      return NextResponse.json({ message: 'Trainer not found' }, { status: 404 });
+    // Only update the trainerName if provided
+    if (trainerName) {
+      trainer.trainerName = trainerName;
     }
 
-    trainer.name = name;
+    // Only update the course if provided
+    if (course) {
+      trainer.courseId = course;
+    }
+
     await trainer.save();
 
     return NextResponse.json({
@@ -52,17 +70,17 @@ export async function PUT(req: NextRequest, context: Context) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { message: 'Error updating trainer', error: errorMessage },
+      { message: 'Error updating Trainer', error: errorMessage },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/trainers/[trainerId] - Delete a trainer by ID
+// DELETE: Delete user by ID
 export async function DELETE(req: NextRequest, context: Context) {
   try {
-    const { id } = context.params;
-    const trainer = await Trainer.findByPk(id);
+    const { trainerId } = context.params;
+    const trainer = await Trainer.findByPk(trainerId);
 
     if (!trainer) {
       return NextResponse.json(

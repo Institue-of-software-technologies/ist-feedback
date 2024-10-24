@@ -12,7 +12,7 @@ export interface Permission {
 
 export interface Course {
   id: number;
-  courseName:string;
+  courseName: string;
 }
 
 export interface Module {
@@ -25,8 +25,8 @@ export interface Module {
 
 export interface Intake {
   id: number;
-  intakeName:string;
-  intakeYear:string;
+  intakeName: string;
+  intakeYear: string;
 }
 
 export interface User {
@@ -43,6 +43,9 @@ export interface User {
 export interface Trainer {
   id: number;
   trainerName: string;
-  courseId: number;
+  courseId: string;
+  course: {
+    id: number;
+    courseName: string;
+  };
 }
-

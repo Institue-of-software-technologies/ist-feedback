@@ -1,10 +1,13 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from "../db_connection";
+import { Course } from './Course';
 
 export class Trainer extends Model {
   id!: number;
-  name!: string;
+  trainerName!: string;
   courseId!: number;
+
+  courses?: Course;
 }
 
 Trainer.init({
@@ -33,3 +36,5 @@ Trainer.init({
   tableName: 'Trainers',
   timestamps: true,
 });
+// Define associations between RolePermission and Permission, Role
+Trainer.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });

@@ -13,31 +13,31 @@ const TrainerManagement: React.FC = () => {
   const { user } = useUser();
   const [trainer, setTrainer] = useState<Trainer[]>([]);
   const [loading, setLoading] = useState<boolean>(true); 
-  const [filteredTrainer, setFilteredTrainer] = useState<Trainer[]>(
-    []
-  ); 
+  const [filteredTrainer, setFilteredTrainer] = useState<Trainer[]>([]); 
   const [search, setSearch] = useState<string>('');
   const router = useRouter();
 
   // Fetch users from your API
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchTrainers = async () => {
       try {
         const response = await api.get('/trainers', {
           method: 'GET',
         });
-        console.log(response);
-        setTrainer(response.data)
-        toast.error('Failed to fetch trainer', {
+          setTrainer(response.data.trainer);
+          setFilteredTrainer(response.data.trainer);
+      } catch (err) {
+         toast.error('Failed to fetch trainer', {
           position: 'top-right',
           autoClose: 3000,
         });
-      } finally {
+      }
+      finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchTrainers();
   }, []);
 
   // Handle user deletion
@@ -95,23 +95,23 @@ const TrainerManagement: React.FC = () => {
 
   const columns = [
     { header: 'trainerName', accessor: 'trainerName' },
-    // { header: '', accessor: 'trainerName' }
+    { header: 'Course', accessor: 'course.courseName' },
   ];
 
   return (
     <div>
-      <ToastContainer /> 
+      <ToastContainer />
       <Table<Trainer>
         columns={columns}
         data={filteredTrainer}
         onSearch={handleSearch}
         onEdit={
-          user && user.trainers.includes('update_trainers')
+          user && user.permissions.includes('update_trainers')
             ? handleEdit
             : undefined
         }
         onDelete={
-          user && user.trainers.includes('delete_trainers')
+          user && user.permissions.includes('delete_trainers')
             ? handleDelete
             : undefined
         }

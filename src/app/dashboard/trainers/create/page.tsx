@@ -10,7 +10,7 @@ import { Course } from '@/types';
 
 interface FormData {
   trainerName: string;
-  courses: string[];
+  courseName: string;
 }
 
 const NewTrainerForm: React.FC = () => {
@@ -54,7 +54,7 @@ const NewTrainerForm: React.FC = () => {
   const inputs = [
     { label: 'trainerName', type: 'text' },
     {
-      label: 'courseId',
+      label: 'course',
       type: 'select',
       options: courses.map((course) => ({
         label: course.courseName,

@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import api from '../../../../../../lib/axios'; 
-import { Trainer } from '@/types'; 
+import api from '../../../../../../lib/axios';
+import { Course, Trainer } from '@/types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 
 interface FormData {
   trainerName: string;
-  courseId: number;
+  courseId: string;
 }
 
 const EditTrainer = () => {
@@ -19,23 +19,36 @@ const EditTrainer = () => {
   const [trainer, setTrainer] = useState<Trainer | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [courses, setCourses] = useState<Course[]>([]);
   // Fetch user data on mount
   useEffect(() => {
     if (trainerId) {
-      const fetchUser = async () => {
+      const fetchTrainer = async () => {
         try {
           const response = await api.get(`/trainers/${trainerId}`);
-          setTrainer(response.data.trainer);
+          setTrainer(response.data);
         } catch (err) {
           setError('Failed to fetch trainer');
         } finally {
           setLoading(false);
         }
       };
-      fetchUser();
+      fetchTrainer();
     }
   }, [trainerId]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get(`/courses`);
+        setCourses(response.data.course);
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
@@ -44,7 +57,7 @@ const EditTrainer = () => {
       await api.put(`/trainers/${trainerId}`, data);
       toast.success('Trainer updated successfully!', {
         position: 'top-right',
-        autoClose: 2000, 
+        autoClose: 2000,
       });
 
       setTimeout(() => {
@@ -53,7 +66,7 @@ const EditTrainer = () => {
     } catch (err) {
       toast.error('Failed to update trainer', {
         position: 'top-right',
-        autoClose: 3000, 
+        autoClose: 3000,
       });
     }
   };
@@ -63,23 +76,26 @@ const EditTrainer = () => {
 
   const inputs = [
     {
-      label: 'Trainer Name',
+      label: 'trainerName',
       type: 'text',
-      value: String(trainer?.trainerName),
+      value: trainer?.trainerName,
     },
     {
-      label: 'Course Id',
-      type: 'number',
-      value: String(trainer?.courseId),
-    }
+      label: 'course',
+      type: 'select',
+      value: trainer?.course?.courseName,
+      options: courses.map((course) => ({
+        label: course.courseName,
+        value: course.id,
+      })),
+    },
   ];
 
   return (
     <div className='p-6'>
       <ToastContainer />{' '}
       <h3 className='text-2xl font-bold mb-4'>Edit Trainer</h3>
-      <Form<FormData>
-        Input={inputs} onSubmit={handleSubmit} />
+      <Form<FormData> Input={inputs} onSubmit={handleSubmit} />
     </div>
   );
 };
