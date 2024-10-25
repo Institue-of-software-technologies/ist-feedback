@@ -47,9 +47,14 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { roleId } = context.params;
-    const { roleName } = await req.json();
+    const { roleName,multiSelectField } = await req.json();
 
     const role = await Role.findByPk(roleId);
+    await RolePermission.destroy({
+      where: {
+        roleId: roleId
+      }
+    });
 
     if (!role) {
       return NextResponse.json({ message: 'Role not found' }, { status: 404 });
@@ -57,6 +62,13 @@ export async function PUT(req: NextRequest, context: Context) {
 
     role.roleName = roleName;
     await role.save();
+
+    for (const permission of multiSelectField) {
+      await RolePermission.create({
+        roleId: role.id,
+        permissionId: permission
+      });
+    }
 
     return NextResponse.json({ message: 'Role updated successfully', role });
   } catch (error) {
@@ -76,6 +88,11 @@ export async function DELETE(req: NextRequest, context: Context) {
     }
 
     await role.destroy();
+    await RolePermission.destroy({
+      where: {
+        roleId: roleId
+      }
+    });
 
     return NextResponse.json({ message: 'Role deleted successfully' });
   } catch (error) {
