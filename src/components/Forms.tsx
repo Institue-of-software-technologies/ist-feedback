@@ -9,7 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 export interface Input {
   label: string;
   type: string;
-  value?: string | number;
+  value?: string;
   defultSelect?: number[];
   options?: { label: string; value: number }[];
 }
@@ -25,7 +25,7 @@ interface CustomInputProps {
 const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Element => {
 
   const { register, handleSubmit, setValue } = useForm<T>();
-  
+
   // State to track the selected options in the multi-select Listbox
   const [SelectedValue, setSelectedValue] = useState<number[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -85,22 +85,22 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
             </label>
 
             {input.type === "select" ? (
-               <select
-               id={input.label}
-               defaultValue={input.value} 
-               {...register(input.label as Path<T>, { required: `${input.label} is required` })}
-               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-             >
-               <option value=""> 
-               {input.value?` 
-  ${input.value}`:`select  
+              <select
+                id={input.label}
+                defaultValue={input.value}
+                {...register(input.label as Path<T>, { required: `${input.label} is required` })}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="">
+                  {input.value ? ` 
+  ${input.value}` : `select  
   ${input.label}`}</option>
-               {input.options?.map((option) => (
-                 <option key={option.value} value={option.value}>
-                   {option.label}
-                 </option>
-               ))}
-             </select> 
+                {input.options?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             ) : input.type === "multiple" ? (
               <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
                 <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">
@@ -126,8 +126,8 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
               <DatePicker
                 selected={
                   selectedDate || new Date(input.value ? input.value.replace(' ', 'T') : new Date())
-                } 
-                onChange={(date) => handleDateChange(date)} 
+                }
+                onChange={(date) => handleDateChange(date)}
                 customInput={<CustomInput />}
                 showTimeSelect
                 dateFormat="MMMM d, yyyy h:mm aa"
