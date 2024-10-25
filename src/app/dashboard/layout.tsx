@@ -26,9 +26,12 @@ import Loading from './loading';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
+  overview: React.ReactNode;
+  reports: React.ReactNode;
+  analytics: React.ReactNode;
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, reports, analytics }) => {
   const { user } = useUser();
   const router = useRouter(); // Router instance for programmatic navigation
   const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
@@ -55,29 +58,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   // Main tabs data with view/create links
   const tabs = [
     {
-      name: "Dashboard",
-      permission: "view_dashboard", // A common permission for all users
-      viewLabel: "Dashboard",
-      icon: <RiDashboard2Fill size={"55px"} />,
-      viewLink: "/dashboard",
+      name: 'Dashboard',
+      permission: 'view_dashboard', // A common permission for all users
+      viewLabel: 'Dashboard',
+      icon: <RiDashboard2Fill size={'55px'} />,
+      viewLink: '/dashboard',
     },
     {
-      name: "User Management",
-      permission: "manage_users",
-      viewLabel: "View Users",
-      createLabel: "Create User",
-      viewLink: "/dashboard/users",
-      icon: <FaUsers size={"55px"} />,
-      createLink: "/dashboard/users/create",
+      name: 'User Management',
+      permission: 'manage_users',
+      viewLabel: 'View Users',
+      createLabel: 'Create User',
+      viewLink: '/dashboard/users',
+      icon: <FaUsers size={'55px'} />,
+      createLink: '/dashboard/users/create',
     },
     {
-      name: "Course Management",
-      permission: "manage_courses",
-      viewLabel: "View Courses",
-      createLabel: "Create Course",
-      viewLink: "/dashboard/courses",
-      icon: <FaGraduationCap size={"55px"} />,
-      createLink: "/dashboard/courses/create",
+      name: 'Course Management',
+      permission: 'manage_courses',
+      viewLabel: 'View Courses',
+      createLabel: 'Create Course',
+      viewLink: '/dashboard/courses',
+      icon: <FaGraduationCap size={'55px'} />,
+      createLink: '/dashboard/courses/create',
     },
     {
       name: "Module Management",
@@ -107,49 +110,49 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       createLink: "/dashboard/class-times/create",
     },
     {
-      name: "Role Management",
-      permission: "manage_roles",
-      viewLabel: "View Roles",
-      createLabel: "Create Role",
-      viewLink: "/dashboard/roles",
-      icon: <FaUsersCog size={"55px"} />,
-      createLink: "/dashboard/roles/create",
+      name: 'Role Management',
+      permission: 'manage_roles',
+      viewLabel: 'View Roles',
+      createLabel: 'Create Role',
+      viewLink: '/dashboard/roles',
+      icon: <FaUsersCog size={'55px'} />,
+      createLink: '/dashboard/roles/create',
     },
     {
-      name: "Permission Management",
-      permission: "manage_permissions",
-      viewLabel: "View Permissions",
-      createLabel: "Create Permission",
-      viewLink: "/dashboard/permissions",
-      icon: <FaUserLock size={"55px"} />,
-      createLink: "/dashboard/permissions/create",
+      name: 'Permission Management',
+      permission: 'manage_permissions',
+      viewLabel: 'View Permissions',
+      createLabel: 'Create Permission',
+      viewLink: '/dashboard/permissions',
+      icon: <FaUserLock size={'55px'} />,
+      createLink: '/dashboard/permissions/create',
     },
     {
-      name: "Trainer Management",
-      permission: "manage_trainers",
-      viewLabel: "View Trainers",
-      createLabel: "Create Trainer",
-      viewLink: "/dashboard/trainers/view",
-      icon: <FaUsers size={"55px"} />,
-      createLink: "/dashboard/trainers/create",
+      name: 'Trainer Management',
+      permission: 'manage_trainers',
+      viewLabel: 'View Trainers',
+      createLabel: 'Create Trainer',
+      viewLink: '/dashboard/trainers',
+      icon: <FaUsers size={'55px'} />,
+      createLink: '/dashboard/trainers/create',
     },
     {
-      name: "Feedback Management",
-      permission: "manage_feedback",
-      viewLabel: "View Feedback",
-      createLabel: "Create Feedback",
-      viewLink: "/dashboard/feedback/view",
-      icon: <VscFeedback size={"55px"} />,
-      createLink: "/dashboard/feedback/create",
+      name: 'Feedback Management',
+      permission: 'manage_feedback',
+      viewLabel: 'View Feedback',
+      createLabel: 'Create Feedback',
+      viewLink: '/dashboard/feedback/view',
+      icon: <VscFeedback size={'55px'} />,
+      createLink: '/dashboard/feedback/create',
     },
     {
-      name: "Feedback Reports",
-      permission: "send_feedback_reports",
-      viewLabel: "View Feedback Reports",
-      createLabel: "Send Feedback Report",
-      viewLink: "/dashboard/feedback-reports/view",
-      icon: <SiGoogleforms size={"55px"} />,
-      createLink: "/dashboard/feedback-reports/send",
+      name: 'Feedback Reports',
+      permission: 'send_feedback_reports',
+      viewLabel: 'View Feedback Reports',
+      createLabel: 'Send Feedback Report',
+      viewLink: '/dashboard/feedback-reports/view',
+      icon: <SiGoogleforms size={'55px'} />,
+      createLink: '/dashboard/feedback-reports/send',
     },
   ];
 
@@ -208,7 +211,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             }`}
         >
           <div className="flex items-center justify-between p-4 bg-red-600">
-            <h2 className="text-lg font-semibold">Dashboard</h2>
+            <h2 className="text-lg font-semibold">Dashboard - Side bar</h2>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(false)}
@@ -249,7 +252,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <div className="flex flex-col flex-1">
           {/* Header */}
           <header className="flex items-center justify-between bg-red-600 text-white p-4 lg:hidden">
-            <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
+            <h1 className="text-2xl font-bold">Welcome to the Dashboard - Top Header</h1>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(true)}
@@ -317,7 +320,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
             {currentView === 'view' && (
               <div>
-                <h2 className="text-xl font-bold">{activeTabDetails?.viewLabel}</h2>
+              
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {overview}
+                  </div>
+                )} 
+
+                {activeTab === 'Dashboard' && (
+              <div>
+                {reports}
+              </div>
+            )}
+
+            {activeTab === 'Dashboard' && (
+              <div>
+                {analytics}
+              </div>
+            )}
                 {/* Render the content for viewing */}
                 {children}
               </div>

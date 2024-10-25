@@ -6,6 +6,8 @@ export class Module extends Model {
   id!: number;
   moduleName!: string;
   courseId!: number;
+
+  course?: Course;
 }
 
 Module.init({
@@ -35,3 +37,5 @@ Module.init({
   tableName: 'Modules',
   timestamps: true,
 });
+
+Module.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });

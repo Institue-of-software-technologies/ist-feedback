@@ -15,8 +15,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
-
+      
       {/* Admin User Management */}
       {pathname === '/dashboard/users' && user.permissions.includes('view_users') && (
         <>
@@ -89,7 +88,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Trainer Management */}
-      {pathname === '/dashboard/trainers/view' && user.permissions.includes('view_trainers') && (
+      {pathname === '/dashboard/trainers' && user.permissions.includes('view_trainers') && (
         <div>
           <h2 className="text-xl font-semibold">Trainer Management</h2>
           {/* Trainer management component goes here */}
