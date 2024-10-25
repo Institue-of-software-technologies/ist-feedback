@@ -37,7 +37,6 @@ AnswerOption.init({
 
 FeedbackQuestion.hasMany(AnswerOption, {
   foreignKey: 'feedbackQuestionId',
-  as: 'options',
 });
 
 AnswerOption.belongsTo(FeedbackQuestion, {

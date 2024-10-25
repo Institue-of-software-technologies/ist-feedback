@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 interface FormData {
   questionText?: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating' | null;
-  options?: string[]; // For closed-ended options
+  options?: string[];
 }
 
 const FeedbackQuestionCreate: React.FC = () => {

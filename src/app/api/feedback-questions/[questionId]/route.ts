@@ -1,4 +1,5 @@
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
+import { AnswerOption } from '@/db/models/AnswerOption';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface Context {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
-    const { questionText, questionType } = await req.json();
+    const { questionText, questionType, options } = await req.json();
 
     // Validate questionType if provided
     const validTypes = ['open-ended', 'closed-ended', 'rating'];
@@ -37,7 +38,10 @@ export async function PUT(req: NextRequest, context: Context) {
       );
     }
 
-    const question = await FeedbackQuestion.findByPk(questionId);
+    // Find the question and include associated answer options
+    const question = await FeedbackQuestion.findByPk(questionId, {
+      include: AnswerOption,
+    });
 
     if (!question) {
       return NextResponse.json({ message: 'Feedback question not found' }, { status: 404 });
@@ -45,6 +49,19 @@ export async function PUT(req: NextRequest, context: Context) {
 
     question.questionText = questionText ?? question.questionText;
     question.questionType = questionType ?? question.questionType;
+
+    // If it's a closed-ended question, update the answer options
+    if (questionType === 'closed-ended' && Array.isArray(options)) {
+      await AnswerOption.destroy({ where: { feedbackQuestionId: questionId } });
+
+      const newOptions = options.map((optionText: string) => ({
+        optionText,
+        feedbackQuestionId: question.id,
+      }));
+
+      await AnswerOption.bulkCreate(newOptions);
+    }
+
     await question.save();
 
     return NextResponse.json({ message: 'Feedback question updated successfully', question });
