@@ -6,7 +6,7 @@ import { Path, useForm, FieldValues, PathValue } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-interface Input {
+export interface Input {
   label: string;
   type: string;
   value?: string | number;
@@ -155,6 +155,5 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
     </form>
   );
 };
-
 
 export default Form;

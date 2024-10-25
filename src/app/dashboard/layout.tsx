@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 import { PiChalkboardTeacherFill } from "react-icons/pi";
+import { TbUserQuestion } from "react-icons/tb";
 import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
@@ -135,6 +136,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLink: '/dashboard/trainers',
       icon: <FaUsers size={'55px'} />,
       createLink: '/dashboard/trainers/create',
+    },
+    {
+      name: "Feedback Questions",
+      permission: "manage_feedback",
+      viewLabel: "View Feedback Question",
+      createLabel: "Create Feedback Question",
+      viewLink: "/dashboard/feedback-questions",
+      icon: <TbUserQuestion size={"55px"} />,
+      createLink: "/dashboard/feedback-questions/create",
     },
     {
       name: "Feedback Management",

@@ -92,7 +92,16 @@ export interface User {
   updatedAt: string;
   role: Role; // Add role object here
 }
+export interface FeedbackQuestion {
+  id: number;
+  questionText: string;
+  questionType: 'open-ended' | 'closed-ended' | 'rating';
+}
 
+export interface AnswerOptions {
+  id: number;
+  optionText: string;
+}
 export interface Trainer {
   id: number;
   trainerName: string;
