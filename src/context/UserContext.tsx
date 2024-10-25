@@ -7,6 +7,8 @@ interface User {
     email: string;
     role: string;
     permissions: string[];
+    trainers: string;
+
 }
 
 interface UserContextType {
