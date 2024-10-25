@@ -18,7 +18,11 @@ export interface Course {
 export interface Module {
   id: number;
   moduleName: string;
-  courseId: number;
+  courseId: string;
+  course: {
+    id: number,
+    courseName: string
+  }
   createdAt: string;
   updatedAt: string;
 }
