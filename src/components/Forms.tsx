@@ -78,21 +78,7 @@ const Form = <T extends FieldValues>({
                  </option>
                ))}
              </select> 
-            ) : input.type === "multiple" ? (
-              <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
-                <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-                  {SelectedValue.length > 0
-                    ? SelectedValue.map((value) => input.options?.find(opt => opt.value === value)?.label).join(", ")
-                    : "Select multiple options..."}
-                </ListboxButton>
-                <ListboxOptions className="mt-2 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  {input.options?.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              ) : input.type === 'multiple' ? (
+            ) : input.type === 'multiple' ? (
                 <Listbox
                   value={SelectedValue}
                   onChange={handleMultiSelectChange}
