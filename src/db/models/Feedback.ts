@@ -1,15 +1,23 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from "../db_connection";
 import { Trainer } from './Trainer';
-import { Course } from './Course';
 import { ClassTime } from './ClassTime';
+import { Module } from './Module';
+import { Intake } from './Intake';
 
 export class Feedback extends Model {
   id!: number;
   trainerId!: number;
-  courseId!: number;
+  intakeId!: number;
   classTimeId!: number;
-  feedbackText!: string;
+  moduleId!: number;
+  studentToken!: string;
+  tokenExpiration!: Date;
+  
+  trainer?: Trainer;
+  // intake?: Intake; // Add this manually for TypeScript to recognize the association
+  classTime?: ClassTime;
+  module?: Module;
 }
 
 Feedback.init({
@@ -28,15 +36,6 @@ Feedback.init({
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   },
-  courseId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: Course,
-      key: 'id',
-    },
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  },
   classTimeId: {
     type: DataTypes.INTEGER,
     references: {
@@ -45,9 +44,31 @@ Feedback.init({
     },
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
+  },  
+  moduleId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Module,
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  },  
+  intakeId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Intake,
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   },
-  feedbackText: {
-    type: DataTypes.TEXT,
+  studentToken: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },  
+  tokenExpiration: {
+    type: DataTypes.DATE,
     allowNull: false,
   },
 }, {
@@ -56,3 +77,22 @@ Feedback.init({
   tableName: 'Feedback',
   timestamps: true,
 });
+
+Feedback.belongsTo(Trainer, {
+  foreignKey: "trainerId",
+  as: "trainer", 
+});
+Feedback.belongsTo(Module, {
+  foreignKey: "moduleId",
+  as: "module",
+});
+
+Feedback.belongsTo(ClassTime, {
+  foreignKey: "classTimeId",
+  as: "classTime",
+});
+Feedback.belongsTo(Intake, {
+  foreignKey: "intakeId",
+  as: "intake",
+});
+

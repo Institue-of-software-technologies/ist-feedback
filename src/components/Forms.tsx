@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { Path, useForm, FieldValues, PathValue } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface Input {
   label: string;
@@ -16,12 +18,34 @@ interface FormProps<T extends FieldValues> {
   Input: Input[];
   onSubmit: (data: T) => void;
 }
-
+interface CustomInputProps {
+  value?: string;
+  onClick?: () => void;
+}
 const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Element => {
   const { register, handleSubmit, setValue } = useForm<T>();
-
+  
   // State to track the selected options in the multi-select Listbox
   const [SelectedValue, setSelectedValue] = useState<number[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
+    ({ value, onClick }, ref) => (
+      <div className="relative w-full">
+        <input
+          onClick={onClick}
+          value={value || ""}
+          ref={ref}
+          readOnly
+          className="w-full p-2 bg-gray-100 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+          placeholder="Select date and time"
+        />
+      </div>
+    )
+  );
+
+  CustomInput.displayName = "CustomInput";
+
 
   useEffect(() => {
     // Set default values for the multi-select if provided
@@ -38,6 +62,12 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
     setSelectedValue(selected);
     setValue("multiSelectField" as Path<T>, selected as unknown as PathValue<T, Path<T>>); // Register the selected values in the form
   };
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+    setValue("tokenExpiration" as Path<T>, date as unknown as PathValue<T, Path<T>>);
+  };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -83,6 +113,17 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
                   ))}
                 </ListboxOptions>
               </Listbox>
+            ) : input.type === "date" ? (
+              <DatePicker
+                selected={
+                  selectedDate || new Date(input.value ? input.value.replace(' ', 'T') : new Date())
+                } 
+                onChange={(date) => handleDateChange(date)} 
+                customInput={<CustomInput />}
+                showTimeSelect
+                dateFormat="MMMM d, yyyy h:mm aa"
+                className="w-full"
+              />
             ) : (
               <input
                 id={input.label}
@@ -102,5 +143,6 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
     </form>
   );
 };
+
 
 export default Form;
