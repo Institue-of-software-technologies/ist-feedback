@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-} from '@headlessui/react';
-import { Path, useForm, FieldValues, PathValue } from 'react-hook-form';
+import React, { forwardRef, useEffect, useState } from "react";
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
+import { Path, useForm, FieldValues, PathValue } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export interface Input {
   label: string;
@@ -21,15 +18,35 @@ interface FormProps<T extends FieldValues> {
   Input: Input[];
   onSubmit: (data: T) => void;
 }
+interface CustomInputProps {
+  value?: string;
+  onClick?: () => void;
+}
+const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Element => {
 
-const Form = <T extends FieldValues>({
-  Input,
-  onSubmit,
-}: FormProps<T>): JSX.Element => {
   const { register, handleSubmit, setValue } = useForm<T>();
-
+  
   // State to track the selected options in the multi-select Listbox
   const [SelectedValue, setSelectedValue] = useState<number[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
+    ({ value, onClick }, ref) => (
+      <div className="relative w-full">
+        <input
+          onClick={onClick}
+          value={value || ""}
+          ref={ref}
+          readOnly
+          className="w-full p-2 bg-gray-100 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+          placeholder="Select date and time"
+        />
+      </div>
+    )
+  );
+
+  CustomInput.displayName = "CustomInput";
+
 
   useEffect(() => {
     // Set default values for the multi-select if provided
@@ -51,6 +68,12 @@ const Form = <T extends FieldValues>({
       selected as unknown as PathValue<T, Path<T>>
     ); // Register the selected values in the form
   };
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+    setValue("tokenExpiration" as Path<T>, date as unknown as PathValue<T, Path<T>>);
+  };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -78,57 +101,50 @@ const Form = <T extends FieldValues>({
                  </option>
                ))}
              </select> 
-            ) : input.type === 'multiple' ? (
-                <Listbox
-                  value={SelectedValue}
-                  onChange={handleMultiSelectChange}
-                  multiple
-                >
-                  <ListboxButton className='block w-full p-2 border border-gray-300 rounded-md shadow-sm'>
-                    {SelectedValue.length > 0
-                      ? SelectedValue.map(
-                          (value) =>
-                            input.options?.find((opt) => opt.value === value)
-                              ?.label
-                        ).join(', ')
-                      : 'Select multiple options...'}
-                  </ListboxButton>
-                  <ListboxOptions className='mt-2 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                    {input.options?.map((option) => (
-                      <ListboxOption
-                        key={option.value}
-                        value={option.value}
-                        className='cursor-pointer select-none p-2'
-                      >
-                        {({ selected }) => (
-                          <>
-                            <span
-                              className={
-                                selected ? 'font-semibold' : 'font-normal'
-                              }
-                            >
-                              {option.label}
-                            </span>
-                          </>
-                        )}
-                      </ListboxOption>
-                    ))}
-                  </ListboxOptions>
-                </Listbox>
-              ) : (
-                <input
-                  id={input.label}
-                  type={input.type}
-                  defaultValue={input.value}
-                  {...register(input.label as Path<T>, {
-                    required: `${input.label} is required`,
-                  })}
-                  className='mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                />
-              )}
-            </div>
-          )
-      )}
+            ) : input.type === "multiple" ? (
+              <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
+                <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                  {SelectedValue.length > 0
+                    ? SelectedValue.map((value) => input.options?.find(opt => opt.value === value)?.label).join(", ")
+                    : "Select multiple options..."}
+                </ListboxButton>
+                <ListboxOptions className="mt-2 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  {input.options?.map((option) => (
+                    <ListboxOption key={option.value} value={option.value} className="cursor-pointer select-none p-2">
+                      {({ selected }) => (
+                        <>
+                          <span className={selected ? "font-semibold" : "font-normal"}>
+                            {option.label}
+                          </span>
+                        </>
+                      )}
+                    </ListboxOption>
+                  ))}
+                </ListboxOptions>
+              </Listbox>
+            ) : input.type === "date" ? (
+              <DatePicker
+                selected={
+                  selectedDate || new Date(input.value ? input.value.replace(' ', 'T') : new Date())
+                } 
+                onChange={(date) => handleDateChange(date)} 
+                customInput={<CustomInput />}
+                showTimeSelect
+                dateFormat="MMMM d, yyyy h:mm aa"
+                className="w-full"
+              />
+            ) : (
+              <input
+                id={input.label}
+                type={input.type}
+                defaultValue={input.value}
+                {...register(input.label as Path<T>, { required: `${input.label} is required` })}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            )}
+          </div>
+        )
+      ))}
 
       <button
         type='submit'
