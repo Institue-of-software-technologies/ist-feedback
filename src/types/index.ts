@@ -12,13 +12,24 @@ export interface Permission {
 
 export interface Course {
   id: number;
-  courseName:string;
+  courseName: string;
 }
 
 export interface Module {
   id: number;
   moduleName: string;
-  courseId: number;
+  courseId: string;
+  course: {
+    id: number,
+    courseName: string
+  }
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ClassTime{
+  id: number;
+  classTime:string;
   createdAt: string;
   updatedAt: string;
 }
@@ -51,8 +62,8 @@ export interface Feedback {
 
 export interface Intake {
   id: number;
-  intakeName:string;
-  intakeYear:string;
+  intakeName: string;
+  intakeYear: string;
 }
 
 export interface Trainer {
@@ -82,4 +93,12 @@ export interface User {
   role: Role; // Add role object here
 }
 
-
+export interface Trainer {
+  id: number;
+  trainerName: string;
+  courseId: string;
+  course: {
+    id: number;
+    courseName: string;
+  };
+}

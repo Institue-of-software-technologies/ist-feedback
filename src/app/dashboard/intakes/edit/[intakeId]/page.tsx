@@ -15,7 +15,7 @@ interface FormData {
 
 const EditIntake = () => {
     const router = useRouter();
-    const { intakeId } = useParams(); // Get the `userId` from the URL
+    const { intakeId } = useParams(); // Get the userId from the URL
     const [intake, setIntake] = useState<Intake | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -96,4 +96,4 @@ const EditIntake = () => {
     );
 };
 
-export default EditIntake;
+export default EditIntake;

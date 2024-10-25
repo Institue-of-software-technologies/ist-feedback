@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { forwardRef, useEffect, useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
@@ -9,7 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 interface Input {
   label: string;
   type: string;
-  value?: string;
+  value?: string | number;
   defultSelect?: number[];
   options?: { label: string; value: number }[];
 }
@@ -23,6 +23,7 @@ interface CustomInputProps {
   onClick?: () => void;
 }
 const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Element => {
+
   const { register, handleSubmit, setValue } = useForm<T>();
   
   // State to track the selected options in the multi-select Listbox
@@ -51,16 +52,21 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
     // Set default values for the multi-select if provided
     Input.forEach((input) => {
       if (input.type === "multiple" && input.defultSelect) {
-        console.log(input.defultSelect);
         setSelectedValue(input.defultSelect);
-        setValue(input.label as Path<T>, input.defultSelect as unknown as PathValue<T, Path<T>>);
+        setValue(
+          input.label as Path<T>,
+          input.defultSelect as unknown as PathValue<T, Path<T>>
+        );
       }
     });
   }, [Input, setValue]);
 
   const handleMultiSelectChange = (selected: number[]) => {
     setSelectedValue(selected);
-    setValue("multiSelectField" as Path<T>, selected as unknown as PathValue<T, Path<T>>); // Register the selected values in the form
+    setValue(
+      'multiSelectField' as Path<T>,
+      selected as unknown as PathValue<T, Path<T>>
+    ); // Register the selected values in the form
   };
 
   const handleDateChange = (date: Date | null) => {
@@ -79,19 +85,22 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
             </label>
 
             {input.type === "select" ? (
-              <select
-                id={input.label}
-                defaultValue={input.value}
-                {...register(input.label as Path<T>, { required: `${input.label} is required` })}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="">Select {input.label}</option>
-                {input.options?.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+               <select
+               id={input.label}
+               defaultValue={input.value} 
+               {...register(input.label as Path<T>, { required: `${input.label} is required` })}
+               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+             >
+               <option value=""> 
+               {input.value?` 
+  ${input.value}`:`select  
+  ${input.label}`}</option>
+               {input.options?.map((option) => (
+                 <option key={option.value} value={option.value}>
+                   {option.label}
+                 </option>
+               ))}
+             </select> 
             ) : input.type === "multiple" ? (
               <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
                 <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">
@@ -137,7 +146,10 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
         )
       ))}
 
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+      <button
+        type='submit'
+        className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+      >
         Submit
       </button>
     </form>
