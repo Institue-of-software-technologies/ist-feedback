@@ -15,9 +15,13 @@ export async function GET() {
 // POST /api/class-Times - Create a new class-Times
 export async function POST(req: NextRequest) {
   try {
-    const { classTime } = await req.json();
-    const course = await ClassTime.create({ classTime });
-    return NextResponse.json({ message: 'class Time created successfully', course }, { status: 201 });
+    const {  classTime,classTimeEnd,classTimeStart } = await req.json();
+    const classTimes = await ClassTime.create({ 
+        classTime:classTime,
+        classTimeEnd:classTimeEnd,
+        classTimeStart:classTimeStart
+    });
+    return NextResponse.json({ message: 'class Time created successfully', classTimes }, { status: 201 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ message: 'Error creating class Time', error: errorMessage }, { status: 500 });
