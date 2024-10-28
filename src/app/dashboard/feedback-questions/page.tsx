@@ -28,7 +28,7 @@ const FeedbackQuestions: React.FC = () => {
         setQuestions(response.data.questions);
         setFilteredquestion(response.data.questions);
       } catch (err) {
-        toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
+        toast.error('Failed to fetch feedback questions', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
       }
@@ -84,7 +84,7 @@ const FeedbackQuestions: React.FC = () => {
   return (
     <div>
       <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
-      {filteredquestion.length === 0 ? (
+      {filteredquestion && filteredquestion.length === 0 ? (
         <div className="text-center p-4">
           <p>No feedback questions available at the moment.</p>
         </div>

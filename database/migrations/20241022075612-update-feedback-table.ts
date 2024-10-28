@@ -14,6 +14,7 @@ module.exports = {
     await queryInterface.addColumn("Feedback", "tokenExpiration", {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: Sequelize.fn('NOW'),
     });
 
     await queryInterface.addColumn("Feedback", "intakeId", {

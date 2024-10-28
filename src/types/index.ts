@@ -79,7 +79,7 @@ export interface ClassTime {
 export interface Module {
   id: number;
   moduleName:string;
-  courseId:number;
+  courseId:string;
 }
 
 export interface User {

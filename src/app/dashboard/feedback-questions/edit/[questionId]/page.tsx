@@ -17,7 +17,7 @@ interface FormData {
 const EditQuestion = () => {
   const router = useRouter();
   const { questionId } = useParams();
-  const [question, setQuestion] = useState<FeedbackQuestion | null>(null);
+  const [, setQuestion] = useState<FeedbackQuestion | null>(null);
   const [formData, setFormData] = useState<FormData>({
     questionText: "",
     questionType: "open-ended",

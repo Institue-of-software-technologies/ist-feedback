@@ -101,6 +101,11 @@ const TrainerManagement: React.FC = () => {
   return (
     <div>
       <ToastContainer />
+      {filteredTrainer && filteredTrainer.length === 0 ? (
+        <div className="text-center p-4">
+          <p>No Trainer available at the moment.</p>
+        </div>
+      ) : (
       <Table<Trainer>
         columns={columns}
         data={filteredTrainer}
@@ -116,6 +121,7 @@ const TrainerManagement: React.FC = () => {
             : undefined
         }
       />
+      )}
     </div>
   );
 };

@@ -84,13 +84,18 @@ const ModuleManagement: React.FC = () => {
   return (
     <div>
       <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
+      {filteredModules && filteredModules.length === 0 ? (
+        <div className="text-center p-4">
+          <p>No Modules available at the moment.</p>
+        </div>
+      ) : (
       <Table<Module>
         columns={columns}
         data={filteredModules}
         onSearch={handleSearch}
         onEdit={user && user.permissions.includes('update_modules') ? handleEdit : undefined}
         onDelete={user && user.permissions.includes('delete_modules') ? handleDelete : undefined}
-      />
+      />)}
     </div>
   );
 };

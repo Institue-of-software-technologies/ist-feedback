@@ -1,6 +1,5 @@
 // src/app/api/roles/[roleId]/route.ts
 import { ClassTime } from '@/db/models/ClassTime';
-import { Course } from '@/db/models/Course';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface Context {
@@ -11,13 +10,13 @@ interface Context {
 export async function GET(req: NextRequest, context: Context) {
   try {
     const { classTimesId } = context.params;
-    const course = await ClassTime.findByPk(classTimesId);
+    const classTimes = await ClassTime.findByPk(classTimesId);
 
-    if (!course) {
+    if (!classTimes) {
       return NextResponse.json({ message: 'Class Time not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ course });
+    return NextResponse.json({ classTimes });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ message: 'Error fetching Class Time', error: errorMessage }, { status: 500 });
@@ -30,16 +29,16 @@ export async function PUT(req: NextRequest, context: Context) {
     const { classTimesId } = context.params;
     const { classTime } = await req.json();
 
-    const course = await ClassTime.findByPk(classTimesId);
+    const classTimes = await ClassTime.findByPk(classTimesId);
 
-    if (!course) {
+    if (!classTimes) {
       return NextResponse.json({ message: 'class Time not found' }, { status: 404 });
     }
 
-    course.classTime = classTime;
-    await course.save();
+    classTimes.classTime = classTime;
+    await classTimes.save();
 
-    return NextResponse.json({ message: 'Class Time updated successfully', course });
+    return NextResponse.json({ message: 'Class Time updated successfully', classTimes });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ message: 'Error updating Class Times', error: errorMessage }, { status: 500 });
@@ -50,13 +49,13 @@ export async function PUT(req: NextRequest, context: Context) {
 export async function DELETE(req: NextRequest, context: Context) {
   try {
     const { classTimesId } = context.params;
-    const course = await Course.findByPk(classTimesId);
+    const classTimes = await ClassTime.findByPk(classTimesId);
 
-    if (!course) {
+    if (!classTimes) {
       return NextResponse.json({ message: 'class Times not found' }, { status: 404 });
     }
 
-    await course.destroy();
+    await classTimes.destroy();
 
     return NextResponse.json({ message: 'class Times deleted successfully' });
   } catch (error) {
