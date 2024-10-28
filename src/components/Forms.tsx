@@ -10,8 +10,9 @@ export interface Input {
   label: string;
   type: string;
   value?: string;
+  name?: string;
   defultSelect?: number[];
-  options?: { label: string; value: number }[];
+  options?: { label: string; value: number | string }[];
 }
 
 interface FormProps<T extends FieldValues> {
