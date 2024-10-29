@@ -1,6 +1,7 @@
 import { ClassTime } from "@/db/models/ClassTime";
 import { Course } from "@/db/models/Course";
 import { Feedback } from "@/db/models/Feedback";
+import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
 import { Trainer } from "@/db/models/Trainer";
@@ -11,7 +12,18 @@ export async function GET() {
     // Fetch feedbacks with associated trainer, module, course, classTime, and intake details
     const feedbacks = await Feedback.findAll({
       include: [
-        { model: Trainer, as: "trainer", attributes: ["trainerName"] },
+        {
+          model: Trainer,
+          as: "trainer",
+          attributes: ["trainerName"],
+          include: [
+            {
+              model: Course,
+              as: "course",
+              attributes: ["courseName"],
+            },
+          ],
+        },
         {
           model: Module,
           as: "module",
@@ -36,14 +48,16 @@ export async function GET() {
     // Format the tokenExpiration dates and send formatted feedback data to the client
     const formattedFeedbacks = feedbacks.map((feedback) => {
       // Convert the tokenExpiration to a formatted string (e.g., using toLocaleString)
-      const formattedExpiration = new Date(feedback.tokenExpiration).toLocaleString('en-KE', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      const formattedExpiration = new Date(
+        feedback.tokenExpiration
+      ).toLocaleString("en-KE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: true,
       });
 
@@ -93,8 +107,14 @@ async function generateUniqueToken() {
 
 export async function POST(req: Request) {
   try {
-    const { trainerId, intakeId, classTimeId, moduleId, tokenExpiration } =
-      await req.json();
+    const {
+      trainerId,
+      intakeId,
+      classTimeId,
+      moduleId,
+      tokenExpiration,
+      multiSelectField,
+    } = await req.json();
 
     // Validate required fields
     if (
@@ -130,6 +150,13 @@ export async function POST(req: Request) {
       studentToken,
       tokenExpiration: Expiration,
     });
+
+    for (const feedbackSelectQuestion of multiSelectField) {
+      await FeedbackSelectQuestions.create({
+        feedbackId: feedback.id,
+        feedbackQuestionsId: feedbackSelectQuestion,
+      });
+    }
 
     return NextResponse.json({
       message: "Feedback submitted successfully",

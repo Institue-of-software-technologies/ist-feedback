@@ -10,7 +10,8 @@ module.exports = {
     await queryInterface.addColumn("Feedback", "studentToken", {
       type: DataTypes.STRING,
       allowNull: false,
-    });    
+    }); 
+       
     await queryInterface.addColumn("Feedback", "tokenExpiration", {
       type: DataTypes.DATE,
       allowNull: false,

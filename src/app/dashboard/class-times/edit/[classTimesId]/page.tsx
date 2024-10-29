@@ -25,8 +25,8 @@ const EditClassTime = () => {
       const fetchUser = async () => {
         try {
           const response = await api.get(`/class-times/${classTimesId}`);
-          console.log(response.data.course);
-          setClassTimes(response.data.course);
+          console.log(response)
+          setClassTimes(response.data.classTimes);
         } catch (err) {
           setError('Failed to fetch class Times');
         } finally {
@@ -63,7 +63,9 @@ const EditClassTime = () => {
   if (error) return <div className="text-red-500">{error}</div>;
 
   const inputs= [
-    { label: "classTime", type: "text",value: classTimes?.classTime || ''}
+    { label: "classTime", type: "text",value: classTimes?.classTime},
+    { label: "classTimeStart", type: "time",value: classTimes?.classTimeStart},
+    { label: "classTimeEnd", type: "time",value: classTimes?.classTimeEnd}
 ];
 
   return (

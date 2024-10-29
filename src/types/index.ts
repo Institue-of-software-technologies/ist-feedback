@@ -74,6 +74,8 @@ export interface Trainer {
 export interface ClassTime {
   id: number;
   classTime:string;
+  classTimeStart:string;
+  classTimeEnd:string;
 }
 
 export interface Module {

@@ -10,7 +10,16 @@ interface Context {
 export async function GET(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
-    const question = await FeedbackQuestion.findByPk(questionId);
+    const question = await FeedbackQuestion.findOne({
+      where: { id: questionId },
+      include: [
+        {
+          model: AnswerOption,
+          as: "answerOption",
+          attributes: ["id", "optionText"],
+        },
+      ],
+    });
 
     if (!question) {
       return NextResponse.json({ message: 'Feedback question not found' }, { status: 404 });
