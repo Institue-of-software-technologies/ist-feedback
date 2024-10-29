@@ -3,6 +3,8 @@ import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
 import { Trainer } from "@/db/models/Trainer";
+import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
+import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Context {
@@ -37,6 +39,19 @@ export async function GET(request: NextRequest, context: Context) {
       ],
     });
 
+    const feedbackQuestions = await FeedbackSelectQuestions.findAll({
+      where: {
+        feedbackId: feedbackId,
+      },
+      include: [
+        {
+          model: FeedbackQuestion,
+          as: "feedbackQuestion",
+          attributes: ["id", "questionText", "questionType"],
+        },
+      ],
+    });
+
     if (!feedback) {
       return NextResponse.json(
         { message: "Feedback not found" },
@@ -44,7 +59,7 @@ export async function GET(request: NextRequest, context: Context) {
       );
     }
 
-    return NextResponse.json({ feedback });
+    return NextResponse.json({ feedback, feedbackQuestions });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -55,7 +70,7 @@ export async function GET(request: NextRequest, context: Context) {
   }
 }
 
-export async function PUT( req: NextRequest,context: Context ) {
+export async function PUT(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
     const { trainerId, intakeId, classTimeId, moduleId, tokenExpiration } =
@@ -103,22 +118,27 @@ export async function PUT( req: NextRequest,context: Context ) {
   }
 }
 
-
-export async function DELETE(req : NextRequest,context: Context) {
+export async function DELETE(req: NextRequest, context: Context) {
   try {
-    const {feedbackId} = context.params;
+    const { feedbackId } = context.params;
     const feedback = await Feedback.findByPk(feedbackId);
 
     if (!feedback) {
-      return NextResponse.json({ message: "Feedback Not Found"}, { status: 404 });
+      return NextResponse.json(
+        { message: "Feedback Not Found" },
+        { status: 404 }
+      );
     }
 
     await feedback.destroy();
 
-    return NextResponse.json({message: "Feedback Deleted Successfully"});
+    return NextResponse.json({ message: "Feedback Deleted Successfully" });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ message: "Error deleting Feedback", error: errorMessage} , {status : 500})
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { message: "Error deleting Feedback", error: errorMessage },
+      { status: 500 }
+    );
   }
-
 }

@@ -85,8 +85,9 @@ const FeedBackManagement: React.FC = () => {
   const columns = [
     { header: 'Student Token', accessor: 'studentToken' },
     { header: 'Trainer Name', accessor: 'trainer.trainerName' },
-    { header: 'Module Name', accessor: 'module.moduleName' },
-    { header: 'Course Name', accessor: 'module.course.courseName' },
+    { header: 'Course', accessor: 'trainer.course.courseName' },
+    // { header: 'Module Name', accessor: 'module.moduleName' },
+    // { header: 'Course Name', accessor: 'module.course.courseName' },
     { header: 'Class Time', accessor: 'classTime.classTime' },
     { header: 'Intake Name', accessor: 'intake.intakeName' },
     { header: 'Intake Year', accessor: 'intake.intakeYear' },

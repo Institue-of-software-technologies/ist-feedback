@@ -6,13 +6,14 @@ import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { ClassTime, Intake, Module, Trainer } from "@/types";
+import { ClassTime, FeedbackQuestion, Intake, Module, Trainer } from "@/types";
 
 interface FormData {
   trainerId: number,
   intakeId: number,
   classTimeId: number,
   moduleId: number,
+  questionId: number,
   tokenExpiration: Date,
 }
 
@@ -23,7 +24,7 @@ const NewFeedbackForm: React.FC = () => {
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
-
+  const [questions, setQuestions] = useState<FeedbackQuestion[]>([]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -48,6 +49,16 @@ const NewFeedbackForm: React.FC = () => {
       } catch (err) {
         console.log(err)
       };
+    }    
+    const fetchQuestions = async () => {
+      try {
+        const response = await api.get(`/feedback-questions`);
+        setQuestions(response.data.questions);
+        setLoading(false);
+
+      } catch (err) {
+        console.log(err)
+      };
     }
     const fetchIntakes = async () => {
       try {
@@ -61,14 +72,14 @@ const NewFeedbackForm: React.FC = () => {
     }
     const fetchClassTimes = async () => {
       try {
-        const response = await api.get(`/classTime`);
+        const response = await api.get(`/class-times`);
         setClassTimes(response.data.classTime);
         setLoading(false);
 
       } catch (err) {
         console.log(err)
       };
-    }    
+    }
 
     const fetchModules = async () => {
       try {
@@ -84,22 +95,23 @@ const NewFeedbackForm: React.FC = () => {
 
     fetchTrainers()
     fetchIntakes()
-    fetchClassTimes()    
+    fetchClassTimes()
     fetchModules()
+    fetchQuestions()
   }, []);
 
 
   if (loading) {
     return <div className="text-center">Loading...</div>;
   }
-  
+
 
   const inputs = [
     {
       label: "trainerId",
       type: "select",
       options: trainers.map((trainer) => ({
-        label: trainer.trainerName,
+        label: `${trainer.trainerName} - ${trainer.course.courseName}`,
         value: trainer.id,
       })),
     },
@@ -107,13 +119,13 @@ const NewFeedbackForm: React.FC = () => {
       label: "moduleId",
       type: "select",
       options: modules.map((module) => ({
-        label: `${module.moduleName} - ${module.courseId}`,
+        label: `${module.moduleName} - ${module.course.courseName}`,
         value: module.id,
       })),
-    },    
+    },
     {
       label: "intakeId",
-      type: "select", 
+      type: "select",
       options: intakes.map((intake) => ({
         label: `${intake.intakeName} - ${intake.intakeYear}`,
         value: intake.id,
@@ -121,10 +133,18 @@ const NewFeedbackForm: React.FC = () => {
     },
     {
       label: "classTimeId",
-      type: "select", 
+      type: "select",
       options: classTimes.map((classTime) => ({
         label: classTime.classTime,
         value: classTime.id,
+      })),
+    },    
+    {
+      label: "questionId",
+      type: "multiple",
+      options: questions.map((question) => ({
+        label: `${question.questionText} - ${question.questionType}`,
+        value: question.id,
       })),
     },
     {

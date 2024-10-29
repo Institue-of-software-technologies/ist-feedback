@@ -8,6 +8,7 @@ export class FeedbackSelectQuestions extends Model {
   feedbackQuestionsId!: number;
 
   // This tells TypeScript that RolePermission has a 'permission' field when associated
+  feedbackQuestions?: FeedbackQuestion;
   feedback?: Feedback;
 }
 
@@ -41,8 +42,16 @@ FeedbackSelectQuestions.init(
 );
 
 // Define associations between RolePermission and Permission, Role
+FeedbackSelectQuestions.belongsTo(FeedbackQuestion, {
+  foreignKey: "feedbackQuestionsId",
+  as: "feedbackQuestion",
+});
+
 FeedbackSelectQuestions.belongsTo(Feedback, {
   foreignKey: "feedbackId",
   as: "feedbackselect",
 });
-FeedbackSelectQuestions.belongsTo(FeedbackQuestion, { foreignKey: "feedbackQuestionId", as: "feedbackQuestion" });
+
+
+
+

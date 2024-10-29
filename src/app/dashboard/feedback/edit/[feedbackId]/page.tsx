@@ -3,7 +3,7 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
-import { ClassTime, Feedback, Intake, Module, Trainer } from '@/types';
+import { ClassTime, Feedback, FeedbackQuestion, Intake, Module, Trainer } from '@/types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
@@ -15,6 +15,7 @@ interface FormData {
   classTimeId: string;
   moduleId: string;
   intakeId: string;
+  feedbackQuestion: string;
   tokenExpiration: Date;
 }
 
@@ -33,6 +34,7 @@ const EditFeedback = () => {
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
+  const [feedbackQuestions, setFeedbackQuestions] = useState<FeedbackQuestion[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const { register, handleSubmit, setValue } = useForm<FormData>();
@@ -65,17 +67,19 @@ const EditFeedback = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [trainersResponse, intakesResponse, classTimesResponse, modulesResponse] = await Promise.all([
+        const [trainersResponse, intakesResponse, classTimesResponse, modulesResponse,feedbackQuestionsResponse] = await Promise.all([
           api.get(`/trainers`),
           api.get(`/intakes`),
-          api.get(`/classTime`),
+          api.get(`/class-times`),
           api.get(`/modules`),
+          api.get(`/feedback-questions`)
         ]);
-
+        console.log(fetchData)
         setTrainers(trainersResponse.data.trainer);
         setIntakes(intakesResponse.data.intake);
         setClassTimes(classTimesResponse.data.classTime);
         setModules(modulesResponse.data);
+        setFeedbackQuestions(feedbackQuestionsResponse.data.questions);
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -102,7 +106,7 @@ const EditFeedback = () => {
         position: 'top-right',
         autoClose: 3000,
       });
-    }
+    } feedbackQuestions
   };
 
   const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
@@ -135,7 +139,7 @@ const EditFeedback = () => {
           <select id="trainerId" {...register('trainerId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             {trainers.map(trainer => (
               <option key={trainer.id} value={trainer.id}>
-                {trainer.trainerName}
+                {trainer.trainerName} - {trainer.course.courseName}
               </option>
             ))}
           </select>
@@ -147,6 +151,17 @@ const EditFeedback = () => {
             {classTimes.map(classTime => (
               <option key={classTime.id} value={classTime.id}>
                 {classTime.classTime}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        <div>
+          <label htmlFor="feedbackQuestion">Feedback Question</label>
+          <select id="feedbackQuestion" {...register('feedbackQuestion')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+            {feedbackQuestions.map(feedbackQuestion => (
+              <option key={feedbackQuestion.id} value={feedbackQuestion.id}>
+                {feedbackQuestion.questionText}
               </option>
             ))}
           </select>
@@ -178,12 +193,12 @@ const EditFeedback = () => {
         <div className="flex flex-col mb-3">
           <label htmlFor="tokenExpiration" className="mb-1">Token Expiration</label>
           <DatePicker
-            selected={selectedDate} 
-            onChange={(date) => setSelectedDate(date)} 
+            selected={selectedDate}
+            onChange={(date) => setSelectedDate(date)}
             customInput={<CustomInput />}
             showTimeSelect
             dateFormat="MMMM d, yyyy h:mm aa"
-            className="w-full mt-1" 
+            className="w-full mt-1"
           />
         </div>
 
