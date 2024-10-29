@@ -1,15 +1,18 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { Path, useForm, FieldValues, PathValue } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-interface Input {
+export interface Input {
   label: string;
   type: string;
   value?: string;
+  name?: string;
   defultSelect?: number[];
-  options?: { label: string; value: number }[];
+  options?: { label: string; value: number | string }[];
 }
 
 interface FormProps<T extends FieldValues> {
@@ -20,31 +23,62 @@ interface FormProps<T extends FieldValues> {
   onSubmit: (data: T) => void;
 }
 
+interface CustomInputProps {
+  value?: string;
+  onClick?: () => void;
+}
 const Form = <T extends FieldValues>({ Input, onSubmit,buttonColor,buttonText,hoverColor }: FormProps<T>): JSX.Element => {
   const { register, handleSubmit, setValue } = useForm<T>();
 
   // State to track the selected options in the multi-select Listbox
   const [SelectedValue, setSelectedValue] = useState<number[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
+    ({ value, onClick }, ref) => (
+      <div className="relative w-full">
+        <input
+          onClick={onClick}
+          value={value || ""}
+          ref={ref}
+          readOnly
+          className="w-full p-2 bg-gray-100 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+          placeholder="Select date and time"
+        />
+      </div>
+    )
+  );
+
+  CustomInput.displayName = "CustomInput";
+
 
   useEffect(() => {
     // Set default values for the multi-select if provided
     Input.forEach((input) => {
       if (input.type === "multiple" && input.defultSelect) {
-        console.log(input.defultSelect);
         setSelectedValue(input.defultSelect);
-        setValue(input.label as Path<T>, input.defultSelect as unknown as PathValue<T, Path<T>>);
+        setValue(
+          input.label as Path<T>,
+          input.defultSelect as unknown as PathValue<T, Path<T>>
+        );
       }
     });
   }, [Input, setValue]);
 
   const handleMultiSelectChange = (selected: number[]) => {
     setSelectedValue(selected);
-    setValue("multiSelectField" as Path<T>, selected as unknown as PathValue<T, Path<T>>); // Register the selected values in the form
+    setValue(
+      'multiSelectField' as Path<T>,
+      selected as unknown as PathValue<T, Path<T>>
+    ); // Register the selected values in the form
   };
-
   const defaultColor = "bg-blue-500";
   const defaultHoverColor = "hover:bg-blue-600";
   const befaultText = "Submit";
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+    setValue("tokenExpiration" as Path<T>, date as unknown as PathValue<T, Path<T>>);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -62,7 +96,10 @@ const Form = <T extends FieldValues>({ Input, onSubmit,buttonColor,buttonText,ho
                 {...register(input.label as Path<T>, { required: `${input.label} is required` })}
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
-                <option value="">Select {input.label}</option>
+                <option value="">
+                  {input.value ? ` 
+  ${input.value}` : `select  
+  ${input.label}`}</option>
                 {input.options?.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -90,6 +127,17 @@ const Form = <T extends FieldValues>({ Input, onSubmit,buttonColor,buttonText,ho
                   ))}
                 </ListboxOptions>
               </Listbox>
+            ) : input.type === "date" ? (
+              <DatePicker
+                selected={
+                  selectedDate || new Date(input.value ? input.value.replace(' ', 'T') : new Date())
+                }
+                onChange={(date) => handleDateChange(date)}
+                customInput={<CustomInput />}
+                showTimeSelect
+                dateFormat="MMMM d, yyyy h:mm aa"
+                className="w-full"
+              />
             ) : (
               <input
                 id={input.label}

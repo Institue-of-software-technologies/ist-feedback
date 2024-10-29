@@ -6,8 +6,7 @@ import api from '../../../../../../lib/axios'; // Update path to your axios lib
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
-import { Course } from '@/db/models/Course';
-
+import { Course } from '@/types';
 interface FormData {
   permissionName: string;
 }
