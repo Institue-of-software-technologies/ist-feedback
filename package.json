@@ -11,7 +11,7 @@
     "seed:one": "dotenv -- sequelize-cli db:seed --seed ",
     "seed:rolleback": "dotenv -- sequelize-cli db:seed:undo ",
     "seed:rolleback:all": "dotenv -- sequelize-cli db:seed:undo:all",
-    "migration:create": "dotenv -- sequelize-cli migration:create",
+    "migration:create": "dotenv -- sequelize-cli migration:create --name",
     "seeder:create": "dotenv -- sequelize-cli seed:generate --name",
     "migrate": "dotenv -- sequelize-cli db:migrate",
     "migrate:rollback": "dotenv -- sequelize-cli db:migrate:undo",
