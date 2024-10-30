@@ -9,12 +9,12 @@ import { useRouter } from "next/navigation";
 import { ClassTime, FeedbackQuestion, Intake, Module, Trainer } from "@/types";
 
 interface FormData {
-  trainerId: number,
-  intakeId: number,
-  classTimeId: number,
-  moduleId: number,
-  questionId: number,
-  tokenExpiration: Date,
+  trainerId: number;
+  intakeId: number;
+  classTimeId: number;
+  moduleId: number;
+  questionId: number;
+  tokenExpiration: Date;
 }
 
 const NewFeedbackForm: React.FC = () => {
@@ -25,6 +25,7 @@ const NewFeedbackForm: React.FC = () => {
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [questions, setQuestions] = useState<FeedbackQuestion[]>([]);
+  const [step, setStep] = useState<number>(1);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -44,69 +45,56 @@ const NewFeedbackForm: React.FC = () => {
       try {
         const response = await api.get(`/trainers`);
         setTrainers(response.data.trainer);
-        setLoading(false);
-
       } catch (err) {
-        console.log(err)
-      };
-    }    
+        console.log(err);
+      }
+    };
     const fetchQuestions = async () => {
       try {
         const response = await api.get(`/feedback-questions`);
         setQuestions(response.data.questions);
-        setLoading(false);
-
       } catch (err) {
-        console.log(err)
-      };
-    }
+        console.log(err);
+      }
+    };
     const fetchIntakes = async () => {
       try {
         const response = await api.get(`/intakes`);
         setIntakes(response.data.intake);
-        setLoading(false);
-
       } catch (err) {
-        console.log(err)
-      };
-    }
+        console.log(err);
+      }
+    };
     const fetchClassTimes = async () => {
       try {
         const response = await api.get(`/class-times`);
         setClassTimes(response.data.classTime);
-        setLoading(false);
-
       } catch (err) {
-        console.log(err)
-      };
-    }
-
+        console.log(err);
+      }
+    };
     const fetchModules = async () => {
       try {
         const response = await api.get(`/modules`);
-        console.log(response)
         setModules(response.data);
-        setLoading(false);
-
       } catch (err) {
-        console.log(err)
-      };
-    }
+        console.log(err);
+      }
+    };
 
-    fetchTrainers()
-    fetchIntakes()
-    fetchClassTimes()
-    fetchModules()
-    fetchQuestions()
+    fetchTrainers();
+    fetchIntakes();
+    fetchClassTimes();
+    fetchModules();
+    fetchQuestions();
+    setLoading(false);
   }, []);
-
 
   if (loading) {
     return <div className="text-center">Loading...</div>;
   }
 
-
-  const inputs = [
+  const step1Inputs = [
     {
       label: "trainerId",
       type: "select",
@@ -131,6 +119,9 @@ const NewFeedbackForm: React.FC = () => {
         value: intake.id,
       })),
     },
+  ];
+
+  const step2Inputs = [
     {
       label: "classTimeId",
       type: "select",
@@ -138,7 +129,7 @@ const NewFeedbackForm: React.FC = () => {
         label: classTime.classTime,
         value: classTime.id,
       })),
-    },    
+    },
     {
       label: "questionId",
       type: "multiple",
@@ -149,21 +140,35 @@ const NewFeedbackForm: React.FC = () => {
     },
     {
       label: "tokenExpiration",
-      type: "date"
-    }
+      type: "date",
+    },
   ];
 
+  const handleNextStep = () => setStep((prev) => prev + 1);
+  const handlePrevStep = () => setStep((prev) => prev - 1);
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
-      <h2 className="text-2xl font-bold mb-4">Create New Feedback</h2>
+      <h2 className="text-2xl font-bold mb-4">Create New Feedback - Step {step}</h2>
       <Form<FormData>
-        Input={inputs}
-        onSubmit={onSubmit}
+        Input={step === 1 ? step1Inputs : step2Inputs}
+        onSubmit={step === 2 ? onSubmit : handleNextStep}
       />
+      <div className="flex justify-between mt-4">
+        {step > 1 && (
+          <button onClick={handlePrevStep} className="bg-gray-300 text-gray-800 px-4 py-2 rounded">
+            Previous
+          </button>
+        )}
+        {step === 1 && (
+          <button onClick={handleNextStep} className="bg-blue-500 text-white px-4 py-2 rounded">
+            Next
+          </button>
+        )}
+      </div>
     </div>
   );
 };
 
-export default NewFeedbackForm
+export default NewFeedbackForm;

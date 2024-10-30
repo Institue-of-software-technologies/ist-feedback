@@ -3,7 +3,7 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
-import { ClassTime, Feedback, FeedbackQuestion, Intake, Module, Trainer } from '@/types';
+import { ClassTime, Intake, Module, Trainer, FeedbackQuestion } from '@/types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,7 @@ interface FormData {
   classTimeId: string;
   moduleId: string;
   intakeId: string;
-  feedbackQuestion: string;
+  feedbackQuestions: string[];
   tokenExpiration: Date;
 }
 
@@ -27,15 +27,16 @@ interface CustomInputProps {
 const EditFeedback = () => {
   const router = useRouter();
   const { feedbackId } = useParams();
-  const [, setFeedbacks] = useState<Feedback | null>(null);
+  const [, setFeedbacks] = useState(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
-  const [feedbackQuestions, setFeedbackQuestions] = useState<FeedbackQuestion[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [feedbackQuestions, setFeedbackQuestions] = useState<FeedbackQuestion[]>([]);
+  const [selectedFeedbackQuestions, setSelectedFeedbackQuestions] = useState<string[]>([]);
 
   const { register, handleSubmit, setValue } = useForm<FormData>();
 
@@ -44,17 +45,24 @@ const EditFeedback = () => {
       const fetchFeedbacks = async () => {
         try {
           const response = await api.get(`/feedback/${feedbackId}`);
-          setFeedbacks(response.data.feedback);
-          // Set default values for the form fields
-          setValue('trainerId', response.data.feedback.trainer.id);
-          setValue('classTimeId', response.data.feedback.classTime.id);
-          setValue('moduleId', response.data.feedback.module.id);
-          setValue('intakeId', response.data.feedback.intake.id);
+          const feedback = response.data.feedback;
+          const questions = response.data.feedbackQuestions;
 
-          // Set the selected date for the DatePicker
-          const tokenExpiration = new Date(response.data.feedback.tokenExpiration);
+          setFeedbacks(feedback);
+
+          setValue('trainerId', feedback.trainerId?.toString() || '');
+          setValue('classTimeId', feedback.classTimeId?.toString() || '');
+          setValue('moduleId', feedback.moduleId?.toString() || '');
+          setValue('intakeId', feedback.intakeId?.toString() || '');
+
+          const selectedQuestions = questions.map((fq: { feedbackQuestion: { id: number } }) => fq.feedbackQuestion.id.toString());
+          setSelectedFeedbackQuestions(selectedQuestions);
+          setValue('feedbackQuestions', selectedQuestions);
+
+          const tokenExpiration = new Date(feedback.tokenExpiration);
           setSelectedDate(tokenExpiration);
         } catch (err) {
+          console.log("Failed to fetch feedback", err);
           setError('Failed to fetch feedback');
         } finally {
           setLoading(false);
@@ -67,14 +75,13 @@ const EditFeedback = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [trainersResponse, intakesResponse, classTimesResponse, modulesResponse,feedbackQuestionsResponse] = await Promise.all([
+        const [trainersResponse, intakesResponse, classTimesResponse, modulesResponse, feedbackQuestionsResponse] = await Promise.all([
           api.get(`/trainers`),
           api.get(`/intakes`),
           api.get(`/class-times`),
           api.get(`/modules`),
           api.get(`/feedback-questions`)
         ]);
-        console.log(fetchData)
         setTrainers(trainersResponse.data.trainer);
         setIntakes(intakesResponse.data.intake);
         setClassTimes(classTimesResponse.data.classTime);
@@ -92,7 +99,8 @@ const EditFeedback = () => {
     try {
       await api.put(`/feedback/${feedbackId}`, {
         ...data,
-        tokenExpiration: selectedDate, // Make sure to send the selected date
+        tokenExpiration: selectedDate,
+        multiSelectField: selectedFeedbackQuestions,
       });
       toast.success('Feedback updated successfully!', {
         position: 'top-right',
@@ -106,7 +114,18 @@ const EditFeedback = () => {
         position: 'top-right',
         autoClose: 3000,
       });
-    } feedbackQuestions
+    }
+  };
+
+  const toggleQuestionSelection = (questionId: string) => {
+    setSelectedFeedbackQuestions((prevSelected) => {
+      const isAlreadySelected = prevSelected.includes(questionId);
+      const updatedSelected = isAlreadySelected
+        ? prevSelected.filter(id => id !== questionId) // Remove if already selected
+        : [...prevSelected, questionId];               // Add if not selected
+      setValue('feedbackQuestions', updatedSelected);
+      return updatedSelected;
+    });
   };
 
   const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
@@ -138,8 +157,8 @@ const EditFeedback = () => {
           <label htmlFor="trainerId">Trainer</label>
           <select id="trainerId" {...register('trainerId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             {trainers.map(trainer => (
-              <option key={trainer.id} value={trainer.id}>
-                {trainer.trainerName} - {trainer.course.courseName}
+              <option key={trainer.id} value={trainer.id.toString()}>
+                {trainer.trainerName}
               </option>
             ))}
           </select>
@@ -149,29 +168,39 @@ const EditFeedback = () => {
           <label htmlFor="classTimeId">Class Time</label>
           <select id="classTimeId" {...register('classTimeId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             {classTimes.map(classTime => (
-              <option key={classTime.id} value={classTime.id}>
+              <option key={classTime.id} value={classTime.id.toString()}>
                 {classTime.classTime}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label htmlFor="feedbackQuestion">Feedback Question</label>
-          <select id="feedbackQuestion" {...register('feedbackQuestion')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {feedbackQuestions.map(feedbackQuestion => (
-              <option key={feedbackQuestion.id} value={feedbackQuestion.id}>
-                {feedbackQuestion.questionText}
               </option>
             ))}
           </select>
         </div>
 
         <div>
+          <label htmlFor="feedbackQuestions">Feedback Questions</label>
+          <div className="mt-2">
+            {feedbackQuestions.map(question => (
+              <div key={question.id} className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  id={`question-${question.id}`}
+                  value={question.id.toString()}
+                  checked={selectedFeedbackQuestions.includes(question.id.toString())}
+                  onChange={() => toggleQuestionSelection(question.id.toString())}
+                  className="mr-2"
+                />
+                <label htmlFor={`question-${question.id}`} className="text-sm">
+                  {question.questionText}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
           <label htmlFor="moduleId">Module</label>
           <select id="moduleId" {...register('moduleId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             {modules.map(module => (
-              <option key={module.id} value={module.id}>
+              <option key={module.id} value={module.id.toString()}>
                 {module.moduleName}
               </option>
             ))}
@@ -182,13 +211,12 @@ const EditFeedback = () => {
           <label htmlFor="intakeId">Intake</label>
           <select id="intakeId" {...register('intakeId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             {intakes.map(intake => (
-              <option key={intake.id} value={intake.id}>
+              <option key={intake.id} value={intake.id.toString()}>
                 {intake.intakeName}
               </option>
             ))}
           </select>
         </div>
-
 
         <div className="flex flex-col mb-3">
           <label htmlFor="tokenExpiration" className="mb-1">Token Expiration</label>
