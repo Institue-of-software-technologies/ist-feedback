@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import api from "../../lib/axios";
 import { toast, ToastContainer } from "react-toastify";
 import Form from '@/components/Forms';
-import {  useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import 'react-toastify/dist/ReactToastify.css';
+import { Feedback } from "@/types";
 
 interface FormData {
   enterToken: string;
@@ -13,15 +14,15 @@ interface FormData {
 
 export default function Home() {
   const router = useRouter();
-  const [feedback, setFeedback] = useState();
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const checkFeedBackAvailability = async () => {
       try {
         const response = await api.get('/feedback');
-        console.log(response);
-        setFeedback(response.data.feedback);
+        setFeedback(response.data.feedbacks || []);
+
       } catch (err) {
         toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
       } finally {
@@ -33,29 +34,29 @@ export default function Home() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await api.get(`/feedback/token/${data.enterToken}`);
-      toast.success("Token found redirecting...", { position: "top-right", autoClose: 3000 });
-      // Delay the redirect to allow the toast to display
+      const response = await api.get(`/feedback/token/${data.enterToken}`);
+      toast.success("Token found! Redirecting...", { position: "top-right", autoClose: 3000 });
       setTimeout(() => {
-        router.push(`/studets-feedback/${data.enterToken}`);
-        // router.push('/dashboard/users'); // Redirect to the user list
+        router.push(`/studets-feedback/${response.data.token.id}`);
       }, 2000);
     } catch (error) {
-      console.error("Failed to create token", error);
-      toast.error("Token not avilable", { position: "top-right", autoClose: 3000 });
+      console.error("Failed to get token", error);
+      toast.error("Token not available. Please check your input and try again.", { position: "top-right", autoClose: 3000 });
     }
   };
+
 
   if (loading) {
     return <div className="text-center">Loading...</div>;
   }
+
   const inputs = [
     { label: "enterToken", type: "text" },
   ];
 
   return (
     <div>
-      {feedback ? (
+      {feedback.length > 0 ? (
         <div className="flex flex-col items-center justify-center min-h-screen p-10 bg-gray-100">
           <ToastContainer />
           <div className="bg-white shadow-md rounded-lg p-6 text-center">
@@ -83,4 +84,3 @@ export default function Home() {
     </div>
   );
 }
-

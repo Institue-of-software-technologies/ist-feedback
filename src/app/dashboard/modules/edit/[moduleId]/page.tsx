@@ -88,7 +88,6 @@ const EditModule = () => {
       }))
     },
   ];
-  console.log(module?.course?.courseName)
 
   return (
     <div className="p-6">
