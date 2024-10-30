@@ -4,11 +4,10 @@ import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
 import { Trainer } from "@/db/models/Trainer";
-import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
-import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 import { NextRequest, NextResponse } from "next/server";
 import { AnswerOption } from '@/db/models/AnswerOption';
-// import { AnswerOption } from '@/db/models/AnswerOption';
+import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
+import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";  
 
 interface Context {
   params: { feedbackId: number };
@@ -76,7 +75,7 @@ export async function GET(request: NextRequest, context: Context) {
       );
     }
 
-    return NextResponse.json({ feedback, feedbackQuestions });
+    return NextResponse.json({ feedback ,feedbackQuestions});
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -90,10 +89,16 @@ export async function GET(request: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
-    const { trainerId, intakeId, classTimeId, moduleId, tokenExpiration } =
+    const { trainerId, intakeId, classTimeId, tokenExpiration ,multiSelectField } =
       await req.json();
 
     const feedback = await Feedback.findByPk(feedbackId);
+    await FeedbackSelectQuestions.destroy({
+      where: {
+        feedbackId : feedbackId
+      }
+    });
+
 
     if (!feedback) {
       return NextResponse.json(
@@ -112,14 +117,19 @@ export async function PUT(req: NextRequest, context: Context) {
     if (classTimeId !== null) {
       feedback.classTimeId = classTimeId;
     }
-    if (moduleId !== null) {
-      feedback.moduleId = moduleId;
-    }
+
     if (tokenExpiration) {
       feedback.tokenExpiration = new Date(tokenExpiration);
     }
 
     await feedback.save();
+
+    for(const feedbackQuestion of multiSelectField) {
+      await FeedbackSelectQuestions.create({
+        feedbackId : feedback.id,
+        feedbackQuestionsId : feedbackQuestion
+      })
+    }
 
     return NextResponse.json({
       message: "Feedback updated successfully",
