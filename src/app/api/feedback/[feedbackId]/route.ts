@@ -1,9 +1,11 @@
+import { Course } from './../../../../db/models/Course';
 import { ClassTime } from "@/db/models/ClassTime";
 import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
 import { Trainer } from "@/db/models/Trainer";
 import { NextRequest, NextResponse } from "next/server";
+import { AnswerOption } from '@/db/models/AnswerOption';
 import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";  
 
@@ -20,6 +22,13 @@ export async function GET(request: NextRequest, context: Context) {
           model: Trainer,
           as: "trainer",
           attributes: ["id", "trainerName"],
+          include: [
+            {
+              model: Course,
+              as: "course",
+              attributes: ["courseName"],
+            },
+          ],
         },
         {
           model: ClassTime,
@@ -48,6 +57,13 @@ export async function GET(request: NextRequest, context: Context) {
           model: FeedbackQuestion,
           as: "feedbackQuestion",
           attributes: ["id", "questionText", "questionType"],
+          include: [
+            {
+              model: AnswerOption,
+              as: "answerOption",
+              attributes: ["id", "optionText"],
+            },
+          ]
         },
       ],
     });

@@ -17,14 +17,17 @@ export interface Input {
 
 interface FormProps<T extends FieldValues> {
   Input: Input[];
+  buttonColor?: string;
+  buttonText?: string;
+  hoverColor?: string;
   onSubmit: (data: T) => void;
 }
+
 interface CustomInputProps {
   value?: string;
   onClick?: () => void;
 }
-const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Element => {
-
+const Form = <T extends FieldValues>({ Input, onSubmit,buttonColor,buttonText,hoverColor }: FormProps<T>): JSX.Element => {
   const { register, handleSubmit, setValue } = useForm<T>();
 
   // State to track the selected options in the multi-select Listbox
@@ -69,12 +72,13 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
       selected as unknown as PathValue<T, Path<T>>
     ); // Register the selected values in the form
   };
-
+  const defaultColor = "bg-blue-500";
+  const defaultHoverColor = "hover:bg-blue-600";
+  const befaultText = "Submit";
   const handleDateChange = (date: Date | null) => {
     setSelectedDate(date);
     setValue("tokenExpiration" as Path<T>, date as unknown as PathValue<T, Path<T>>);
   };
-
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -156,7 +160,7 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
                 type={input.type}
                 defaultValue={input.value}
                 {...register(input.label as Path<T>, { required: `${input.label} is required` })}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             )}
           </div>
@@ -164,10 +168,10 @@ const Form = <T extends FieldValues>({ Input, onSubmit }: FormProps<T>): JSX.Ele
       ))}
 
       <button
-        type='submit'
-        className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+        type="submit"
+        className={`${buttonColor || defaultColor} text-white px-4 py-2 rounded ${hoverColor||defaultHoverColor}`}
       >
-        Submit
+        {buttonText||befaultText}  {/* Use default label "Submit" if none is provided */}
       </button>
     </form>
   );

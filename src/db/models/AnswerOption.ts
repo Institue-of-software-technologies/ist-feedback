@@ -6,6 +6,7 @@ export class AnswerOption extends Model {
   id!: number;
   optionText!: string;
   feedbackQuestionId!: number;
+  feedbackQuestion?: FeedbackQuestion;
 }
 
 AnswerOption.init({

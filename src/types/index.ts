@@ -45,6 +45,9 @@ export interface Feedback {
   trainer: {
     id: number;
     trainerName: string;
+    course: {
+      courseName: string
+    }
   };
   intake: {
     id: number;
@@ -95,9 +98,25 @@ export interface User {
   role: Role; // Add role object here
 }
 export interface FeedbackQuestion {
+  feedbackQuestion: string;
   id: number;
   questionText: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating';
+}
+
+export interface FeedbackQuestionSelect {
+  id: number;
+  questionText: string;
+  questionType: string;
+  feedbackQuestion: {
+    id: number;
+    questionText: string;
+    questionType: string;
+    answerOption:[{
+      id:number;
+      optionText:string;
+    }]
+  };
 }
 
 export interface AnswerOptions {
