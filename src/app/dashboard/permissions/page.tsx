@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
+import Loading from '../loading';  // Import the Loading component
 
 
 const PermissionManagement: React.FC = () => {
@@ -73,9 +74,7 @@ const PermissionManagement: React.FC = () => {
     router.push(`/dashboard/permissions/edit/${permission.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const columns = [
     { header: 'permissionName', accessor: 'permissionName' }

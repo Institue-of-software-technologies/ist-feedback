@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
+import Loading from '../loading';  // Import the Loading component
 
 const TrainerManagement: React.FC = () => {
   const { user } = useUser();
@@ -89,9 +90,7 @@ const TrainerManagement: React.FC = () => {
     router.push(`/dashboard/trainers/edit/${trainer.id}`);
   };
 
-  if (loading) {
-    return <div className='text-center'>Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const columns = [
     { header: 'trainerName', accessor: 'trainerName' },

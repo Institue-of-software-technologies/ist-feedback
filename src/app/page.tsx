@@ -7,6 +7,7 @@ import Form from '@/components/Forms';
 import { useRouter } from "next/navigation";
 import 'react-toastify/dist/ReactToastify.css';
 import { Feedback } from "@/types";
+import Loading from './loading';  // Import the Loading component
 
 interface FormData {
   enterToken: string;
@@ -46,9 +47,7 @@ export default function Home() {
   };
 
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const inputs = [
     { label: "enterToken", type: "text" },
