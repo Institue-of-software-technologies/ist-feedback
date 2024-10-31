@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
+import Loading from '../loading';  // Import the Loading component
 
 const FeedbackQuestions: React.FC = () => {
   const { user } = useUser();
@@ -72,9 +73,7 @@ const FeedbackQuestions: React.FC = () => {
     router.push(`/dashboard/feedback-questions/edit/${question.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const columns = [
     { header: 'questionText', accessor: 'questionText' },

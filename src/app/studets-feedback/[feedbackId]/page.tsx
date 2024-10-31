@@ -6,6 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../../../lib/axios';
 import { useParams, useRouter } from 'next/navigation';
+import Loading from '../../loading';  // Import the Loading component
 
 interface FormValues {
     [key: string]: string | number; // This allows dynamic keys for each question
@@ -64,7 +65,7 @@ export default function StudentFeedback() {
     };
     
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loading />;
     if (error) return <div className="text-red-500">{error}</div>;
 
     return (
