@@ -95,7 +95,6 @@ const FeedBackManagement: React.FC = () => {
       header: 'Token Expiration',
       accessor: 'tokenExpiration',
       Cell: ({ value }: { value: string }) => {
-        // Convert the ISO string to a Date object and format it
         const date = new Date(value);
 
        
