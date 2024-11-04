@@ -11,6 +11,7 @@ import { useUser } from "@/context/UserContext";
 import Image from 'next/image';
 import istLogo from '../../public/assets/image/cropedImag.png';
 // public/assets/image/cropedImag.png
+import Loading from './loading';  // Import the Loading component
 
 interface FormData {
   Token: string;
@@ -68,9 +69,7 @@ export default function Home() {
   };
 
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const inputs = [
     { label: "Token", type: "text" }

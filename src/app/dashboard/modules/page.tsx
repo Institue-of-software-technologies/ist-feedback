@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
+import Loading from '../loading';  // Import the Loading component
 
 const ModuleManagement: React.FC = () => {
   const { user } = useUser();
@@ -72,9 +73,7 @@ const ModuleManagement: React.FC = () => {
     router.push(`/dashboard/modules/edit/${module.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const columns = [
     { header: 'Module Name', accessor: 'moduleName' },
