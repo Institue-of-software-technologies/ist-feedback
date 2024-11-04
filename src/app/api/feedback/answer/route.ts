@@ -1,4 +1,5 @@
 import { FeedbackAnswer } from '@/db/models/FeedbackAnswer';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 interface FeedbackAnswerCreateRequest {
@@ -10,30 +11,25 @@ interface FeedbackAnswerCreateRequest {
 
 export async function POST(req: Request) {
     const { formData } = await req.json();
-    let ipAddress = 'Unknown IP';
-    await fetch("https://api.ipify.org?format=json")
-        .then(response => response.json())
-        .then(data => {
-            ipAddress = data.ip;
-        })
-        .catch(error => {
-            console.error("Error fetching IP address:", error);
-        });
-
-
+    
     try {
         await Promise.all(formData.map(async (answer: FeedbackAnswerCreateRequest) => {
             await FeedbackAnswer.create({
                 feedbackId: answer.feedbackId,
                 questionId: answer.questionId,
                 answerText: answer.answer,
-                userIp: ipAddress
             });
         }));
 
-        return NextResponse.json({
+        const expires = new Date(Date.now() +(1 * 60 * 60 * 1000));
+
+        cookies().set('feedMe', 'true', { expires, httpOnly: true });
+
+        const response = NextResponse.json({
             message: "Feedback submitted successfully",
         });
+        return response;
+        
     } catch (error) {
         console.error("Error saving feedback answers:", error);
         return NextResponse.json({
@@ -42,3 +38,13 @@ export async function POST(req: Request) {
         }, { status: 500 }); // Return a 500 status code on error
     }
 }
+
+export async function GET() {
+    const cookieStore = cookies();
+    const myCookie = cookieStore.get('feedMe')?.value === 'true';
+  
+    return NextResponse.json({
+      myCookie
+    });
+  }
+  
