@@ -160,7 +160,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       permission: 'send_feedback_reports',
       viewLabel: 'View Feedback Reports',
       createLabel: 'Send Feedback Report',
-      viewLink: '/dashboard/feedback-reports/view',
+      viewLink: '/dashboard/feedback-reports/',
       icon: <SiGoogleforms size={'55px'} />,
       createLink: '/dashboard/feedback-reports/send',
     },
