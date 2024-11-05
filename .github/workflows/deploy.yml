@@ -35,27 +35,27 @@ jobs:
       - name: Publish image to docker hub
         run: docker push kirarwa/ist-feedback:latest
 
-  deploy:
-    needs: build
-    runs-on: self-hosted
-    steps:
-      - name: Login to docker hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Pull image from docker hub
-        run: docker pull kirarwa/ist-feedback:latest
-      - name: Clean up old containers and images
-        run: |
-            # Stop the container if it's running
-            docker stop nextjs-app-container || true
-            # Remove the container
-            docker rm -f nextjs-app-container || true
-            # Remove unused images
-            docker image prune -f
-            # Clean up dangling volumes (optional)
-            docker volume prune -f  
-      - name: Run docker container
-        run: docker run -d -p 3000:3000 --name nextjs-app-container kirarwa/ist-feedback
-      - name: Run migrations
-        run: docker exec nextjs-app-container npm run migrate
-      - name: Run seeders
-        run: docker exec nextjs-app-container npm run seed 
+  # deploy:
+  #   needs: build
+  #   runs-on: self-hosted
+  #   steps:
+  #     - name: Login to docker hub
+  #       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+  #     - name: Pull image from docker hub
+  #       run: docker pull kirarwa/ist-feedback:latest
+  #     - name: Clean up old containers and images
+  #       run: |
+  #           # Stop the container if it's running
+  #           docker stop nextjs-app-container || true
+  #           # Remove the container
+  #           docker rm -f nextjs-app-container || true
+  #           # Remove unused images
+  #           docker image prune -f
+  #           # Clean up dangling volumes (optional)
+  #           docker volume prune -f  
+  #     - name: Run docker container
+  #       run: docker run -d -p 3000:3000 --name nextjs-app-container kirarwa/ist-feedback
+  #     - name: Run migrations
+  #       run: docker exec nextjs-app-container npm run migrate
+  #     - name: Run seeders
+  #       run: docker exec nextjs-app-container npm run seed 
