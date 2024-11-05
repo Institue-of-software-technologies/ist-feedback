@@ -40,11 +40,7 @@ FeedbackAnswer.init({
   answerText: {
     type: DataTypes.TEXT,
     allowNull: false,
-  },
-  userIp: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
+  }
 }, {
   sequelize,
   modelName: 'FeedbackAnswer',

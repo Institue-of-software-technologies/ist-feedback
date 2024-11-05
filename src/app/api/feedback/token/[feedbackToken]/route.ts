@@ -1,5 +1,6 @@
 import { Feedback } from "@/db/models/Feedback";
-import { FeedbackAnswer } from "@/db/models/FeedbackAnswer";
+import { Permission } from "@/db/models/Permission";
+import { RolePermission } from "@/db/models/RolePermissions";
 import { NextResponse } from "next/server";
 import { NextRequest } from 'next/server';
 import { Op } from "sequelize";
@@ -19,32 +20,19 @@ export async function GET(request: NextRequest, { params }: { params: { feedback
             return NextResponse.json({ message: 'Feedback token not found or expired' }, { status: 404 });
         }
 
-        let ipAddress = 'Unknown IP';
-        await fetch("https://api.ipify.org?format=json")
-            .then(response => response.json())
-            .then(data => {
-                ipAddress = data.ip;
-            })
-            .catch(error => {
-                console.error("Error fetching IP address:", error);
-            });
-
-        const ipCheck = await FeedbackAnswer.findOne({
-            where: {
-                userIp: ipAddress,
-            }
+        const rolePermissions = await RolePermission.findAll({
+            where: { roleId: 3 },
+            include: [
+                {
+                    model: Permission,
+                    as: 'permission',
+                    attributes: ['permissionName']
+                }
+            ],
         });
+        const permissions = rolePermissions.map((rp) => rp.permission?.permissionName || '');
 
-        if (ipCheck) {
-            return NextResponse.json(
-                { 
-                    message: 'It seems you have already submitted your feedback. If you need to make changes, please contact support.' 
-                }, 
-                { status: 409 }
-            );
-        }
-
-        return NextResponse.json({ token });
+        return NextResponse.json({ token,permissions:permissions,role:"student"});
     } catch (error) {
         console.log(error);
         return NextResponse.json(
