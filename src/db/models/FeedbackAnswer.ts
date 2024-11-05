@@ -5,9 +5,11 @@ import { Feedback } from './Feedback';
 
 export class FeedbackAnswer extends Model {
   id!: number;
-  feedbackQuestionId!: number; // Foreign key to FeedbackQuestions
+  questionId!: number; // Foreign key to FeedbackQuestions
   feedbackId!: number; // Foreign key to Feedback
   answerText!: string;
+  question?: FeedbackQuestion;
+  feedback?: Feedback;
 }
 
 FeedbackAnswer.init({
@@ -17,7 +19,7 @@ FeedbackAnswer.init({
     primaryKey: true,
     allowNull: false,
   },
-  feedbackQuestionId: {
+  questionId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -40,7 +42,7 @@ FeedbackAnswer.init({
   answerText: {
     type: DataTypes.TEXT,
     allowNull: false,
-  },
+  }
 }, {
   sequelize,
   modelName: 'FeedbackAnswer',
@@ -50,7 +52,7 @@ FeedbackAnswer.init({
 
 // Associations
 FeedbackAnswer.belongsTo(FeedbackQuestion, {
-  foreignKey: 'feedbackQuestionId',
+  foreignKey: 'questionId',
   as: 'question',
 });
 

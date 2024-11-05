@@ -1,22 +1,24 @@
-import { ExclamationTriangleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ClipboardIcon, ExclamationTriangleIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import React, { ReactNode, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
-interface Column<T> {
+interface Column {
     header: string;
-    accessor: keyof T | string;
+    accessor: string;
 }
 
 
 interface TableProps<T> {
-    columns: Column<T>[];
+    columns: Column[];
     data: T[];
     onEdit?: (row: T) => void;
     onDelete?: (row: T) => void;
+    onView?: (row: T) => void;
     onSearch?: (value: string) => void;
 }
 
-const Table = <T,>({ columns, data, onEdit, onDelete,onSearch }: TableProps<T>): JSX.Element => {
+const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableProps<T>): JSX.Element => {
     const [confirmDelete, setConfirmDelete] = useState<T | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -63,7 +65,18 @@ const Table = <T,>({ columns, data, onEdit, onDelete,onSearch }: TableProps<T>):
         setSearch(e.target.value);
         onSearch?.(e.target.value);  // Trigger search on input change
         console.log(search);
-      };
+    };
+
+    const handleCopy = (token: string) => {
+        navigator.clipboard.writeText(token)
+            .then(() => {
+                toast.info('Student Token copied!', { position: 'top-right', autoClose: 1000 });
+            })
+            .catch(err => {
+                toast.error('Failed to copy token: ', err);
+            });
+    };
+
     // Pagination logic: get the rows for the current page
     const paginatedData = data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
@@ -127,7 +140,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete,onSearch }: TableProps<T>):
                                         {column.header}
                                     </th>
                                 ))}
-                                {(onEdit || onDelete) && <th className="px-4 py-2">Actions</th>}
+                                {(onEdit || onDelete || onView) && <th className="px-4 py-2">Actions</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -135,12 +148,23 @@ const Table = <T,>({ columns, data, onEdit, onDelete,onSearch }: TableProps<T>):
                                 <tr key={index} className="border-t">
                                     {columns.map((column) => (
                                         <td key={column.accessor.toString()} className="px-4 py-2">
-                                            {typeof column.accessor === 'string' && column.accessor.includes('.')
-                                                ? getNestedValue(row, column.accessor)
-                                                : getNestedValue(row, column.accessor as string)}
+                                            {typeof column.accessor === 'string' && column.accessor === 'studentToken' ? (
+                                                <div className="flex items-center">
+                                                    <span>{getNestedValue(row, column.accessor)}</span>
+                                                    <button
+                                                        onClick={() => handleCopy(String(getNestedValue(row, column.accessor)))}
+                                                        className="text-blue-500 hover:underline ml-5 inline-flex items-center"
+                                                    >
+                                                        <ClipboardIcon className="h-8 w-7 mr-1" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                getNestedValue(row, column.accessor as string)
+                                            )}
+
                                         </td>
                                     ))}
-                                    {(onEdit || onDelete) && (
+                                    {(onEdit || onDelete || onView) && (
                                         <td className="px-4 py-2 flex space-x-2">
                                             {onEdit && (
                                                 <button
@@ -158,6 +182,15 @@ const Table = <T,>({ columns, data, onEdit, onDelete,onSearch }: TableProps<T>):
                                                 >
                                                     <TrashIcon className="h-5 w-5 mr-1" />
                                                     Delete
+                                                </button>
+                                            )} 
+                                            {onView && (
+                                                <button
+                                                    onClick={() => onView(row)}
+                                                    className="text-green-500 hover:underline inline-flex items-center ml-4"
+                                                >
+                                                    <EyeIcon className="h-5 w-5 mr-1" />
+                                                    View
                                                 </button>
                                             )}
                                         </td>

@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
+import Loading from '../loading';  // Import the Loading component
 
 
 const CourseManagement: React.FC = () => {
@@ -73,9 +74,7 @@ const CourseManagement: React.FC = () => {
     router.push(`/dashboard/courses/edit/${course.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const columns = [
     { header: 'courseName', accessor: 'courseName' }

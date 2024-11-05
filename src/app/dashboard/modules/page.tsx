@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
+import Loading from '../loading';  // Import the Loading component
 
 const ModuleManagement: React.FC = () => {
   const { user } = useUser();
@@ -72,25 +73,28 @@ const ModuleManagement: React.FC = () => {
     router.push(`/dashboard/modules/edit/${module.id}`);
   };
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading />;
 
   const columns = [
     { header: 'Module Name', accessor: 'moduleName' },
-    { header: 'Course ID', accessor: 'courseId' },
+    { header: 'Course ID', accessor: 'course.courseName' },
   ];
 
   return (
     <div>
       <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
+      {filteredModules && filteredModules.length === 0 ? (
+        <div className="text-center p-4">
+          <p>No Modules available at the moment.</p>
+        </div>
+      ) : (
       <Table<Module>
         columns={columns}
         data={filteredModules}
         onSearch={handleSearch}
         onEdit={user && user.permissions.includes('update_modules') ? handleEdit : undefined}
         onDelete={user && user.permissions.includes('delete_modules') ? handleDelete : undefined}
-      />
+      />)}
     </div>
   );
 };
