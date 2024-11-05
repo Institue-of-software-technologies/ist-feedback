@@ -4,6 +4,7 @@ import { Trainer } from './Trainer';
 import { ClassTime } from './ClassTime';
 import { Module } from './Module';
 import { Intake } from './Intake';
+import { FeedbackAnswer } from './FeedbackAnswer';
 
 export class Feedback extends Model {
   id!: number;
@@ -18,6 +19,7 @@ export class Feedback extends Model {
   // intake?: Intake; // Add this manually for TypeScript to recognize the association
   classTime?: ClassTime;
   module?: Module;
+  feedbackAnswers?: FeedbackAnswer[];
 }
 
 Feedback.init({

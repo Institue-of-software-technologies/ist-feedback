@@ -1,4 +1,4 @@
-import { ClipboardIcon, ExclamationTriangleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ClipboardIcon, ExclamationTriangleIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import React, { ReactNode, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
@@ -14,10 +14,11 @@ interface TableProps<T> {
     data: T[];
     onEdit?: (row: T) => void;
     onDelete?: (row: T) => void;
+    onView?: (row: T) => void;
     onSearch?: (value: string) => void;
 }
 
-const Table = <T,>({ columns, data, onEdit, onDelete, onSearch }: TableProps<T>): JSX.Element => {
+const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableProps<T>): JSX.Element => {
     const [confirmDelete, setConfirmDelete] = useState<T | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -139,7 +140,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch }: TableProps<T>)
                                         {column.header}
                                     </th>
                                 ))}
-                                {(onEdit || onDelete) && <th className="px-4 py-2">Actions</th>}
+                                {(onEdit || onDelete || onView) && <th className="px-4 py-2">Actions</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
@@ -163,7 +164,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch }: TableProps<T>)
 
                                         </td>
                                     ))}
-                                    {(onEdit || onDelete) && (
+                                    {(onEdit || onDelete || onView) && (
                                         <td className="px-4 py-2 flex space-x-2">
                                             {onEdit && (
                                                 <button
@@ -181,6 +182,15 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch }: TableProps<T>)
                                                 >
                                                     <TrashIcon className="h-5 w-5 mr-1" />
                                                     Delete
+                                                </button>
+                                            )} 
+                                            {onView && (
+                                                <button
+                                                    onClick={() => onView(row)}
+                                                    className="text-green-500 hover:underline inline-flex items-center ml-4"
+                                                >
+                                                    <EyeIcon className="h-5 w-5 mr-1" />
+                                                    View
                                                 </button>
                                             )}
                                         </td>

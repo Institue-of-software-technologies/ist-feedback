@@ -5,6 +5,7 @@ export class FeedbackQuestion extends Model {
   id!: number;
   questionText!: string;
   questionType!: 'open-ended' | 'closed-ended' | 'rating';
+  responses!: { [answerText: string]: { count: number; percentage: string } }
 }
 
 FeedbackQuestion.init({
