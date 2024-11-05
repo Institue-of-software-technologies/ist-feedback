@@ -59,6 +59,7 @@ export default function StudentFeedback() {
             const response = await api.post('/feedback/answer', { formData: formattedData });
             toast.success("Feedback submitted successfully!", { position: "top-right", autoClose: 3000 });
             console.log(response)
+            localStorage.clear();
             setTimeout(() => {
                 router.push(`/`);
             }, 3000);
