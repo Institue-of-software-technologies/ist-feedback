@@ -7,9 +7,11 @@ import { Course, Trainer } from '@/types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
+import Loading from '../../../loading';
 
 interface FormData {
   trainerName: string;
+  email:string;
   courseId: string;
 }
 
@@ -71,7 +73,7 @@ const EditTrainer = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
   if (error) return <div className='text-red-500'>{error}</div>;
 
   const inputs = [
@@ -79,6 +81,11 @@ const EditTrainer = () => {
       label: 'trainerName',
       type: 'text',
       value: trainer?.trainerName,
+    },
+    {
+      label: 'email',
+      type: 'text',
+      value: trainer?.email,
     },
     {
       label: 'course',

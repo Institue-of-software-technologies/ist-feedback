@@ -45,6 +45,7 @@ export interface Feedback {
   trainer: {
     id: number;
     trainerName: string;
+    email: string;
     course: {
       courseName: string
     }
@@ -72,6 +73,7 @@ export interface Intake {
 export interface Trainer {
   id: number;
   trainerName:string;
+  email:string;
 }
 
 export interface ClassTime {

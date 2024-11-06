@@ -39,7 +39,7 @@ export async function GET(req: Request, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { trainerId } = context.params;
-    const { trainerName, course } = await req.json();
+    const { trainerName, course, email } = await req.json();
 
     const trainer = await Trainer.findByPk(trainerId);
 
@@ -58,6 +58,10 @@ export async function PUT(req: NextRequest, context: Context) {
     // Only update the course if provided
     if (course) {
       trainer.courseId = course;
+    }
+
+    if (email) {
+      trainer.email = email;
     }
 
     await trainer.save();
