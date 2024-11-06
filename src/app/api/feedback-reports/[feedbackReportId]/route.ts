@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, context: Context) {
             {
               model: Trainer,
               as: "trainer",
-              attributes: ["trainerName"],
+              attributes: ["trainerName","email"],
               include: [
                 {
                   model: Course,
@@ -85,5 +85,4 @@ export async function GET(req: NextRequest, context: Context) {
     );
   }
 }
-
 
