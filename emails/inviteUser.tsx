@@ -116,7 +116,7 @@ import {
   const logo = {
     display: "flex",
     justifyContent: "center",
-    alingItems: "center",
+    alignItems: "center",
     padding: 20,
   };
   

@@ -53,6 +53,7 @@ const NewTrainerForm: React.FC = () => {
 
   const inputs = [
     { label: 'trainerName', type: 'text' },
+    { label: 'email', type: 'text' },
     {
       label: 'course',
       type: 'select',

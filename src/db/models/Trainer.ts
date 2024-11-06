@@ -5,6 +5,7 @@ import { Course } from './Course';
 export class Trainer extends Model {
   id!: number;
   trainerName!: string;
+  email!: string;
   courseId!: number;
 
   courses?: Course;
@@ -29,6 +30,11 @@ Trainer.init({
     },
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
   },
 }, {
   sequelize,

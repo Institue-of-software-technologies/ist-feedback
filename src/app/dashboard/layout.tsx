@@ -24,6 +24,8 @@ import api from '../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
+import istLogo from '../../../public/assets/image/logo.png';
+import Image from 'next/image';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -220,8 +222,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
         >
-          <div className="flex items-center justify-between p-4 bg-red-600">
-            <h2 className="text-lg font-semibold">Dashboard - Side bar</h2>
+          <div className="flex items-center justify-between p-4 bg-grey-800">
+            <h2 className="text-lg font-semibold">IST</h2>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(false)}
@@ -261,8 +263,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
         {/* Main Content */}
         <div className="flex flex-col flex-1">
           {/* Header */}
-          <header className="flex items-center justify-between bg-red-600 text-white p-4 lg:hidden">
-            <h1 className="text-2xl font-bold">Welcome to the Dashboard - Top Header</h1>
+          <header className="flex items-center justify-between bg-gray-800 text-white p-4 lg:hidden">
+
+          <Image
+              className="justify-start w-[100px] h-[75px]"
+              src={istLogo}
+              alt="ist_logo"
+              width={100}
+              height={100}
+            />
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(true)}

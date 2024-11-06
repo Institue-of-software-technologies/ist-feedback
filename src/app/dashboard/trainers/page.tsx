@@ -94,6 +94,7 @@ const TrainerManagement: React.FC = () => {
 
   const columns = [
     { header: 'trainerName', accessor: 'trainerName' },
+    { header: 'email', accessor: 'email' },
     { header: 'Course', accessor: 'course.courseName' },
   ];
 
