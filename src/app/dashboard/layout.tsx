@@ -24,6 +24,8 @@ import api from '../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
+import istLogo from '../../../public/assets/image/cropedImag.png';
+import Image from 'next/image';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -63,78 +65,87 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       permission: 'view_dashboard', // A common permission for all users
       viewLabel: 'Dashboard',
       icon: <RiDashboard2Fill size={'55px'} />,
+      sideIcon: <RiDashboard2Fill size={'30px'} />,
       viewLink: '/dashboard',
     },
     {
-      name: 'User Management',
+      name: 'User',
       permission: 'manage_users',
       viewLabel: 'View Users',
       createLabel: 'Create User',
       viewLink: '/dashboard/users',
       icon: <FaUsers size={'55px'} />,
+      sideIcon: <FaUsers size={'30px'} />,
       createLink: '/dashboard/users/create',
     },
     {
-      name: 'Course Management',
+      name: 'Course',
       permission: 'manage_courses',
       viewLabel: 'View Courses',
       createLabel: 'Create Course',
       viewLink: '/dashboard/courses',
       icon: <FaGraduationCap size={'55px'} />,
+      sideIcon: <FaGraduationCap size={'30px'} />,
       createLink: '/dashboard/courses/create',
     },
     {
-      name: "Module Management",
+      name: "Module ",
       permission: "manage_modules",
       viewLabel: "View Modules",
       createLabel: "Create Module",
       viewLink: "/dashboard/modules",
       icon: <FaWpforms size={"55px"} />,
+      sideIcon: <FaWpforms size={"30px"} />,
       createLink: "/dashboard/modules/create",
     },
     {
-      name: "Intake Management",
+      name: "Intake ",
       permission: "manage_intakes",
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
       viewLink: "/dashboard/intakes",
       icon: <FaBookReader size={"55px"} />,
+      sideIcon: <FaBookReader size={"30px"} />,
       createLink: "/dashboard/intakes/create",
     },
     {
-      name: "Class Time Management",
+      name: "Class Time",
       permission: "manage_class_time",
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
       viewLink: "/dashboard/class-times",
       icon: <PiChalkboardTeacherFill size={"55px"} />,
+      sideIcon: <PiChalkboardTeacherFill size={"30px"} />,
       createLink: "/dashboard/class-times/create",
     },
     {
-      name: 'Role Management',
+      name: 'Role',
       permission: 'manage_roles',
       viewLabel: 'View Roles',
       createLabel: 'Create Role',
       viewLink: '/dashboard/roles',
       icon: <FaUsersCog size={'55px'} />,
+      sideIcon: <FaUsersCog size={'30px'} />,
       createLink: '/dashboard/roles/create',
     },
     {
-      name: 'Permission Management',
+      name: 'Permission',
       permission: 'manage_permissions',
       viewLabel: 'View Permissions',
       createLabel: 'Create Permission',
       viewLink: '/dashboard/permissions',
       icon: <FaUserLock size={'55px'} />,
+      sideIcon: <FaUserLock size={'30px'} />,
       createLink: '/dashboard/permissions/create',
     },
     {
-      name: 'Trainer Management',
+      name: 'Trainer',
       permission: 'manage_trainers',
       viewLabel: 'View Trainers',
       createLabel: 'Create Trainer',
       viewLink: '/dashboard/trainers',
       icon: <FaUsers size={'55px'} />,
+      sideIcon: <FaUsers size={'30px'} />,
       createLink: '/dashboard/trainers/create',
     },
     {
@@ -144,15 +155,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       createLabel: "Create Feedback Question",
       viewLink: "/dashboard/feedback-questions",
       icon: <TbUserQuestion size={"55px"} />,
+      sideIcon: <TbUserQuestion size={"30px"} />,
       createLink: "/dashboard/feedback-questions/create",
     },
     {
-      name: "Feedback Management",
+      name: "Feedback",
       permission: "manage_feedback",
       viewLabel: "View Feedback",
       createLabel: "Create Feedback",
       viewLink: "/dashboard/feedback",
       icon: <VscFeedback size={"55px"} />,
+      sideIcon: <VscFeedback size={"30px"} />,
       createLink: "/dashboard/feedback/create",
     },
     {
@@ -162,6 +175,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       createLabel: 'Send Feedback Report',
       viewLink: '/dashboard/feedback-reports/',
       icon: <SiGoogleforms size={'55px'} />,
+      sideIcon: <SiGoogleforms size={'30px'} />,
       createLink: '/dashboard/feedback-reports/send',
     },
   ];
@@ -220,10 +234,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
         >
-          <div className="flex items-center justify-between p-4 bg-red-600">
-            <h2 className="text-lg font-semibold">Dashboard - Side bar</h2>
+          <div className="flex items-center justify-between p-1 bg-gray-800">
+            <div className="d flex justify-center items-center">
+              <Image
+                className="w-[100px] h-[75px]"
+                src={istLogo}
+                alt="ist_logo"
+                width={150}
+                height={150}
+              />
+            </div>
             <button
-              className="text-white focus:outline-none"
+              className="text-white focus:outline-none m-3"
               onClick={() => setSidebarOpen(false)}
             >
               <FaTimes size={20} />
@@ -239,7 +261,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
                       className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''
                         } transition-colors`}
                     >
-                      {tab.icon}
+                      <span>{tab.sideIcon}</span>
                       <span className="ml-2">{tab.name}</span>
                     </button>
                   </li>
@@ -261,8 +283,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
         {/* Main Content */}
         <div className="flex flex-col flex-1">
           {/* Header */}
-          <header className="flex items-center justify-between bg-red-600 text-white p-4 lg:hidden">
-            <h1 className="text-2xl font-bold">Welcome to the Dashboard - Top Header</h1>
+          <header className="flex items-center justify-between bg-gray-800 text-white p-4 lg:hidden">
+          <div className="mb-1 d flex justify-center items-center">
+              <Image
+                className="w-[100px] h-[75px]"
+                src={istLogo}
+                alt="ist_logo"
+                width={100}
+                height={100}
+              />
+            </div>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(true)}
@@ -327,7 +357,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           )}
 
           {/* Main Content */}
-          <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
+          <main className="flex-grow p-2 overflow-y-auto bg-background text-foreground">
             {currentView === 'view' && (
               <div>
               
