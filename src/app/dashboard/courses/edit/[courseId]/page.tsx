@@ -37,7 +37,6 @@ const EditCourse = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
-    console.log(data)
     try {
       await api.put(`/courses/${courseId}`, data);
       toast.success('courses updated successfully!', {
