@@ -20,10 +20,6 @@ interface EmailTemplateProps {
   resetPasswordLink?: string;
 }
 
-const baseUrl = process.env.URL
-  ? `http://localhost:3000/`
-  : "";
-
 export const ResetPasswordEmail = ({
   username,
   updatedDate,
@@ -143,7 +139,7 @@ const content = {
 const logo = {
   display: "flex",
   justifyContent: "center",
-  alingItems: "center",
+  alignItems: "center",
   padding: 20,
 };
 
