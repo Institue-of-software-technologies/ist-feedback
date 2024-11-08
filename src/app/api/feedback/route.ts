@@ -57,7 +57,8 @@ export async function GET() {
         day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false,
+        hour12: true,
+        timeZoneName: "short",
       });
 
       return {
@@ -139,6 +140,9 @@ export async function POST(req: Request) {
       );
     }
 
+    // Convert tokenExpiration to UTC
+    const utcExpiration = new Date(Expiration.toISOString()); // Converts to UTC
+
     const studentToken = await generateUniqueToken();
 
     const feedback = await Feedback.create({
@@ -147,7 +151,7 @@ export async function POST(req: Request) {
       classTimeId,
       moduleId,
       studentToken,
-      tokenExpiration: Expiration,
+      tokenExpiration: utcExpiration, // Store in UTC
     });
 
     for (const feedbackSelectQuestion of multiSelectField) {
@@ -169,3 +173,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
