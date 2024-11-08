@@ -82,7 +82,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
 
     return (
         <>
-            <div className="border shadow rounded-lg divide-y outline-gray-100 divide-gray-200 w-full">
+            <div className="overflow-x-auto border shadow rounded-lg divide-y outline-gray-100 divide-gray-200 w-full">
                 {/* Search and Rows per Page Selection */}
                 <div className="flex flex-col sm:flex-row justify-between items-center p-4 space-y-2 sm:space-y-0 w-full">
                     <div className="relative w-full max-w-xs flex items-center space-x-2">
@@ -130,24 +130,28 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                         </select>
                     </div>
                 </div>
+    
                 {/* Responsive Table */}
                 <div className="overflow-x-auto w-full">
                     <table className="min-w-full divide-y divide-gray-200 w-full">
                         <thead className="bg-stone-100">
                             <tr>
                                 {columns.map((column) => (
-                                    <th key={column.accessor.toString()} className="px-4 py-2 text-left">
+                                    <th
+                                        key={column.accessor.toString()}
+                                        className="px-4 py-2 text-left text-sm font-medium text-gray-500"
+                                    >
                                         {column.header}
                                     </th>
                                 ))}
-                                {(onEdit || onDelete || onView) && <th className="px-4 py-2">Actions</th>}
+                                {(onEdit || onDelete || onView) && <th className="px-4 py-2 text-sm">Actions</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                             {paginatedData.map((row, index) => (
                                 <tr key={index} className="border-t">
                                     {columns.map((column) => (
-                                        <td key={column.accessor.toString()} className="px-4 py-2">
+                                        <td key={column.accessor.toString()} className="px-4 py-2 text-sm">
                                             {typeof column.accessor === 'string' && column.accessor === 'studentToken' ? (
                                                 <div className="flex items-center">
                                                     <span>{getNestedValue(row, column.accessor)}</span>
@@ -161,11 +165,10 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                                             ) : (
                                                 getNestedValue(row, column.accessor as string)
                                             )}
-
                                         </td>
                                     ))}
                                     {(onEdit || onDelete || onView) && (
-                                        <td className="px-4 py-2 flex space-x-2">
+                                        <td className="px-4 py-2 flex space-x-2 text-sm">
                                             {onEdit && (
                                                 <button
                                                     onClick={() => onEdit(row)}
@@ -183,7 +186,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                                                     <TrashIcon className="h-5 w-5 mr-1" />
                                                     Delete
                                                 </button>
-                                            )} 
+                                            )}
                                             {onView && (
                                                 <button
                                                     onClick={() => onView(row)}
@@ -199,7 +202,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                             ))}
                         </tbody>
                     </table>
-
+    
                     {/* Pagination Controls */}
                     <div className="border py-1 px-4 flex justify-between items-center">
                         <button
@@ -210,11 +213,11 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                         >
                             « Previous
                         </button>
-
+    
                         <span className="text-sm">
                             Page {currentPage} of {totalPages}
                         </span>
-
+    
                         <button
                             type="button"
                             className="p-2 text-sm text-gray-800 hover:bg-gray-100"
@@ -225,7 +228,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                         </button>
                     </div>
                 </div>
-
+    
                 {/* Confirmation Modal */}
                 {confirmDelete && (
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
@@ -256,7 +259,6 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                 )}
             </div>
         </>
-
     );
 };
 
