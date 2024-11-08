@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create a custom Axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://feedback.isteducation.com/api',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://feedback.isteducation.com/api',
   timeout: 40000, // Set a timeout
 });
 
