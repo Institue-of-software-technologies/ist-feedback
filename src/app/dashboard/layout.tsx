@@ -217,7 +217,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
 
   return (
     <Suspense fallback={<Loading />}>
-      <div className="flex h-screen bg-background text-foreground">
+      <div className="flex h-screen bg-background text-foreground overflow-x-hidden">
         <ToastContainer />
 
         {/* Sidebar for Mobile */}
@@ -234,8 +234,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
         >
-          <div className="flex items-center justify-between p-1 bg-gray-800">
-            <div className="d flex justify-center items-center">
+          <div className="flex items-center justify-between p-1 bg-gray-800 w-full overflow-x-hidden white-space-nowrap">
+            <div className="flex justify-center items-center">
               <Image
                 className="w-[100px] h-[75px]"
                 src={istLogo}
@@ -251,32 +251,35 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
               <FaTimes size={20} />
             </button>
           </div>
+
+
           <nav className="p-4">
-            <ul className="space-y-2">
-              {tabs.map((tab) => (
-                user.permissions.includes(tab.permission) && (
-                  <li key={tab.name}>
-                    <button
-                      onClick={() => handleTabChange(tab.name, 'view')}
-                      className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''
-                        } transition-colors`}
-                    >
-                      <span>{tab.sideIcon}</span>
-                      <span className="ml-2">{tab.name}</span>
-                    </button>
-                  </li>
-                )
-              ))}
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center w-full p-2 rounded hover:bg-gray-700 transition-colors"
-                >
-                  <FaPowerOff size={20} />
-                  <span className="ml-2">Logout</span>
-                </button>
-              </li>
-            </ul>
+            <div className="max-h-[calc(100vh-4rem)] overflow-y-auto overflow-scroll">  {/* Allows vertical scroll */}
+              <ul className="space-y-2">
+                {tabs.map((tab) => (
+                  user.permissions.includes(tab.permission) && (
+                    <li key={tab.name}>
+                      <button
+                        onClick={() => handleTabChange(tab.name, 'view')}
+                        className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''} transition-colors`}
+                      >
+                        <span>{tab.sideIcon}</span>
+                        <span className="ml-2">{tab.name}</span>
+                      </button>
+                    </li>
+                  )
+                ))}
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full p-2 rounded hover:bg-gray-700 transition-colors"
+                  >
+                    <FaPowerOff size={20} />
+                    <span className="ml-2">Logout</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
           </nav>
         </div>
 
@@ -284,7 +287,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
         <div className="flex flex-col flex-1">
           {/* Header */}
           <header className="flex items-center justify-between bg-gray-800 text-white p-4 lg:hidden">
-          <div className="mb-1 d flex justify-center items-center">
+            <div className="mb-1 d flex justify-center items-center">
               <Image
                 className="w-[100px] h-[75px]"
                 src={istLogo}
@@ -336,48 +339,49 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
 
           {/* Sub-tabs for View/Create */}
           {activeTabDetails && (
-            <div className="bg-gray-200 p-4 flex space-x-2">
+            <div className="bg-gray-200 p-4 flex flex-wrap space-x-2">
               {activeTabDetails.viewLabel && (
                 <button
-                  onClick={() => handleTabChange(activeTab, 'view')} // Switch to view mode
-                  className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
+                  onClick={() => handleTabChange(activeTab, 'view')}
+                  className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors w-full sm:w-auto sm:flex-grow-0 flex-grow m-1`}
                 >
                   {activeTabDetails.viewLabel}
                 </button>
               )}
               {activeTabDetails.createLabel && (
                 <button
-                  onClick={() => handleTabChange(activeTab, 'create')} // Switch to create mode
-                  className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
+                  onClick={() => handleTabChange(activeTab, 'create')}
+                  className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors w-full sm:w-auto sm:flex-grow-0 flex-grow m-1`}
                 >
                   {activeTabDetails.createLabel}
                 </button>
               )}
             </div>
+
           )}
 
           {/* Main Content */}
-          <main className="flex-grow p-2 overflow-y-auto bg-background text-foreground">
+          <main className="flex-grow p-2 overflow-y-auto overflow-x-auto bg-background text-foreground">
             {currentView === 'view' && (
               <div>
-              
+
                 {activeTab === 'Dashboard' && (
                   <div>
                     {overview}
                   </div>
-                )} 
+                )}
 
                 {activeTab === 'Dashboard' && (
-              <div>
-                {reports}
-              </div>
-            )}
+                  <div>
+                    {reports}
+                  </div>
+                )}
 
-            {activeTab === 'Dashboard' && (
-              <div>
-                {analytics}
-              </div>
-            )}
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {analytics}
+                  </div>
+                )}
                 {/* Render the content for viewing */}
                 {children}
               </div>

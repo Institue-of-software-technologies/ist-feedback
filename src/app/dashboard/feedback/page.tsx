@@ -96,15 +96,15 @@ const FeedBackManagement: React.FC = () => {
       Cell: ({ value }: { value: string }) => {
         const date = new Date(value);
 
-       
-        return date.toLocaleString('en-KE', { 
+
+        return date.toLocaleString('en-KE', {
           weekday: 'long',
           year: 'numeric',
-          month: 'long', 
+          month: 'long',
           day: '2-digit',
           hour: '2-digit',
-          hour12: true, 
-          timeZoneName: 'short', 
+          hour12: true,
+          timeZoneName: 'short',
         });
       },
     }

@@ -8,7 +8,6 @@ interface Column {
     accessor: string;
 }
 
-
 interface TableProps<T> {
     columns: Column[];
     data: T[];
@@ -25,7 +24,6 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
     const [search, setSearch] = useState<string>('');
 
     const totalPages = Math.ceil(data.length / rowsPerPage);
-
 
     const handleDelete = () => {
         if (confirmDelete && onDelete) {
@@ -107,15 +105,17 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                                 stroke-width="2"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
+
                             >
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <path d="m21 21-4.3-4.3"></path>
+
                             </svg>
                         </div>
                     </div>
                     <div className="w-full sm:w-auto">
                         <label htmlFor="rowsPerPage" className="mr-2">
-                            Rows per page:
+                            Rows:
                         </label>
                         <select
                             id="rowsPerPage"
@@ -130,11 +130,11 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                         </select>
                     </div>
                 </div>
-    
+
                 {/* Responsive Table */}
                 <div className="overflow-x-auto w-full">
                     <table className="min-w-full divide-y divide-gray-200 w-full">
-                        <thead className="bg-stone-100">
+                        <thead>
                             <tr>
                                 {columns.map((column) => (
                                     <th
@@ -202,7 +202,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                             ))}
                         </tbody>
                     </table>
-    
+
                     {/* Pagination Controls */}
                     <div className="border py-1 px-4 flex justify-between items-center">
                         <button
@@ -213,11 +213,11 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                         >
                             « Previous
                         </button>
-    
+
                         <span className="text-sm">
                             Page {currentPage} of {totalPages}
                         </span>
-    
+
                         <button
                             type="button"
                             className="p-2 text-sm text-gray-800 hover:bg-gray-100"
@@ -228,7 +228,7 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                         </button>
                     </div>
                 </div>
-    
+
                 {/* Confirmation Modal */}
                 {confirmDelete && (
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
