@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        const emailHtml = await render(ResetPasswordEmail({
+        const view  = await render(ResetPasswordEmail({
             username: findUser.username,
             updatedDate: now,
             resetPasswordLink: customLink
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
             from: user,
             to: email,
             subject: 'Password Reset',
-            html: emailHtml,
+            html: view ,
         };
 
         await transporter.sendMail(options);
