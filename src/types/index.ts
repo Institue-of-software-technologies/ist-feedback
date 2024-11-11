@@ -51,6 +51,7 @@ export interface Feedback {
     }
   };
   intake: {
+    intakeYear: string;
     id: number;
     intakeName: string;
   };  

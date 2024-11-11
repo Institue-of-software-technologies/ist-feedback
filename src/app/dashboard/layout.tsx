@@ -64,7 +64,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       name: 'Dashboard',
       permission: 'view_dashboard', // A common permission for all users
       viewLabel: 'Dashboard',
-      icon: <RiDashboard2Fill size={'55px'} />,
+      icon: <RiDashboard2Fill size={'40px'} />,
       sideIcon: <RiDashboard2Fill size={'30px'} />,
       viewLink: '/dashboard',
     },
@@ -74,7 +74,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Users',
       createLabel: 'Create User',
       viewLink: '/dashboard/users',
-      icon: <FaUsers size={'55px'} />,
+      icon: <FaUsers size={'40px'} />,
       sideIcon: <FaUsers size={'30px'} />,
       createLink: '/dashboard/users/create',
     },
@@ -84,7 +84,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Courses',
       createLabel: 'Create Course',
       viewLink: '/dashboard/courses',
-      icon: <FaGraduationCap size={'55px'} />,
+      icon: <FaGraduationCap size={'40px'} />,
       sideIcon: <FaGraduationCap size={'30px'} />,
       createLink: '/dashboard/courses/create',
     },
@@ -94,7 +94,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: "View Modules",
       createLabel: "Create Module",
       viewLink: "/dashboard/modules",
-      icon: <FaWpforms size={"55px"} />,
+      icon: <FaWpforms size={"40px"} />,
       sideIcon: <FaWpforms size={"30px"} />,
       createLink: "/dashboard/modules/create",
     },
@@ -104,7 +104,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
       viewLink: "/dashboard/intakes",
-      icon: <FaBookReader size={"55px"} />,
+      icon: <FaBookReader size={"40px"} />,
       sideIcon: <FaBookReader size={"30px"} />,
       createLink: "/dashboard/intakes/create",
     },
@@ -114,7 +114,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
       viewLink: "/dashboard/class-times",
-      icon: <PiChalkboardTeacherFill size={"55px"} />,
+      icon: <PiChalkboardTeacherFill size={"40px"} />,
       sideIcon: <PiChalkboardTeacherFill size={"30px"} />,
       createLink: "/dashboard/class-times/create",
     },
@@ -124,7 +124,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Roles',
       createLabel: 'Create Role',
       viewLink: '/dashboard/roles',
-      icon: <FaUsersCog size={'55px'} />,
+      icon: <FaUsersCog size={'40px'} />,
       sideIcon: <FaUsersCog size={'30px'} />,
       createLink: '/dashboard/roles/create',
     },
@@ -134,7 +134,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Permissions',
       createLabel: 'Create Permission',
       viewLink: '/dashboard/permissions',
-      icon: <FaUserLock size={'55px'} />,
+      icon: <FaUserLock size={'40px'} />,
       sideIcon: <FaUserLock size={'30px'} />,
       createLink: '/dashboard/permissions/create',
     },
@@ -144,7 +144,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Trainers',
       createLabel: 'Create Trainer',
       viewLink: '/dashboard/trainers',
-      icon: <FaUsers size={'55px'} />,
+      icon: <FaUsers size={'40px'} />,
       sideIcon: <FaUsers size={'30px'} />,
       createLink: '/dashboard/trainers/create',
     },
@@ -154,7 +154,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: "View Feedback Question",
       createLabel: "Create Feedback Question",
       viewLink: "/dashboard/feedback-questions",
-      icon: <TbUserQuestion size={"55px"} />,
+      icon: <TbUserQuestion size={"40px"} />,
       sideIcon: <TbUserQuestion size={"30px"} />,
       createLink: "/dashboard/feedback-questions/create",
     },
@@ -164,7 +164,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: "View Feedback",
       createLabel: "Create Feedback",
       viewLink: "/dashboard/feedback",
-      icon: <VscFeedback size={"55px"} />,
+      icon: <VscFeedback size={"40px"} />,
       sideIcon: <VscFeedback size={"30px"} />,
       createLink: "/dashboard/feedback/create",
     },
@@ -174,7 +174,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Feedback Reports',
       createLabel: 'Send Feedback Report',
       viewLink: '/dashboard/feedback-reports/',
-      icon: <SiGoogleforms size={'55px'} />,
+      icon: <SiGoogleforms size={'40px'} />,
       sideIcon: <SiGoogleforms size={'30px'} />,
       createLink: '/dashboard/feedback-reports/send',
     },
@@ -315,11 +315,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
                         onClick={() => handleTabChange(tab.name, 'view')} // Navigate to view mode
                         className={`p-2 rounded ${activeTab === tab.name ? 'bg-gray-600' : 'hover:bg-gray-700'} transition-colors`}
                       >
-                        {tab.icon}
+                        <div className="flex flex-col items-center">
+                          <span className='m-1'>{tab.icon}</span>
+                          <span className='m-1'>{tab.name}</span>
+                        </div>
+
                       </button>
-                      <div className="absolute hidden group-hover:block bg-white text-black text-sm rounded px-2 py-1 whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-2">
-                        {tab.name}
-                      </div>
                     </div>
                   </li>
                 )
