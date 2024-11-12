@@ -66,7 +66,7 @@ const FeedbackQuestions: React.FC = () => {
       setFilteredquestion(filtered);
     }
   };
-  
+
   // Handle feedback question editing
   const handleEdit = (question: FeedbackQuestion) => {
     toast.info('Redirecting to edit user...', { position: "top-right", autoClose: 2000 });
@@ -77,7 +77,7 @@ const FeedbackQuestions: React.FC = () => {
 
   const columns = [
     { header: 'questionText', accessor: 'questionText' },
-    { header: 'questionType', accessor: 'questionType'}
+    { header: 'questionType', accessor: 'questionType' },
   ];
 
   return (
