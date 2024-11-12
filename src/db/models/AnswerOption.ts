@@ -19,6 +19,7 @@ AnswerOption.init({
   optionText: {
     type: DataTypes.STRING,
     allowNull: false,
+    defaultValue: false
   },
   feedbackQuestionId: {
     type: DataTypes.INTEGER,
@@ -29,6 +30,10 @@ AnswerOption.init({
     },
     onDelete: 'CASCADE',
   },
+  description: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  }
 }, {
   sequelize,
   modelName: 'AnswerOption',

@@ -12,6 +12,7 @@ interface FeedbackAnswer {
     id: number;
     questionId: number;
     answerText: string;
+    description: string;
     feedback: {
         id: number;
         trainer: {
@@ -223,20 +224,20 @@ export default function FeedbackQuestionID() {
                 toast.success('PDF report sent successfully!', {
                     position: 'top-right',
                     autoClose: 2000,
-                  });
+                });
             } else {
                 alert();
                 toast.error("Failed to send PDF report.", {
                     position: 'top-right',
                     autoClose: 3000,
-                  })
+                })
             }
         } catch (error) {
             console.error("Error sending PDF:", error);
             toast.error("An error occurred while sending the PDF report.", {
                 position: 'top-right',
                 autoClose: 3000,
-              })
+            })
         } finally {
             setIsLoading(false); // Stop loading once the request is done
         }
@@ -295,19 +296,29 @@ export default function FeedbackQuestionID() {
             page.drawText("Answer", { x: 50, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
             page.drawText("Responses", { x: 250, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
             page.drawText("Percentage", { x: 350, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
+            page.drawText("Description", { x: 350, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
             yPosition -= lineSpacing;
 
             Object.entries(question.responses).forEach(([answerText, { count, percentage }]) => {
                 page.drawText(answerText, { x: 50, y: yPosition, size: tableFontSize, font });
                 page.drawText(count.toString(), { x: 250, y: yPosition, size: tableFontSize, font });
                 page.drawText(percentage, { x: 350, y: yPosition, size: tableFontSize, font });
+
+                // Add description to the PDF
+                const description = feedbackReport
+                    .filter(answer => answer.answerText === answerText)
+                    .map(filteredAnswer => filteredAnswer.description).join(", ") || "No Description";
+
+                page.drawText(description, { x: 450, y: yPosition, size: tableFontSize, font });
                 yPosition -= lineSpacing;
 
+                // Page overflow check
                 if (yPosition < 50) {
                     yPosition = 750;
                     page = pdfDoc.addPage([600, 800]);
                 }
             });
+
 
             yPosition -= 20;
         });
@@ -358,6 +369,7 @@ export default function FeedbackQuestionID() {
                                 <th className="p-3 border-b border-gray-300">Answer</th>
                                 <th className="p-3 border-b border-gray-300">Responses</th>
                                 <th className="p-3 border-b border-gray-300">Percentage</th>
+                                <th className="p-3 border-b border-gray-300">Description</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -366,12 +378,19 @@ export default function FeedbackQuestionID() {
                                     <td className="p-3 border-b border-gray-300">{answerText}</td>
                                     <td className="p-3 border-b border-gray-300">{count}</td>
                                     <td className="p-3 border-b border-gray-300">{percentage}</td>
+                                    <td className="p-3 border-b border-gray-300">
+                                        {/* Display the description for each response */}
+                                        {feedbackReport
+                                            .filter(answer => answer.answerText === answerText)
+                                            .map(filteredAnswer => filteredAnswer.description).join(", ") || "No Description"}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             ))}
+
 
             {/* Conditionally render buttons only if feedback report is available */}
             {feedbackReport.length > 0 && (

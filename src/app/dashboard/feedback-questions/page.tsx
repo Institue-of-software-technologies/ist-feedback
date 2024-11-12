@@ -77,7 +77,11 @@ const FeedbackQuestions: React.FC = () => {
 
   const columns = [
     { header: 'questionText', accessor: 'questionText' },
+<<<<<<< HEAD
     { header: 'questionType', accessor: 'questionType' }
+=======
+    { header: 'questionType', accessor: 'questionType' },
+>>>>>>> development
   ];
 
   return (

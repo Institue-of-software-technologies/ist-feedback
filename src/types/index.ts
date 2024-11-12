@@ -116,6 +116,7 @@ export interface FeedbackQuestionSelect {
     questionText: string;
     questionType: string;
     answerOption:[{
+      description: any;
       id:number;
       optionText:string;
     }]
@@ -125,6 +126,7 @@ export interface FeedbackQuestionSelect {
 export interface AnswerOptions {
   id: number;
   optionText: string;
+  description?: string;
 }
 export interface Trainer {
   id: number;
