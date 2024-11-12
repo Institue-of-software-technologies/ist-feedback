@@ -116,7 +116,7 @@ export interface FeedbackQuestionSelect {
     questionText: string;
     questionType: string;
     answerOption:[{
-      description: any;
+      description: string;
       id:number;
       optionText:string;
     }]

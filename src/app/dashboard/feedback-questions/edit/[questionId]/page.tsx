@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form, { Input } from '@/components/Forms';
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
+import { AnswerOptions } from '@/types';
 
 interface FormData {
   questionText: string;
@@ -39,7 +40,7 @@ const EditQuestion = () => {
           setFormData({
             questionText: fetchedQuestion.questionText,
             questionType: fetchedQuestion.questionType,
-            options: fetchedQuestion.options?.map((opt: any) => ({
+            options: fetchedQuestion.options?.map((opt:AnswerOptions) => ({
               optionText: opt.optionText,
               description: opt.description || false,
             })) || [{ optionText: "", description: false }],

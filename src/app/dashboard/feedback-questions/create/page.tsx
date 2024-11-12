@@ -89,11 +89,6 @@ const FeedbackQuestionCreate: React.FC = () => {
     },
   ];
 
-  const openEndedInputs: Input[] = [
-    { label: "questionText", type: "text", name: "questionText" },
-    { label: "questionType", type: "hidden", name: "questionType", value: "open-ended" },
-  ];
-
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
