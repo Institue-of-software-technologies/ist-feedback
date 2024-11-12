@@ -8,6 +8,7 @@ export class FeedbackAnswer extends Model {
   questionId!: number; // Foreign key to FeedbackQuestions
   feedbackId!: number; // Foreign key to Feedback
   answerText!: string;
+  description!: string;
   question?: FeedbackQuestion;
   feedback?: Feedback;
 }
@@ -42,6 +43,10 @@ FeedbackAnswer.init({
   answerText: {
     type: DataTypes.TEXT,
     allowNull: false,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   }
 }, {
   sequelize,

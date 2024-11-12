@@ -61,7 +61,7 @@ export async function GET(request: NextRequest, context: Context) {
             {
               model: AnswerOption,
               as: "answerOption",
-              attributes: ["id", "optionText"],
+              attributes: ["id", "optionText","description"],
             },
           ]
         },
