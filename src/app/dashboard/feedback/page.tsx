@@ -1,21 +1,21 @@
 "use client";
+
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
-import { Feedback } from '@/types'; // Adjust this path to your Feedback type definition
+import { Feedback } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
-import Table from '@/components/Tables';  // Ensure this is the correct path
+import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
-import { TableColumn } from 'react-data-table-component';  // Import TableColumn from the data table component library
 
 const FeedBackManagement: React.FC = () => {
   const { user } = useUser();
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredFeedback, setFilteredFeedback] = useState<Feedback[]>([]);
-  const [, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
   const router = useRouter();
 
   // Fetch feedback from your API
@@ -26,6 +26,7 @@ const FeedBackManagement: React.FC = () => {
           method: 'GET',
         });
 
+        // Ensure response contains 'feedbacks' array (plural)
         if (response?.data?.feedbacks && Array.isArray(response.data.feedbacks)) {
           setFeedbacks(response.data.feedbacks);
           setFilteredFeedback(response.data.feedbacks);
@@ -58,10 +59,12 @@ const FeedBackManagement: React.FC = () => {
   };
 
   const handleSearch = (value: string) => {
+    console.log(search);
     setSearch(value);
 
+    // Filter the feedback based on the search query
     if (value.trim() === '') {
-      setFilteredFeedback(feedbacks);
+      setFilteredFeedback(feedbacks);  // Show all if search is empty
     } else {
       const filtered = feedbacks.filter(feedback =>
         feedback.studentToken.toLowerCase().includes(value.toLowerCase())
@@ -70,6 +73,7 @@ const FeedBackManagement: React.FC = () => {
     }
   };
 
+  // Handle feedback editing
   const handleEdit = (feedback: Feedback) => {
     toast.info('Redirecting to edit Feedback...', { position: "top-right", autoClose: 1500 });
     router.push(`/dashboard/feedback/edit/${feedback.id}`);
@@ -77,29 +81,44 @@ const FeedBackManagement: React.FC = () => {
 
   if (loading) return <Loading />;
 
-  const columns: TableColumn<Feedback>[] = [
-    { name: 'Student Token', selector: row => row.studentToken },
-    { name: 'Trainer Name', selector: row => row.trainer.trainerName },
-    { name: 'Course', selector: row => row.trainer.course.courseName },
-    { name: 'Class Time', selector: row => row.classTime.classTime },
-    { name: 'Intake Name', selector: row => row.intake.intakeName },
-    { name: 'Intake Year', selector: row => row.intake.intakeYear },
+  const columns = [
+    { header: 'Student Token', accessor: 'studentToken' },
+    { header: 'Trainer Name', accessor: 'trainer.trainerName' },
+    { header: 'Course', accessor: 'trainer.course.courseName' },
+    // { header: 'Module Name', accessor: 'module.moduleName' },
+    // { header: 'Course Name', accessor: 'module.course.courseName' },
+    { header: 'Class Time', accessor: 'classTime.classTime' },
+    { header: 'Intake Name', accessor: 'intake.intakeName' },
+    { header: 'Intake Year', accessor: 'intake.intakeYear' },
     {
-      name: 'Token Expiration',
-      selector: row => row.tokenExpiration,
-      width: "400px",
-    },
+      header: 'Token Expiration',
+      accessor: 'tokenExpiration',
+      Cell: ({ value }: { value: string }) => {
+        const date = new Date(value);
+
+       
+        return date.toLocaleString('en-KE', { 
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long', 
+          day: '2-digit',
+          hour: '2-digit',
+          hour12: false, 
+          timeZoneName: 'short', 
+        });
+      },
+    }
   ];
 
   return (
-    <div className="overflow-x-auto p-4">
-      <ToastContainer />
+    <div>
+      <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
       {filteredFeedback && filteredFeedback.length === 0 ? (
         <div className="text-center p-4">
           <p>No Feedbacks available at the moment.</p>
         </div>
       ) : (
-        <Table
+        <Table<Feedback>
           columns={columns}
           data={filteredFeedback}
           onSearch={handleSearch}
@@ -108,7 +127,6 @@ const FeedBackManagement: React.FC = () => {
         />
       )}
     </div>
-
   );
 };
 

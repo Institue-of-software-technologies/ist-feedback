@@ -340,32 +340,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
 
           {/* Sub-tabs for View/Create */}
           {activeTabDetails && (
-            <div className="bg-gray-200 p-4 flex flex-wrap space-x-2">
+            <div className="bg-gray-200 p-4 flex space-x-2">
               {activeTabDetails.viewLabel && (
                 <button
-                  onClick={() => handleTabChange(activeTab, 'view')}
-                  className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors w-full sm:w-auto sm:flex-grow-0 flex-grow m-1`}
+                  onClick={() => handleTabChange(activeTab, 'view')} // Switch to view mode
+                  className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
                 >
                   {activeTabDetails.viewLabel}
                 </button>
               )}
               {activeTabDetails.createLabel && (
                 <button
-                  onClick={() => handleTabChange(activeTab, 'create')}
-                  className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors w-full sm:w-auto sm:flex-grow-0 flex-grow m-1`}
+                  onClick={() => handleTabChange(activeTab, 'create')} // Switch to create mode
+                  className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
                 >
                   {activeTabDetails.createLabel}
                 </button>
               )}
             </div>
-
           )}
 
           {/* Main Content */}
-          <main className="flex-grow p-2 overflow-y-auto overflow-x-auto bg-background text-foreground">
+          <main className="flex-grow p-2 bg-background text-foreground overflow-x-auto">
             {currentView === 'view' && (
               <div>
-
                 {activeTab === 'Dashboard' && (
                   <div>
                     {overview}
@@ -396,6 +394,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
               </div>
             )}
           </main>
+
 
         </div>
       </div>
