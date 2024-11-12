@@ -77,11 +77,7 @@ const FeedbackQuestions: React.FC = () => {
 
   const columns = [
     { header: 'questionText', accessor: 'questionText' },
-<<<<<<< HEAD
-    { header: 'questionType', accessor: 'questionType' }
-=======
     { header: 'questionType', accessor: 'questionType' },
->>>>>>> development
   ];
 
   return (
@@ -92,13 +88,13 @@ const FeedbackQuestions: React.FC = () => {
           <p>No feedback questions available at the moment.</p>
         </div>
       ) : (
-          <Table<FeedbackQuestion>
-            columns={columns}
-            data={filteredquestion}
-            onSearch={handleSearch}
-            onEdit={user && user.permissions.includes('update_feedback_questions') ? handleEdit : undefined}
-            onDelete={user && user.permissions.includes('delete_feedback_questions') ? handleDelete : undefined}
-          />
+        <Table<FeedbackQuestion>
+          columns={columns}
+          data={filteredquestion}
+          onSearch={handleSearch}
+          onEdit={user && user.permissions.includes('update_feedback_questions') ? handleEdit : undefined}
+          onDelete={user && user.permissions.includes('delete_feedback_questions') ? handleDelete : undefined}
+        />
       )}
     </div>
   );
