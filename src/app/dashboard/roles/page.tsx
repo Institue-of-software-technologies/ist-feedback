@@ -30,6 +30,7 @@ const RoleManagement: React.FC = () => {
         setRoles(response.data.roles);
         setFilteredRoles(response.data.roles);
       } catch (err) {
+        console.log(err);
         toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -48,6 +49,7 @@ const RoleManagement: React.FC = () => {
         setFilteredRoles(roles.filter(role => role.id !== confirmDelete.id));
         toast.success('Role deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete role', { position: "top-right", autoClose: 3000 });
       }
     }

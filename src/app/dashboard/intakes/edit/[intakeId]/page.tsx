@@ -28,6 +28,7 @@ const EditIntake = () => {
                     const response = await api.get(`/intakes/${intakeId}`);
                     setIntake(response.data.intake);
                 } catch (err) {
+                    console.log(err)
                     setError('Failed to fetch intake');
                 } finally {
                     setLoading(false);
@@ -52,6 +53,7 @@ const EditIntake = () => {
                 router.push('/dashboard/intakes'); 
             }, 1000);
         } catch (err) {
+            console.log(err)
             toast.error('Failed to update intake', {
                 position: "top-right",
                 autoClose: 3000, 

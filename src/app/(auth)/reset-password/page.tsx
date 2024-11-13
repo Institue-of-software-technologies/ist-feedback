@@ -45,6 +45,7 @@ export default function ResetPassword(){
                 toast.error(response.data.message, { position: "top-right", autoClose: 3000 });
             }
         } catch (error) {
+            console.log(error);
             toast.error('Invalid email or server error', { position: "top-right", autoClose: 3000 });
         } finally {
             setIsLoading(false);

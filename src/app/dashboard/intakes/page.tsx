@@ -30,6 +30,7 @@ const IntakeManagement: React.FC = () => {
                 setIntakes(response.data.intake);
                 setFilteredIntake(response.data.intake);
             } catch (err) {
+                console.log(err)
                 toast.error('Failed to fetch intakes', { position: "top-right", autoClose: 3000 });
             } finally {
                 setLoading(false);
@@ -48,6 +49,7 @@ const IntakeManagement: React.FC = () => {
                 setFilteredIntake(filteredIntake.filter(filteredIntake => filteredIntake.id !== confirmDelete.id));
                 toast.success('Intake deleted successfully', { position: "top-right", autoClose: 2000 });
             } catch (err) {
+                console.log(err)
                 toast.error('Failed to delete intake', { position: "top-right", autoClose: 3000 });
             }
         }

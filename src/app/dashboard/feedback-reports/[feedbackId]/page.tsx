@@ -109,6 +109,7 @@ export default function FeedbackQuestionID() {
 
                     setQuestions(questionArray);
                 } catch (err) {
+                    console.log(err)
                     setError("Failed to fetch feedback question");
                 } finally {
                     setLoading(false);

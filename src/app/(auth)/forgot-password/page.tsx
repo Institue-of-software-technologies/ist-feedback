@@ -31,6 +31,7 @@ export default function ForgotPassword(){
         } catch (error) {
             // Handle invalid email or other errors
             toast.error('Invalid email or server error', { position: "top-right", autoClose: 3000 });
+            console.log(error)
         } finally {
             setIsLoading(false); // Stop loading once the request is done
         }

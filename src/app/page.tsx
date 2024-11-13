@@ -31,6 +31,7 @@ export default function Home() {
         const response = await api.get('/feedback');
         setFeedback(response.data.feedbacks || []);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);

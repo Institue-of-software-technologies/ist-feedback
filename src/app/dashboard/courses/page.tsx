@@ -30,6 +30,7 @@ const CourseManagement: React.FC = () => {
         setCourses(response.data.course);
         setFilteredcourse(response.data.course);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -48,6 +49,7 @@ const CourseManagement: React.FC = () => {
         setFilteredcourse(filteredcourse.filter(filteredcourse => filteredcourse.id !== confirmDelete.id));
         toast.success('course deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete course', { position: "top-right", autoClose: 3000 });
       }
     }

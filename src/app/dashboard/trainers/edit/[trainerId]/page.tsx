@@ -30,6 +30,7 @@ const EditTrainer = () => {
           const response = await api.get(`/trainers/${trainerId}`);
           setTrainer(response.data);
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch trainer');
         } finally {
           setLoading(false);
@@ -66,6 +67,7 @@ const EditTrainer = () => {
         router.push('/dashboard/trainers');
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update trainer', {
         position: 'top-right',
         autoClose: 3000,

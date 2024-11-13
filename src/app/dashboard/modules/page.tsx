@@ -28,6 +28,7 @@ const ModuleManagement: React.FC = () => {
         setModules(response.data);
         setFilteredModules(response.data);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch modules', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -46,6 +47,7 @@ const ModuleManagement: React.FC = () => {
         setFilteredModules(filteredModules.filter(module => module.id !== confirmDelete.id));
         toast.success('Module deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete module', { position: "top-right", autoClose: 3000 });
       }
     }

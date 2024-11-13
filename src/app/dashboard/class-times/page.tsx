@@ -29,6 +29,7 @@ const ClassTimeFormManagement: React.FC = () => {
         setClassTimes(response.data.classTime);
         setFilteredClassTimes(response.data.classTime);
       } catch (err) {
+        console.log(err);
         toast.error('Failed to fetch Class Time', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -47,6 +48,7 @@ const ClassTimeFormManagement: React.FC = () => {
         setFilteredClassTimes(filteredClassTimes.filter(filteredClassTimes => filteredClassTimes.id !== confirmDelete.id));
         toast.success('Class Time deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err);
         toast.error('Failed to delete Class Time', { position: "top-right", autoClose: 3000 });
       }
     }

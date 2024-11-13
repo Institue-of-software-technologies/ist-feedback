@@ -33,6 +33,7 @@ export default function StudentFeedback() {
                     setFeedback(response.data.feedback);
                     setFeedbackQuestion(response.data.feedbackQuestions);
                 } catch (err) {
+                    console.log(err);
                     setError('Failed to fetch feedback');
                     toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
                 } finally {
@@ -71,6 +72,7 @@ export default function StudentFeedback() {
                 router.push(`/`);
             }, 3000);
         } catch (error) {
+            console.log(error);
             toast.error('Failed to submit feedback', { position: "top-right", autoClose: 3000 });
         }
     };

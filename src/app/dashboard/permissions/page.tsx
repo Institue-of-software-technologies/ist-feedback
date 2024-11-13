@@ -30,6 +30,7 @@ const PermissionManagement: React.FC = () => {
         setPermission(response.data.permission);
         setFilteredPermission(response.data.permission);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -48,6 +49,7 @@ const PermissionManagement: React.FC = () => {
         setFilteredPermission(filteredPermission.filter(filteredPermission => filteredPermission.id !== confirmDelete.id));
         toast.success('Permission deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete permission', { position: "top-right", autoClose: 3000 });
       }
     }

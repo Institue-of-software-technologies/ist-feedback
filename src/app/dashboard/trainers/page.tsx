@@ -28,6 +28,7 @@ const TrainerManagement: React.FC = () => {
           setTrainer(response.data.trainer);
           setFilteredTrainer(response.data.trainer);
       } catch (err) {
+        console.log(err)
          toast.error('Failed to fetch trainer', {
           position: 'top-right',
           autoClose: 3000,
@@ -59,6 +60,7 @@ const TrainerManagement: React.FC = () => {
           autoClose: 2000,
         });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete trainer', {
           position: 'top-right',
           autoClose: 3000,

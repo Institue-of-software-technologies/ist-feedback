@@ -46,6 +46,7 @@ const EditQuestion = () => {
             })) || [{ optionText: "", description: false }],
           });
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch feedback question');
         } finally {
           setLoading(false);
@@ -99,6 +100,7 @@ const EditQuestion = () => {
         router.push('/dashboard/feedback-questions');
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update feedback question', {
         position: "top-right",
         autoClose: 3000,
