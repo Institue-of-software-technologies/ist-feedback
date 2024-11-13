@@ -10,7 +10,7 @@ import { useUser } from '@/context/UserContext';
 import Loading from '../../loading';  // Import the Loading component
 
 interface FormValues {
-    [key: string]: string | number; // This allows dynamic keys for each question
+    [key: string]: string | number;
 }
 
 export default function StudentFeedback() {
@@ -21,7 +21,6 @@ export default function StudentFeedback() {
     const { feedbackId } = useParams();
     const router = useRouter();
     const { user } = useUser();
-    console.log(user)
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormValues>();
 
     const numbers = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -32,9 +31,9 @@ export default function StudentFeedback() {
                 try {
                     const response = await api.get(`/feedback/${feedbackId}`);
                     setFeedback(response.data.feedback);
-                    setFeedbackQuestion(response.data.feedbackQuestions)
-
+                    setFeedbackQuestion(response.data.feedbackQuestions);
                 } catch (err) {
+                    console.log(err);
                     setError('Failed to fetch feedback');
                     toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
                 } finally {
@@ -47,23 +46,33 @@ export default function StudentFeedback() {
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         const formattedData = Object.entries(data).map(([key, value]) => {
-            // Extract the question ID from the key (e.g., "question-1" becomes 1)
-            const questionID = parseInt(key.replace("question-", ""), 10);
-            return {
-                feedbackId: feedback?.id,
-                questionId: questionID,
-                answer: value
-            };
-        });
+            if (key.startsWith("question-")) {
+                if(key.startsWith("description-")) {
+                    return null;
+                }
+                const questionID = parseInt(key.replace("question-", ""), 10);
+
+                // Construct the description key dynamically based on the question ID
+                const descriptionKey = `description-${questionID}`;
+                const description = data[descriptionKey] || null;
+                return {
+                    feedbackId: feedback?.id,
+                    questionId: questionID,
+                    answer: value,
+                    description: description,
+                };
+            }
+            return null;
+        }).filter(item => item !== null);
 
         try {
-            const response = await api.post('/feedback/answer', { formData: formattedData });
+            await api.post('/feedback/answer', { formData: formattedData });
             toast.success("Feedback submitted successfully!", { position: "top-right", autoClose: 3000 });
-            console.log(response)
             setTimeout(() => {
                 router.push(`/`);
             }, 3000);
         } catch (error) {
+            console.log(error);
             toast.error('Failed to submit feedback', { position: "top-right", autoClose: 3000 });
         }
     };
@@ -74,7 +83,7 @@ export default function StudentFeedback() {
 
     if (!user?.permissions.includes('view_feedback')) {
         return <div>You do not have access to this page.</div>;
-      }
+    }
 
     return (
         <div className="bg-gray-100 min-h-screen text-black p-4">
@@ -98,7 +107,6 @@ export default function StudentFeedback() {
                     </div>
                 </div>
 
-
                 {feedbackQuestion && feedbackQuestion.length > 0 ? (
                     feedbackQuestion.map((question, index) => {
                         const questionKey = `question-${question.feedbackQuestion.id}`;
@@ -115,20 +123,41 @@ export default function StudentFeedback() {
                                     />
                                 )}
 
-                                {question.feedbackQuestion.answerOption.map((option) => (
-                                    <div key={option.id} className="flex items-center mb-2">
-                                        <input
-                                            type="radio"
-                                            id={`option-${question.feedbackQuestion.id}-${option.id}`}
-                                            value={option.optionText}
-                                            {...register(questionKey, { required: "This field is required" })}
-                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                        />
-                                        <label htmlFor={`option-${question.feedbackQuestion.id}-${option.id}`} className="ml-2 block text-lg text-gray-900">
-                                            {option.optionText}
-                                        </label>
-                                    </div>
-                                ))}
+                                {question.feedbackQuestion.answerOption.map((option) => {
+                                    const selectedOption = watch(questionKey);
+                                    const isSelected = selectedOption === option.optionText;
+
+                                    return (
+                                        <div key={option.id} className="mb-2">
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="radio"
+                                                    id={`option-${question.feedbackQuestion.id}-${option.id}`}
+                                                    value={option.optionText}
+                                                    {...register(questionKey, { required: "This field is required" })}
+                                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                                />
+                                                <label htmlFor={`option-${question.feedbackQuestion.id}-${option.id}`} className="ml-2 block text-lg text-gray-900">
+                                                    {option.optionText}
+                                                </label>
+                                            </div>
+
+                                            {/* Display the textarea below the radio option if it is selected */}
+                                            {isSelected && option.description && (
+                                                <div className="mt-2">
+                                                    <textarea
+                                                        rows={3}
+                                                        id={`description-${question.feedbackQuestion.id}-${option.id}`}
+                                                        placeholder="Add your description"
+                                                        className="w-full p-2 border rounded"
+                                                        {...register(`description-${question.feedbackQuestion.id}`)}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                    );
+                                })}
 
                                 {question.feedbackQuestion.questionType === "rating" && (
                                     <div className="flex justify-center items-center mt-7 overflow-x-auto">
@@ -169,5 +198,4 @@ export default function StudentFeedback() {
             </form>
         </div>
     );
-
 }

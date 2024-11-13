@@ -30,6 +30,7 @@ const EditModule = () => {
           const response = await api.get(`/modules/${moduleId}`);
           setModule(response.data.courseModule);
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch module');
         } finally {
           setLoading(false);
@@ -42,6 +43,7 @@ const EditModule = () => {
           const response = await api.get(`/courses`);
           setCourses(response.data.course);
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch courses');
         } finally {
           setLoading(false);
@@ -65,6 +67,7 @@ const EditModule = () => {
         router.push('/dashboard/modules'); // Redirect to the module list
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update module', {
         position: "top-right",
         autoClose: 3000, // Automatically close the toast after 3 seconds

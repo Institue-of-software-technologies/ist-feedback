@@ -1,0 +1,4 @@
+.flex.items-center.justify-between.p-1.bg-gray-800.w-full {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    white-space: nowrap; /* Prevent text wrapping */
+  }

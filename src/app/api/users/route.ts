@@ -63,7 +63,7 @@ export async function POST(req: Request) {
           rejectUnauthorized: false, // Allows self-signed certificates (use with caution)
       },
   });
-  const emailHtml = await render(InviteUserEmail({
+  const view  = await render(InviteUserEmail({
       username: username,
       inviteLink: customLink
   }));
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       from: user,
       to: email,
       subject: 'Invite user',
-      html: emailHtml,
+      html: view ,
   };
 
 await transporter.sendMail(options);

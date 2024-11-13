@@ -53,6 +53,7 @@ const FeedBackManagement: React.FC = () => {
         setFilteredFeedback(filteredFeedback.filter(feedback => feedback.id !== confirmDelete.id));
         toast.success('Feedback deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete feedback', { position: "top-right", autoClose: 3000 });
       }
     }

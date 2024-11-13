@@ -29,6 +29,7 @@ const UserManagement: React.FC = () => {
         setUsers(response.data);
         setFilteredUsers(response.data);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -47,6 +48,7 @@ const UserManagement: React.FC = () => {
         setFilteredUsers(filteredUsers.filter(user => user.id !== confirmDelete.id));
         toast.success('User deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete user', { position: "top-right", autoClose: 3000 });
       }
     }

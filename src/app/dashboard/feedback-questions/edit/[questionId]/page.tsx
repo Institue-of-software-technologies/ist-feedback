@@ -7,11 +7,13 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form, { Input } from '@/components/Forms';
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
+import { AnswerOptions } from '@/types';
 
 interface FormData {
   questionText: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating';
-  options?: string[];
+  options?: { optionText: string, description: boolean }[];
+  
 }
 
 const EditQuestion = () => {
@@ -21,7 +23,7 @@ const EditQuestion = () => {
   const [formData, setFormData] = useState<FormData>({
     questionText: "",
     questionType: "open-ended",
-    options: [""]
+    options: [{ optionText: "", description: false }],
   });
   const [showDetailsForm, setShowDetailsForm] = useState(false); // Whether to show the second form
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,9 +40,13 @@ const EditQuestion = () => {
           setFormData({
             questionText: fetchedQuestion.questionText,
             questionType: fetchedQuestion.questionType,
-            options: fetchedQuestion.options || [""]
+            options: fetchedQuestion.options?.map((opt:AnswerOptions) => ({
+              optionText: opt.optionText,
+              description: opt.description || false,
+            })) || [{ optionText: "", description: false }],
           });
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch feedback question');
         } finally {
           setLoading(false);
@@ -50,10 +56,42 @@ const EditQuestion = () => {
     }
   }, [questionId]);
 
+  // Handle adding a new option for closed-ended questions
+  const handleAddOption = () => {
+    setFormData((prev) => ({
+      ...prev,
+      options: [...(prev.options || []), { optionText: "", description: false }],
+    }));
+  };
+
+  // Handle removing an option for closed-ended questions
+  const handleRemoveOption = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      options: (prev.options || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  // Handle changes in options (text or description checkbox)
+  const handleOptionChange = (index: number, field: string, value: string | boolean) => {
+    const newOptions = [...(formData.options || [])];
+    newOptions[index] = { ...newOptions[index], [field]: value };
+    setFormData((prev) => ({
+      ...prev,
+      options: newOptions,
+    }));
+  };
+
   // Handle the form submission for the second form (open-ended or closed-ended)
   const handleSubmit = async (data: FormData) => {
     try {
-      await api.put(`/feedback-questions/${questionId}`, data);
+      await api.put(`/feedback-questions/${questionId}`, {
+        ...data,
+        options: formData.options?.map((option) => ({
+          optionText: option.optionText,
+          description: option.description, // Send description status to backend
+        })),
+      });
       toast.success('Feedback question updated successfully!', {
         position: "top-right",
         autoClose: 2000,
@@ -62,6 +100,7 @@ const EditQuestion = () => {
         router.push('/dashboard/feedback-questions');
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update feedback question', {
         position: "top-right",
         autoClose: 3000,
@@ -73,32 +112,6 @@ const EditQuestion = () => {
   const handleQuestionTypeSelection = (data: { questionType: 'open-ended' | 'closed-ended' | 'rating' }) => {
     setFormData({ ...formData, questionType: data.questionType });
     setShowDetailsForm(true); // Show the second form based on question type
-  };
-
-  // Handle adding a new option for closed-ended questions
-  const handleAddOption = () => {
-    setFormData((prev) => ({
-      ...prev,
-      options: [...(prev.options || []), ""]
-    }));
-  };
-
-  // Handle removing an option for closed-ended questions
-  const handleRemoveOption = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      options: (prev.options || []).filter((_, i) => i !== index)
-    }));
-  };
-
-  // Handle option input change for closed-ended questions
-  const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...(formData.options || [])];
-    newOptions[index] = value;
-    setFormData((prev) => ({
-      ...prev,
-      options: newOptions
-    }));
   };
 
   // Go back to the question type selection form
@@ -182,8 +195,8 @@ const EditQuestion = () => {
                 <input
                   type="text"
                   placeholder={`Option ${index + 1}`}
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  value={option.optionText}
+                  onChange={(e) => handleOptionChange(index, "optionText", e.target.value)}
                   className="border p-2 flex-grow"
                 />
                 <button
@@ -193,6 +206,17 @@ const EditQuestion = () => {
                 >
                   Remove
                 </button>
+
+                {/* Checkbox for enabling description */}
+                <label className="ml-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={option.description}
+                    onChange={(e) => handleOptionChange(index, "description", e.target.checked)}
+                    className="ml-2"
+                  />
+                  <span className="ml-1 text-gray-600">Enable Description</span>
+                </label>
               </div>
             ))}
 

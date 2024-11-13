@@ -34,6 +34,7 @@ const EditRoles = () => {
           );
           setSelectedPermissions(permissionIds);
         } catch (err) {
+         console.log(err)
           setError('Failed to fetch user');
         } finally {
           setLoading(false);
@@ -69,6 +70,7 @@ const EditRoles = () => {
         router.push('/dashboard/roles'); // Redirect to the user list
       }, 2000);
     } catch (err) {
+      console.log(err);
       toast.error('Failed to update roles', {
         position: "top-right",
         autoClose: 3000, // Automatically close the toast after 3 seconds

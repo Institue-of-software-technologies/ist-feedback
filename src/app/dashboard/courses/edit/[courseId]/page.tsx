@@ -26,6 +26,7 @@ const EditCourse = () => {
           const response = await api.get(`/courses/${courseId}`);
           setCourse(response.data.course);
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch course');
         } finally {
           setLoading(false);
@@ -37,7 +38,6 @@ const EditCourse = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
-    console.log(data)
     try {
       await api.put(`/courses/${courseId}`, data);
       toast.success('courses updated successfully!', {
@@ -50,6 +50,7 @@ const EditCourse = () => {
         router.push('/dashboard/courses'); // Redirect to the user list
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update user', {
         position: "top-right",
         autoClose: 3000, // Automatically close the toast after 3 seconds

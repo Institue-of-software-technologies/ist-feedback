@@ -4,24 +4,24 @@ import React, { useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { Input } from "@/components/Forms"
+import { Input } from "@/components/Forms";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 
 interface FormData {
   questionText?: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating' | null;
-  options?: string[];
+  options?: { text: string; description?: boolean }[];
 }
 
 const FeedbackQuestionCreate: React.FC = () => {
   const router = useRouter();
-  
-  // State to manage form data and whether to show the second form
-  const [formData, setFormData] = useState<FormData>({ questionType: null, options: [""] });
+  const [formData, setFormData] = useState<FormData>({
+    questionType: null,
+    options: [{ text: "", description: false }],
+  });
   const [showDetailsForm, setShowDetailsForm] = useState(false);
 
-  // Handles submission for the final form (open-ended/closed-ended)
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/feedback-questions", data);
@@ -35,26 +35,22 @@ const FeedbackQuestionCreate: React.FC = () => {
     }
   };
 
-  // Handles submission for the question type selection form
   const handleQuestionTypeSelection = (data: { questionType: 'open-ended' | 'closed-ended' | 'rating' }) => {
     setFormData({ ...formData, questionType: data.questionType });
-    setShowDetailsForm(true); // Show the second form after question type is selected
+    setShowDetailsForm(true);
   };
 
-  // Go back to the question type selection
   const handleGoBack = () => {
-    setShowDetailsForm(false); // Hide the details form and show the question type selection form
+    setShowDetailsForm(false);
   };
 
-  // Add a new option to the closed-ended question
   const handleAddOption = () => {
     setFormData(prev => ({
       ...prev,
-      options: [...(prev.options || []), ""]
+      options: [...(prev.options || []), { text: "", description: false }]
     }));
   };
 
-  // Remove an option from the closed-ended question
   const handleRemoveOption = (index: number) => {
     setFormData(prev => ({
       ...prev,
@@ -62,17 +58,24 @@ const FeedbackQuestionCreate: React.FC = () => {
     }));
   };
 
-  // Handle input change for options
   const handleOptionChange = (index: number, value: string) => {
     const newOptions = [...(formData.options || [])];
-    newOptions[index] = value;
+    newOptions[index].text = value;
     setFormData(prev => ({
       ...prev,
       options: newOptions
     }));
   };
 
-  // Initial form for selecting the question type
+  const toggleDescription = (index: number) => {
+    const newOptions = [...(formData.options || [])];
+    newOptions[index].description = !newOptions[index].description;
+    setFormData(prev => ({
+      ...prev,
+      options: newOptions
+    }));
+  };
+
   const typeSelectionInputs: Input[] = [
     {
       label: "questionType",
@@ -91,20 +94,17 @@ const FeedbackQuestionCreate: React.FC = () => {
     { label: "questionText", type: "text", name: "questionText" },
     { label: "questionType", type: "hidden", name: "questionType", value: "open-ended" },
   ];
-
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
       <h2 className="text-2xl font-bold mb-4">Create New Feedback Question</h2>
 
-      {/* First form for question type selection */}
       {!showDetailsForm && (
         <Form<{ questionType: 'open-ended' | 'closed-ended' | 'rating' }>
           Input={typeSelectionInputs}
           onSubmit={handleQuestionTypeSelection}
         />
       )}
-
       {/* Second form based on selected question type */}
       {showDetailsForm && formData.questionType === 'open-ended' && (
         <>
@@ -129,38 +129,44 @@ const FeedbackQuestionCreate: React.FC = () => {
           <div>
             <h1>Type the question below and the answers</h1>
 
-            {/* Question text input */}
             <input
               type="text"
               placeholder="Enter your question"
               value={formData.questionText || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, questionText: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
               className="border p-2 w-full mb-2"
             />
 
-            {/* Dynamically render the options */}
             {formData.options?.map((option, index) => (
-              <div key={index} className="flex items-center mb-2">
-                <input
-                  type="text"
-                  placeholder={`Option ${index + 1}`}
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  className="border p-2 flex-grow"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOption(index)}
-                  className="ml-2 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Remove
-                </button>
+              <div key={index} className="flex flex-col mb-2">
+                <div className="flex items-center mb-2">
+                  <input
+                    type="text"
+                    placeholder={`Option ${index + 1}`}
+                    value={option.text}
+                    onChange={(e) => handleOptionChange(index, e.target.value)}
+                    className="border p-2 flex-grow"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveOption(index)}
+                    className="ml-2 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    checked={option.description || false}
+                    onChange={() => toggleDescription(index)}
+                    className="mr-2"
+                  />
+                  <span>Add Description</span>
+                </div>
               </div>
             ))}
 
-            {/* Button to add a new option */}
             <button
               type="button"
               onClick={handleAddOption}
@@ -169,7 +175,6 @@ const FeedbackQuestionCreate: React.FC = () => {
               Add Answer
             </button>
 
-            {/* Submit Button */}
             <button
               onClick={() => onSubmit(formData)}
               className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -177,7 +182,6 @@ const FeedbackQuestionCreate: React.FC = () => {
               Submit
             </button>
 
-            {/* Back Button */}
             <button
               onClick={handleGoBack}
               className="mt-4 ml-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
@@ -185,19 +189,6 @@ const FeedbackQuestionCreate: React.FC = () => {
               Back
             </button>
           </div>
-        </>
-      )}
-
-      {/* Rating question type placeholder */}
-      {showDetailsForm && formData.questionType === 'rating' && (
-        <>
-          <div>Rating question form not implemented yet</div>
-          <button
-            onClick={handleGoBack}
-            className="mt-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-          >
-            Back
-          </button>
         </>
       )}
     </div>

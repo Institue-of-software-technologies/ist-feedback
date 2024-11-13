@@ -56,7 +56,7 @@ export async function GET(req: NextRequest, context: Context) {
           model: FeedbackQuestion,
           as: "question",
           attributes: ["id", "questionText", "questionType"],
-          where: { questionType: "closed-ended" },
+          // where: { questionType: "closed-ended" },
           include: [
             {
               model: AnswerOption,

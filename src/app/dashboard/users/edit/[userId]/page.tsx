@@ -28,6 +28,7 @@ const EditUser = () => {
             roleId: response.data.roleId 
           });
         } catch (err) {
+          console.log(err)
           setError('Failed to fetch user');
         } finally {
           setLoading(false);
@@ -52,6 +53,7 @@ const EditUser = () => {
         router.push('/dashboard/users'); // Redirect to the user list
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update user', {
         position: "top-right",
         autoClose: 3000, // Automatically close the toast after 3 seconds

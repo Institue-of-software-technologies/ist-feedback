@@ -31,6 +31,7 @@ export default function Home() {
         const response = await api.get('/feedback');
         setFeedback(response.data.feedbacks || []);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -64,7 +65,7 @@ export default function Home() {
       }, 2000);
     } catch (error) {
       console.error("Failed to get token", error);
-      toast.error("Token not available. Please check your input and try again.", { position: "top-right", autoClose: 3000 });
+      toast.error("Token expired.", { position: "top-right", autoClose: 3000 });
     }
   };
 

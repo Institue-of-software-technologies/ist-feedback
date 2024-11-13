@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     });
     const now = new Date();
 
-    const emailHtml = await render(ReportEmail({
+    const view  = await render(ReportEmail({
         trainerName: receiverName,
         reportDate: now,
     }));
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
         to: receiverEmail,
         subject: "Feedback Report",
-        html: emailHtml,
+        html: view ,
         attachments: [
             {
                 filename: "feedback_report.pdf",

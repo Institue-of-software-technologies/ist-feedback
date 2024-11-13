@@ -24,7 +24,7 @@ import api from '../../../lib/axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
-import istLogo from '../../../public/assets/image/logo.png';
+import istLogo from '../../../public/assets/image/cropedImag.png';
 import Image from 'next/image';
 
 type DashboardLayoutProps = {
@@ -54,6 +54,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
         toast.success('Logout successfully', { position: "top-right", autoClose: 3000 });
       }
     } catch (error) {
+      console.log(error)
       toast.error('Failed to logout', { position: "top-right", autoClose: 3000 });
     }
   };
@@ -64,79 +65,88 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       name: 'Dashboard',
       permission: 'view_dashboard', // A common permission for all users
       viewLabel: 'Dashboard',
-      icon: <RiDashboard2Fill size={'55px'} />,
+      icon: <RiDashboard2Fill size={'40px'} />,
+      sideIcon: <RiDashboard2Fill size={'30px'} />,
       viewLink: '/dashboard',
     },
     {
-      name: 'User Management',
+      name: 'User',
       permission: 'manage_users',
       viewLabel: 'View Users',
       createLabel: 'Create User',
       viewLink: '/dashboard/users',
-      icon: <FaUsers size={'55px'} />,
+      icon: <FaUsers size={'40px'} />,
+      sideIcon: <FaUsers size={'30px'} />,
       createLink: '/dashboard/users/create',
     },
     {
-      name: 'Course Management',
+      name: 'Course',
       permission: 'manage_courses',
       viewLabel: 'View Courses',
       createLabel: 'Create Course',
       viewLink: '/dashboard/courses',
-      icon: <FaGraduationCap size={'55px'} />,
+      icon: <FaGraduationCap size={'40px'} />,
+      sideIcon: <FaGraduationCap size={'30px'} />,
       createLink: '/dashboard/courses/create',
     },
     {
-      name: "Module Management",
+      name: "Module ",
       permission: "manage_modules",
       viewLabel: "View Modules",
       createLabel: "Create Module",
       viewLink: "/dashboard/modules",
-      icon: <FaWpforms size={"55px"} />,
+      icon: <FaWpforms size={"40px"} />,
+      sideIcon: <FaWpforms size={"30px"} />,
       createLink: "/dashboard/modules/create",
     },
     {
-      name: "Intake Management",
+      name: "Intake ",
       permission: "manage_intakes",
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
       viewLink: "/dashboard/intakes",
-      icon: <FaBookReader size={"55px"} />,
+      icon: <FaBookReader size={"40px"} />,
+      sideIcon: <FaBookReader size={"30px"} />,
       createLink: "/dashboard/intakes/create",
     },
     {
-      name: "Class Time Management",
+      name: "Class Time",
       permission: "manage_class_time",
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
       viewLink: "/dashboard/class-times",
-      icon: <PiChalkboardTeacherFill size={"55px"} />,
+      icon: <PiChalkboardTeacherFill size={"40px"} />,
+      sideIcon: <PiChalkboardTeacherFill size={"30px"} />,
       createLink: "/dashboard/class-times/create",
     },
     {
-      name: 'Role Management',
+      name: 'Role',
       permission: 'manage_roles',
       viewLabel: 'View Roles',
       createLabel: 'Create Role',
       viewLink: '/dashboard/roles',
-      icon: <FaUsersCog size={'55px'} />,
+      icon: <FaUsersCog size={'40px'} />,
+      sideIcon: <FaUsersCog size={'30px'} />,
       createLink: '/dashboard/roles/create',
     },
     {
-      name: 'Permission Management',
+      name: 'Permission',
       permission: 'manage_permissions',
       viewLabel: 'View Permissions',
       createLabel: 'Create Permission',
       viewLink: '/dashboard/permissions',
-      icon: <FaUserLock size={'55px'} />,
+      icon: <FaUserLock size={'40px'} />,
+      sideIcon: <FaUserLock size={'30px'} />,
       createLink: '/dashboard/permissions/create',
     },
     {
-      name: 'Trainer Management',
+      name: 'Trainer',
       permission: 'manage_trainers',
       viewLabel: 'View Trainers',
       createLabel: 'Create Trainer',
       viewLink: '/dashboard/trainers',
-      icon: <FaUsers size={'55px'} />,
+      icon: <FaUsers size={'40px'} />,
+      sideIcon: <FaUsers size={'30px'} />,
       createLink: '/dashboard/trainers/create',
     },
     {
@@ -145,16 +155,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: "View Feedback Question",
       createLabel: "Create Feedback Question",
       viewLink: "/dashboard/feedback-questions",
-      icon: <TbUserQuestion size={"55px"} />,
+      icon: <TbUserQuestion size={"40px"} />,
+      sideIcon: <TbUserQuestion size={"30px"} />,
       createLink: "/dashboard/feedback-questions/create",
     },
     {
-      name: "Feedback Management",
+      name: "Feedback",
       permission: "manage_feedback",
       viewLabel: "View Feedback",
       createLabel: "Create Feedback",
       viewLink: "/dashboard/feedback",
-      icon: <VscFeedback size={"55px"} />,
+      icon: <VscFeedback size={"40px"} />,
+      sideIcon: <VscFeedback size={"30px"} />,
       createLink: "/dashboard/feedback/create",
     },
     {
@@ -163,7 +175,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       viewLabel: 'View Feedback Reports',
       createLabel: 'Send Feedback Report',
       viewLink: '/dashboard/feedback-reports/',
-      icon: <SiGoogleforms size={'55px'} />,
+      icon: <SiGoogleforms size={'40px'} />,
+      sideIcon: <SiGoogleforms size={'30px'} />,
       createLink: '/dashboard/feedback-reports/send',
     },
   ];
@@ -205,7 +218,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
 
   return (
     <Suspense fallback={<Loading />}>
-      <div className="flex h-screen bg-background text-foreground">
+      <div className="flex h-screen bg-background text-foreground overflow-x-hidden">
         <ToastContainer />
 
         {/* Sidebar for Mobile */}
@@ -222,41 +235,52 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-50 transform transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
         >
-          <div className="flex items-center justify-between p-4 bg-grey-800">
-            <h2 className="text-lg font-semibold">IST</h2>
+          <div className="flex items-center justify-between p-1 bg-gray-800 w-full overflow-x-hidden white-space-nowrap">
+            <div className="flex justify-center items-center">
+              <Image
+                className="w-[100px] h-[75px]"
+                src={istLogo}
+                alt="ist_logo"
+                width={150}
+                height={150}
+              />
+            </div>
             <button
-              className="text-white focus:outline-none"
+              className="text-white focus:outline-none m-3"
               onClick={() => setSidebarOpen(false)}
             >
               <FaTimes size={20} />
             </button>
           </div>
+
+
           <nav className="p-4">
-            <ul className="space-y-2">
-              {tabs.map((tab) => (
-                user.permissions.includes(tab.permission) && (
-                  <li key={tab.name}>
-                    <button
-                      onClick={() => handleTabChange(tab.name, 'view')}
-                      className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''
-                        } transition-colors`}
-                    >
-                      {tab.icon}
-                      <span className="ml-2">{tab.name}</span>
-                    </button>
-                  </li>
-                )
-              ))}
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center w-full p-2 rounded hover:bg-gray-700 transition-colors"
-                >
-                  <FaPowerOff size={20} />
-                  <span className="ml-2">Logout</span>
-                </button>
-              </li>
-            </ul>
+            <div className="max-h-[calc(100vh-4rem)] overflow-y-auto overflow-scroll">  {/* Allows vertical scroll */}
+              <ul className="space-y-2">
+                {tabs.map((tab) => (
+                  user.permissions.includes(tab.permission) && (
+                    <li key={tab.name}>
+                      <button
+                        onClick={() => handleTabChange(tab.name, 'view')}
+                        className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''} transition-colors`}
+                      >
+                        <span>{tab.sideIcon}</span>
+                        <span className="ml-2">{tab.name}</span>
+                      </button>
+                    </li>
+                  )
+                ))}
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full p-2 rounded hover:bg-gray-700 transition-colors"
+                  >
+                    <FaPowerOff size={20} />
+                    <span className="ml-2">Logout</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
           </nav>
         </div>
 
@@ -264,14 +288,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
         <div className="flex flex-col flex-1">
           {/* Header */}
           <header className="flex items-center justify-between bg-gray-800 text-white p-4 lg:hidden">
-
-          <Image
-              className="justify-start w-[100px] h-[75px]"
-              src={istLogo}
-              alt="ist_logo"
-              width={100}
-              height={100}
-            />
+            <div className="mb-1 d flex justify-center items-center">
+              <Image
+                className="w-[100px] h-[75px]"
+                src={istLogo}
+                alt="ist_logo"
+                width={100}
+                height={100}
+              />
+            </div>
             <button
               className="text-white focus:outline-none"
               onClick={() => setSidebarOpen(true)}
@@ -291,11 +316,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
                         onClick={() => handleTabChange(tab.name, 'view')} // Navigate to view mode
                         className={`p-2 rounded ${activeTab === tab.name ? 'bg-gray-600' : 'hover:bg-gray-700'} transition-colors`}
                       >
-                        {tab.icon}
+                        <div className="flex flex-col items-center">
+                          <span className='m-1'>{tab.icon}</span>
+                          <span className='m-1'>{tab.name}</span>
+                        </div>
+
                       </button>
-                      <div className="absolute hidden group-hover:block bg-white text-black text-sm rounded px-2 py-1 whitespace-nowrap top-full left-1/2 transform -translate-x-1/2 mt-2">
-                        {tab.name}
-                      </div>
                     </div>
                   </li>
                 )
@@ -336,27 +362,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           )}
 
           {/* Main Content */}
-          <main className="flex-grow p-5 overflow-y-auto bg-background text-foreground">
+          <main className="flex-grow p-2 bg-background text-foreground overflow-x-auto">
             {currentView === 'view' && (
               <div>
-              
                 {activeTab === 'Dashboard' && (
                   <div>
                     {overview}
                   </div>
-                )} 
+                )}
 
                 {activeTab === 'Dashboard' && (
-              <div>
-                {reports}
-              </div>
-            )}
+                  <div>
+                    {reports}
+                  </div>
+                )}
 
-            {activeTab === 'Dashboard' && (
-              <div>
-                {analytics}
-              </div>
-            )}
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {analytics}
+                  </div>
+                )}
                 {/* Render the content for viewing */}
                 {children}
               </div>
@@ -370,6 +395,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
               </div>
             )}
           </main>
+
 
         </div>
       </div>

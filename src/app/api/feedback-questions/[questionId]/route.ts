@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, context: Context) {
         {
           model: AnswerOption,
           as: "answerOption",
-          attributes: ["id", "optionText"],
+          attributes: ["id", "optionText","description"],
         },
       ],
     });
@@ -40,6 +40,7 @@ export async function GET(req: NextRequest, context: Context) {
 }
 
 // PUT /api/feedback-questions/[questionId] - Update a feedback question by ID
+
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
@@ -69,21 +70,29 @@ export async function PUT(req: NextRequest, context: Context) {
       );
     }
 
+    // Update the question details
     question.questionText = questionText ?? question.questionText;
     question.questionType = questionType ?? question.questionType;
 
     // If it's a closed-ended question, update the answer options
     if (questionType === "closed-ended" && Array.isArray(options)) {
+      // Remove existing options
       await AnswerOption.destroy({ where: { feedbackQuestionId: questionId } });
 
-      const newOptions = options.map((optionText: string) => ({
-        optionText,
-        feedbackQuestionId: question.id,
-      }));
+      // Prepare new options with descriptions
+      const newOptions = options.map(
+        (option: { optionText: string; description: boolean }) => ({
+          optionText: option.optionText,
+          description: option.description || false, // Ensure description defaults to false
+          feedbackQuestionId: question.id,
+        })
+      );
 
+      // Bulk create new options
       await AnswerOption.bulkCreate(newOptions);
     }
 
+    // Save the updated question
     await question.save();
 
     return NextResponse.json({
