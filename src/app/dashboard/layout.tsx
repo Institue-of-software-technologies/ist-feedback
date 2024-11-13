@@ -54,6 +54,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
         toast.success('Logout successfully', { position: "top-right", autoClose: 3000 });
       }
     } catch (error) {
+      console.log(error)
       toast.error('Failed to logout', { position: "top-right", autoClose: 3000 });
     }
   };

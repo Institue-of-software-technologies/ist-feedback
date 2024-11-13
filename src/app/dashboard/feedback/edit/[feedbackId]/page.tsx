@@ -110,6 +110,7 @@ const EditFeedback = () => {
         router.push('/dashboard/feedback');
       }, 2000);
     } catch (err) {
+      console.log(err)
       toast.error('Failed to update feedback', {
         position: 'top-right',
         autoClose: 3000,

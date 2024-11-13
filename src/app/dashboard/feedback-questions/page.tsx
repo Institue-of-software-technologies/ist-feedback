@@ -29,6 +29,7 @@ const FeedbackQuestions: React.FC = () => {
         setQuestions(response.data.questions);
         setFilteredquestion(response.data.questions);
       } catch (err) {
+        console.log(err)
         toast.error('Failed to fetch feedback questions', { position: "top-right", autoClose: 3000 });
       } finally {
         setLoading(false);
@@ -47,6 +48,7 @@ const FeedbackQuestions: React.FC = () => {
         setFilteredquestion(filteredquestion.filter(filteredquestion => filteredquestion.id !== confirmDelete.id));
         toast.success('Feedback question deleted successfully', { position: "top-right", autoClose: 2000 });
       } catch (err) {
+        console.log(err)
         toast.error('Failed to delete feedback question', { position: "top-right", autoClose: 3000 });
       }
     }

@@ -28,6 +28,7 @@ const EditClassTime = () => {
           console.log(response)
           setClassTimes(response.data.classTimes);
         } catch (err) {
+          console.log(err);
           setError('Failed to fetch class Times');
         } finally {
           setLoading(false);
@@ -52,6 +53,7 @@ const EditClassTime = () => {
         router.push('/dashboard/class-times'); // Redirect to the Class Times list
       }, 2000);
     } catch (err) {
+      console.log(err);
       toast.error('Failed to update Class Times', {
         position: "top-right",
         autoClose: 3000, // Automatically close the toast after 3 seconds
