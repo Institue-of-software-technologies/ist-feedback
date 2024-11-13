@@ -1,6 +1,5 @@
 "use client";
 import istLogo from '../../../../public/assets/image/cropedImag.png';
-import '../../../css/loginPage.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import React, { useState } from 'react';

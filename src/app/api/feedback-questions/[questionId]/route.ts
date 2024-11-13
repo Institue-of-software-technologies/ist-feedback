@@ -41,7 +41,7 @@ export async function GET(req: NextRequest, context: Context) {
 
 // PUT /api/feedback-questions/[questionId] - Update a feedback question by ID
 
-export async function PUT(req: NextRequest, context: any) {
+export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
     const { questionText, questionType, options } = await req.json();

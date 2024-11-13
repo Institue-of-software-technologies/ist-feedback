@@ -51,6 +51,7 @@ export interface Feedback {
     }
   };
   intake: {
+    intakeYear: string;
     id: number;
     intakeName: string;
   };  
@@ -115,7 +116,7 @@ export interface FeedbackQuestionSelect {
     questionText: string;
     questionType: string;
     answerOption:[{
-      description: any;
+      description: string;
       id:number;
       optionText:string;
     }]

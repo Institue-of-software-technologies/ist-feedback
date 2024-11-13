@@ -103,7 +103,7 @@ const FeedBackManagement: React.FC = () => {
           month: 'long', 
           day: '2-digit',
           hour: '2-digit',
-          hour12: true, 
+          hour12: false, 
           timeZoneName: 'short', 
         });
       },
