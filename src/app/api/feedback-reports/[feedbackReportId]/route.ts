@@ -56,12 +56,12 @@ export async function GET(req: NextRequest, context: Context) {
           model: FeedbackQuestion,
           as: "question",
           attributes: ["id", "questionText", "questionType"],
-          where: { questionType: "closed-ended" },
+          // where: { questionType: "closed-ended" },
           include: [
             {
               model: AnswerOption,
               as: "answerOption",
-              attributes: ["id", "optionText","description"],
+              attributes: ["id", "optionText"],
             },
           ],
         }

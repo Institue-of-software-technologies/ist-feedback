@@ -89,6 +89,11 @@ const FeedbackQuestionCreate: React.FC = () => {
     },
   ];
 
+  // Form for open-ended question
+  const openEndedInputs: Input[] = [
+    { label: "questionText", type: "text", name: "questionText" },
+    { label: "questionType", type: "hidden", name: "questionType", value: "open-ended" },
+  ];
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
@@ -99,6 +104,24 @@ const FeedbackQuestionCreate: React.FC = () => {
           Input={typeSelectionInputs}
           onSubmit={handleQuestionTypeSelection}
         />
+      )}
+      {/* Second form based on selected question type */}
+      {showDetailsForm && formData.questionType === 'open-ended' && (
+        <>
+          <div>
+            <h1>Type the question below</h1>
+          </div>
+          <Form<FormData>
+            Input={openEndedInputs}
+            onSubmit={onSubmit}
+          />
+          <button
+            onClick={handleGoBack}
+            className="mt-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+          >
+            Back
+          </button>
+        </>
       )}
 
       {showDetailsForm && formData.questionType === 'closed-ended' && (
