@@ -2,12 +2,12 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
 import Loading from '../../loading'
 import axios from "../../../../../lib/axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import logo from '../../../../../public/assets/image/logo.png'
 interface FeedbackAnswer {
     id: number;
     questionId: number;
@@ -73,7 +73,7 @@ export default function FeedbackQuestionID() {
                     const questionMap: { [questionId: number]: FeedbackQuestion } = {};
 
                     feedbackReport.forEach((answer: FeedbackAnswer) => {
-                        const { questionId, answerText, question } = answer;
+                        const { questionId, answerText, question, description } = answer;
 
                         if (!questionMap[questionId]) {
                             questionMap[questionId] = {
@@ -117,6 +117,229 @@ export default function FeedbackQuestionID() {
             fetchFeedbackData();
         }
     }, [feedbackId]);
+    // Common function to generate the PDF content
+    const generatePDFContent = async (feedbackReport: FeedbackAnswer[], questions: FeedbackQuestion[]) => {
+        const pdfDoc = await PDFDocument.create();
+        let page = pdfDoc.addPage([850, 842]);
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        let yPosition = 800;
+
+        const headerFontSize = 12;
+        const titleFontSize = 18;
+        const questionFontSize = 15;
+        const tableFontSize = 13;
+        const descriptionFontSize = 11;
+        const lineSpacing = 20;
+        const pageMargin = 40;
+        const maxWidth = 650; // Max width for text before wrapping or breaking
+
+        const feedbackDetails = feedbackReport[0].feedback;
+        // Customizable variables for logo
+        const logoUrl = "https://raw.githubusercontent.com/Institue-of-software-technologies/ist-feedback/refs/heads/main/public/assets/image/logo.png";
+        const logoScaleFactor = 0.1;
+        const logoVerticalPadding = 0; 
+        const logoHorizontalPadding = 0; 
+
+        // Embed the logo image from URL
+        const logoBytes = await fetch(logoUrl).then((res) => res.arrayBuffer());
+        const logoImage = await pdfDoc.embedPng(logoBytes);  
+
+        const logoWidth = logoImage.width * logoScaleFactor;
+        const logoHeight = logoImage.height * logoScaleFactor;
+
+        const logoXPosition = (pdfDoc.getPage(0).getWidth() - logoWidth) / 2 + logoHorizontalPadding;
+
+        page.drawImage(logoImage, {
+            x: logoXPosition,
+            y: yPosition - logoHeight - logoVerticalPadding, 
+            width: logoWidth,
+            height: logoHeight,
+        });
+
+        // Update yPosition after the logo
+        yPosition -= logoHeight + logoVerticalPadding + 20;  
+
+        const addNewPageIfNeeded = () => {
+            if (yPosition < pageMargin) {
+                page = pdfDoc.addPage([850, 842]);
+                yPosition = 800;
+            }
+        };
+
+        // Draw general information about the feedback
+        page.drawText(`Trainer: ${feedbackDetails.trainer.trainerName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        yPosition -= lineSpacing;
+        addNewPageIfNeeded();
+
+        page.drawText(`Course: ${feedbackDetails.trainer.course.courseName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        yPosition -= lineSpacing;
+        addNewPageIfNeeded();
+
+        page.drawText(`Module: ${feedbackDetails.module.moduleName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        yPosition -= lineSpacing;
+        addNewPageIfNeeded();
+
+        page.drawText(`Intake: ${feedbackDetails.intake.intakeName} - ${feedbackDetails.intake.intakeYear}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        yPosition -= lineSpacing;
+        addNewPageIfNeeded();
+
+        page.drawText(`Class Time: ${feedbackDetails.classTime.classTime}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        yPosition -= lineSpacing * 2;
+        addNewPageIfNeeded();
+
+        page.drawText("Feedback Report", {
+            x: pageMargin,
+            y: yPosition,
+            size: titleFontSize,
+            font: boldFont,
+            color: rgb(0, 0.53, 0.7),
+        });
+        yPosition -= 40;
+        addNewPageIfNeeded();
+
+        // Separate open-ended and close-ended questions
+        const openEndedQuestions = questions.filter(q => q.questionType === 'open-ended');
+        const closeEndedQuestions = questions.filter(q => q.questionType === 'closed-ended');
+
+        // Draw Close-ended questions first
+        if (closeEndedQuestions.length > 0) {
+            page.drawText("Closed-ended Questions", {
+                x: pageMargin,
+                y: yPosition,
+                size: titleFontSize,
+                font: boldFont,
+                color: rgb(0, 0.53, 0.7),
+            });
+            yPosition -= 40;
+            addNewPageIfNeeded();
+
+            closeEndedQuestions.forEach((question) => {
+                page.drawText(question.questionText, {
+                    x: pageMargin + 60,
+                    y: yPosition,
+                    size: questionFontSize,
+                    font: boldFont,
+                    color: rgb(0, 0, 0),
+                });
+                yPosition -= 20;
+                addNewPageIfNeeded();
+
+                page.drawText("Answer", { x: pageMargin, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
+                page.drawText("Responses", { x: 300, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
+                page.drawText("Percentage", { x: 500, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
+                yPosition -= lineSpacing;
+                addNewPageIfNeeded();
+
+                Object.entries(question.responses).forEach(([answerText, response]) => {
+                    const { count, percentage } = response as { count: number; percentage: string };
+                    page.drawText(answerText, { x: pageMargin, y: yPosition, size: tableFontSize, font });
+                    page.drawText(count.toString(), { x: 300, y: yPosition, size: tableFontSize, font });
+                    page.drawText(percentage, { x: 500, y: yPosition, size: tableFontSize, font });
+                    yPosition -= lineSpacing;
+                    addNewPageIfNeeded();
+
+                    // Handle Descriptions for Closed-ended Answers
+                    const descriptions = feedbackReport
+                        .filter((answer) => answer.answerText === answerText)
+                        .map((filteredAnswer) => filteredAnswer.description)
+                        .filter(Boolean);
+
+                    descriptions.forEach((description, index) => {
+                        if (description.trim()) {
+                            page.drawText(`Description for Response ${index + 1}:`, {
+                                x: pageMargin + 10,
+                                y: yPosition,
+                                size: descriptionFontSize,
+                                font,
+                                color: rgb(1, 0, 0), 
+                            });
+                            yPosition -= lineSpacing;
+                            addNewPageIfNeeded();
+
+                            // Wrap and draw the long description text
+                            const wrappedDescription = wrapText(description, font, descriptionFontSize, maxWidth);
+                            wrappedDescription.forEach((line) => {
+                                page.drawText(line, { x: pageMargin + 10, y: yPosition, size: descriptionFontSize, font });
+                                yPosition -= lineSpacing;
+                                addNewPageIfNeeded();
+                            });
+                        }
+                    });
+                });
+
+                yPosition -= 20;
+                addNewPageIfNeeded();
+            });
+        }
+
+        // Draw Open-ended questions
+        if (openEndedQuestions.length > 0) {
+            page.drawText("Open-ended Questions", {
+                x: pageMargin,
+                y: yPosition,
+                size: titleFontSize,
+                font: boldFont,
+                color: rgb(0, 0.53, 0.7),
+            });
+            yPosition -= 40;
+            addNewPageIfNeeded();
+
+            openEndedQuestions.forEach((question) => {
+                page.drawText(question.questionText, {
+                    x: pageMargin + 60,
+                    y: yPosition,
+                    size: questionFontSize,
+                    font: boldFont,
+                    color: rgb(0, 0, 0),
+                });
+                yPosition -= 20;
+                addNewPageIfNeeded();
+
+                // Handle Descriptions for Open-ended Responses
+                feedbackReport
+                    .filter((answer) => answer.questionId === question.id)
+                    .forEach((filteredAnswer, index) => {
+                        const description = filteredAnswer.answerText;
+
+                        if (description && description.trim()) {
+                            page.drawText(`Response ${index + 1}:`, {
+                                x: pageMargin + 10,
+                                y: yPosition,
+                                size: descriptionFontSize,
+                                font,
+                                color: rgb(1, 0, 0),
+                            });
+                            yPosition -= lineSpacing;
+                            addNewPageIfNeeded();
+
+                            // Wrap and draw the long description text
+                            const wrappedDescription = wrapText(description, font, descriptionFontSize, maxWidth);
+                            wrappedDescription.forEach((line) => {
+                                page.drawText(line, { x: pageMargin + 10, y: yPosition, size: descriptionFontSize, font });
+                                yPosition -= lineSpacing;
+                                addNewPageIfNeeded();
+                            });
+                        }
+                    });
+
+                // Line separator after open-ended responses
+                page.drawLine({
+                    start: { x: pageMargin, y: yPosition },
+                    end: { x: 550, y: yPosition },
+                    thickness: 2,
+                    color: rgb(0.2, 0.2, 0.2),
+                });
+                yPosition -= lineSpacing;
+                addNewPageIfNeeded();
+            });
+        }
+
+        return pdfDoc.save();
+    };
+
+
+
 
     const downloadPDF = async () => {
         if (feedbackReport.length === 0) {
@@ -124,79 +347,8 @@ export default function FeedbackQuestionID() {
             return;
         }
 
-        const pdfDoc = await PDFDocument.create();
-        let page = pdfDoc.addPage([600, 800]);
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        let yPosition = 750;
+        const pdfBytes = await generatePDFContent(feedbackReport, questions);
 
-        // Style settings
-        const headerFontSize = 12;
-        const titleFontSize = 20;
-        const questionFontSize = 14;
-        const tableFontSize = 10;
-        const lineSpacing = 15;
-
-        const feedbackDetails = feedbackReport[0].feedback;
-
-        // Header details (Trainer, Course, Module, Intake, Class Time)
-        page.drawText(`Trainer: ${feedbackDetails.trainer.trainerName}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Course: ${feedbackDetails.trainer.course.courseName}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Module: ${feedbackDetails.module.moduleName}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Intake: ${feedbackDetails.intake.intakeName} - ${feedbackDetails.intake.intakeYear}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Class Time: ${feedbackDetails.classTime.classTime}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing * 2;
-
-        // Report Title
-        page.drawText("Feedback Report", {
-            x: 50,
-            y: yPosition,
-            size: titleFontSize,
-            font: titleFont,
-            color: rgb(0, 0.53, 0.71),
-        });
-        yPosition -= 40;
-
-        questions.forEach((question) => {
-            // Question text
-            page.drawText(question.questionText, {
-                x: 50,
-                y: yPosition,
-                size: questionFontSize,
-                font: titleFont,
-                color: rgb(0, 0, 0),
-            });
-            yPosition -= 20;
-
-            // Table headers
-            page.drawText("Answer", { x: 50, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            page.drawText("Responses", { x: 250, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            page.drawText("Percentage", { x: 350, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            yPosition -= lineSpacing;
-
-            // Table rows for each response
-            Object.entries(question.responses).forEach(([answerText, { count, percentage }]) => {
-                page.drawText(answerText, { x: 50, y: yPosition, size: tableFontSize, font });
-                page.drawText(count.toString(), { x: 250, y: yPosition, size: tableFontSize, font });
-                page.drawText(percentage, { x: 350, y: yPosition, size: tableFontSize, font });
-                yPosition -= lineSpacing;
-
-                // Page overflow check
-                if (yPosition < 50) {
-                    yPosition = 750;
-                    page = pdfDoc.addPage([600, 800]);
-                }
-            });
-
-            yPosition -= 20; // Extra space between questions
-        });
-
-        // Download PDF
-        const pdfBytes = await pdfDoc.save();
         const blob = new Blob([pdfBytes], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -205,6 +357,55 @@ export default function FeedbackQuestionID() {
         link.click();
         URL.revokeObjectURL(url);
     };
+
+    // Function to generate PDF and send as email
+    const generatePDF = async () => {
+        if (feedbackReport.length === 0) {
+            alert("Feedback report is not available for this ID.");
+            return;
+        }
+
+        const pdfBytes = await generatePDFContent(feedbackReport, questions);
+
+        // Send PDF as an email attachment
+        sendPDF({
+            pdfBytes,
+            receiverEmail: feedbackReport[0].feedback.trainer.email,
+            receiverName: feedbackReport[0].feedback.trainer.trainerName,
+        });
+    };
+
+    // Helper function to wrap text into multiple lines
+    function wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: number) {
+        const lines = [];
+        const words = text.replace(/\n/g, " ").split(" ");  // Remove newlines and split by space
+        let currentLine = "";
+        let currentWidth = 0;
+
+        words.forEach((word) => {
+            const wordWidth = font.widthOfTextAtSize(word, fontSize);
+
+            // If adding the word exceeds the max width, push the current line and start a new one
+            if (currentWidth + wordWidth > maxWidth) {
+                lines.push(currentLine);
+                currentLine = word;
+                currentWidth = wordWidth;
+            } else {
+                currentLine += (currentLine ? " " : "") + word;
+                currentWidth += wordWidth;
+            }
+        });
+
+        if (currentLine) {
+            lines.push(currentLine);
+        }
+
+        return lines;
+    }
+
+
+
+
 
     const sendPDF = async ({ pdfBytes, receiverEmail, receiverName }: SendPDFParams): Promise<void> => {
         setIsLoading(true);
@@ -239,107 +440,23 @@ export default function FeedbackQuestionID() {
                 autoClose: 3000,
             })
         } finally {
-            setIsLoading(false); // Stop loading once the request is done
+            setIsLoading(false); 
         }
     };
 
-    const generatePDF = async () => {
-        if (feedbackReport.length === 0) {
-            alert("Feedback report is not available for this ID.");
-            return;
-        }
-
-        const pdfDoc = await PDFDocument.create();
-        let page = pdfDoc.addPage([600, 800]);
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-        let yPosition = 750;
-
-        const headerFontSize = 12;
-        const titleFontSize = 20;
-        const questionFontSize = 14;
-        const tableFontSize = 10;
-        const lineSpacing = 15;
-
-        const feedbackDetails = feedbackReport[0].feedback;
-
-        page.drawText(`Trainer: ${feedbackDetails.trainer.trainerName}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Course: ${feedbackDetails.trainer.course.courseName}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Module: ${feedbackDetails.module.moduleName}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Intake: ${feedbackDetails.intake.intakeName} - ${feedbackDetails.intake.intakeYear}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing;
-        page.drawText(`Class Time: ${feedbackDetails.classTime.classTime}`, { x: 50, y: yPosition, size: headerFontSize, font });
-        yPosition -= lineSpacing * 2;
-
-        page.drawText("Feedback Report", {
-            x: 50,
-            y: yPosition,
-            size: titleFontSize,
-            font: titleFont,
-            color: rgb(0, 0.53, 0.71),
-        });
-        yPosition -= 40;
-
-        questions.forEach((question) => {
-            page.drawText(question.questionText, {
-                x: 50,
-                y: yPosition,
-                size: questionFontSize,
-                font: titleFont,
-                color: rgb(0, 0, 0),
-            });
-            yPosition -= 20;
-
-            page.drawText("Answer", { x: 50, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            page.drawText("Responses", { x: 250, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            page.drawText("Percentage", { x: 350, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            page.drawText("Description", { x: 350, y: yPosition, size: tableFontSize, font, color: rgb(0.2, 0.2, 0.2) });
-            yPosition -= lineSpacing;
-
-            Object.entries(question.responses).forEach(([answerText, { count, percentage }]) => {
-                page.drawText(answerText, { x: 50, y: yPosition, size: tableFontSize, font });
-                page.drawText(count.toString(), { x: 250, y: yPosition, size: tableFontSize, font });
-                page.drawText(percentage, { x: 350, y: yPosition, size: tableFontSize, font });
-
-                // Add description to the PDF
-                const description = feedbackReport
-                    .filter(answer => answer.answerText === answerText)
-                    .map(filteredAnswer => filteredAnswer.description).join(", ") || "No Description";
-
-                page.drawText(description, { x: 450, y: yPosition, size: tableFontSize, font });
-                yPosition -= lineSpacing;
-
-                // Page overflow check
-                if (yPosition < 50) {
-                    yPosition = 750;
-                    page = pdfDoc.addPage([600, 800]);
-                }
-            });
 
 
-            yPosition -= 20;
-        });
+    if (loading) {
+        return <Loading />;
+    }
 
-        const pdfBytes = await pdfDoc.save();
-        sendPDF({
-            pdfBytes,
-            receiverEmail: feedbackReport[0].feedback.trainer.email,
-            receiverName: feedbackReport[0].feedback.trainer.trainerName,
-        });
-    };
-
-
-
-    if (loading) return <Loading />
-    if (error) return <div className="text-center text-red-500">{error}</div>;
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
-        <div className="max-w-3xl mx-auto p-4">
+        <div className="max-w-7xl mx-auto p-4">
             <ToastContainer />
-            {/* Message if the feedback report is not available */}
             {feedbackReport.length === 0 && (
                 <div className="text-center text-gray-500">
                     Feedback report is not available for this Feedback
@@ -363,33 +480,78 @@ export default function FeedbackQuestionID() {
             {questions.map((question) => (
                 <div key={question.id} className="mb-8">
                     <h2 className="text-xl font-semibold mb-2">Question: {question.questionText}</h2>
-                    <table className="min-w-full border border-gray-300 text-left text-sm">
-                        <thead className="bg-gray-200">
-                            <tr>
-                                <th className="p-3 border-b border-gray-300">Answer</th>
-                                <th className="p-3 border-b border-gray-300">Responses</th>
-                                <th className="p-3 border-b border-gray-300">Percentage</th>
-                                <th className="p-3 border-b border-gray-300">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.entries(question.responses).map(([answerText, { count, percentage }]) => (
-                                <tr key={answerText} className="hover:bg-gray-50">
-                                    <td className="p-3 border-b border-gray-300">{answerText}</td>
-                                    <td className="p-3 border-b border-gray-300">{count}</td>
-                                    <td className="p-3 border-b border-gray-300">{percentage}</td>
-                                    <td className="p-3 border-b border-gray-300">
-                                        {/* Display the description for each response */}
-                                        {feedbackReport
-                                            .filter(answer => answer.answerText === answerText)
-                                            .map(filteredAnswer => filteredAnswer.description).join(", ") || "No Description"}
-                                    </td>
+
+                    {/* If it's an open-ended question */}
+                    {question.questionType === "open-ended" && (
+                        <div className="p-3 border border-gray-300">
+                            <strong>Open-Ended Responses:</strong>
+                            <ul>
+                                {feedbackReport
+                                    .filter((answer) => answer.questionId === question.id)
+                                    .map((answer, index) => (
+                                        <li key={index}>
+                                            <strong>Response {index + 1}:</strong> {answer.answerText}
+                                            {answer.description && answer.description.trim() && (
+                                                <div className="ml-4">
+                                                    <strong>Description:</strong> {answer.description}
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* For regular (non-open-ended) questions */}
+                    {question.questionType !== "open-ended" && (
+                        <table className="border border-gray-300 text-left text-sm">
+                            <thead className="bg-gray-200">
+                                <tr>
+                                    <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
+                                    <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
+                                    <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
+                                    // Filter descriptions for the current answer
+                                    const descriptions = feedbackReport
+                                        .filter((answer) => answer.answerText === answerText)
+                                        .map((filteredAnswer) => filteredAnswer.description);
+
+                                    return (
+                                        <>
+                                            {/* Row for Answer, Responses, and Percentage */}
+                                            <tr key={answerText} className="hover:bg-gray-50">
+                                                <td className="p-3 border-b border-gray-300">{answerText}</td>
+                                                <td className="p-3 border-b border-gray-300">{count}</td>
+                                                <td className="p-3 border-b border-gray-300">{percentage}</td>
+                                            </tr>
+
+                                            {/* Row for Description, displayed only if there are descriptions */}
+                                            {feedbackReport
+                                                .filter((answer) => answer.answerText === answerText)
+                                                .map((filteredAnswer, index) => (
+                                                    <>
+                                                        {/* Check if there are descriptions for the answer */}
+                                                        {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
+                                                            <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
+                                                                <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
+                                                                    <strong>Description:</strong> {filteredAnswer.description}
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </>
+                                                ))}
+                                        </>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             ))}
+
 
 
             {/* Conditionally render buttons only if feedback report is available */}
@@ -443,3 +605,4 @@ export default function FeedbackQuestionID() {
 
     );
 }
+
