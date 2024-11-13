@@ -7,7 +7,7 @@ import Loading from '../../loading'
 import axios from "../../../../../lib/axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import logo from '../../../../../public/assets/image/logo.png'
+
 interface FeedbackAnswer {
     id: number;
     questionId: number;
@@ -73,7 +73,7 @@ export default function FeedbackQuestionID() {
                     const questionMap: { [questionId: number]: FeedbackQuestion } = {};
 
                     feedbackReport.forEach((answer: FeedbackAnswer) => {
-                        const { questionId, answerText, question, description } = answer;
+                        const { questionId, answerText, question } = answer;
 
                         if (!questionMap[questionId]) {
                             questionMap[questionId] = {
@@ -516,7 +516,7 @@ export default function FeedbackQuestionID() {
                             <tbody>
                                 {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
                                     // Filter descriptions for the current answer
-                                    const descriptions = feedbackReport
+                                    feedbackReport
                                         .filter((answer) => answer.answerText === answerText)
                                         .map((filteredAnswer) => filteredAnswer.description);
 
@@ -532,7 +532,7 @@ export default function FeedbackQuestionID() {
                                             {/* Row for Description, displayed only if there are descriptions */}
                                             {feedbackReport
                                                 .filter((answer) => answer.answerText === answerText)
-                                                .map((filteredAnswer, index) => (
+                                                .map((filteredAnswer) => (
                                                     <>
                                                         {/* Check if there are descriptions for the answer */}
                                                         {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
