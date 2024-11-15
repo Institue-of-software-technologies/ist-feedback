@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Permission } from "@/types";
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
   roleName: string;
@@ -39,11 +40,11 @@ const CreateRole: React.FC = () => {
     try {
       console.log("Form Data Submitted:", data);
       await api.post("/roles", data);
-      toast.success("Role created successfully!", { position: "top-right", autoClose: 3000 });
+      showToast.success("Role created successfully!");
       setTimeout(() => router.push('/dashboard/roles'), 2000);
     } catch (error) {
       console.error("Failed to create role", error);
-      toast.error("Failed to create role", { position: "top-right", autoClose: 3000 });
+      showToast.error("Failed to create role");
     }
   };
 
@@ -64,9 +65,9 @@ const CreateRole: React.FC = () => {
   console.log(permissions);
   if (loading) return <div>Loading...</div>;
 
-  
+
   return (
-    
+
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
       <h2 className="text-2xl font-bold mb-4">Create New Role</h2>

@@ -21,9 +21,10 @@ import { PiChalkboardTeacherFill } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
 import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
+import { showToast } from '@/components/ToastMessage';
 
 type DashboardLayoutProps = {
     children: React.ReactNode;
@@ -49,11 +50,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
                     router.push('/login');
                 }, 3000);
 
-                toast.success('Logout successfully', { position: "top-right", autoClose: 3000 });
             }
         } catch (error) {
             console.log(error)
-            toast.error('Failed to logout', { position: "top-right", autoClose: 3000 });
+            showToast.error('Failed to logout');
         }
     };
 

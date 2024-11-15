@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import api from "../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Form from '@/components/Forms';
 import { useRouter } from "next/navigation";
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,6 +12,7 @@ import Image from 'next/image';
 import istLogo from '../../public/assets/image/cropedImag.png';
 // public/assets/image/cropedImag.png
 import Loading from './loading';  // Import the Loading component
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
   Token: string;
@@ -32,7 +33,7 @@ export default function Home() {
         setFeedback(response.data.feedbacks || []);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch feedback');
       } finally {
         setLoading(false);
       }
@@ -59,13 +60,13 @@ export default function Home() {
       localStorage.setItem('userRolesPermissions', JSON.stringify(response.data));
 
       setUser(useRolesPermissions);
-      toast.success("Token found! Redirecting...", { position: "top-right", autoClose: 3000 });
+      showToast.success("Token found! Redirecting...");
       setTimeout(() => {
         router.push(`/studets-feedback/${response.data.token.id}`);
       }, 2000);
     } catch (error) {
       console.error("Failed to get token", error);
-      toast.error("Token expired.", { position: "top-right", autoClose: 3000 });
+      showToast.error("Token expired.");
     }
   };
 

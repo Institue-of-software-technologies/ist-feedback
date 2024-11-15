@@ -2,12 +2,13 @@
 import { Feedback, FeedbackQuestionSelect } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../../../lib/axios';
 import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import Loading from '../../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 interface FormValues {
     [key: string]: string | number;
@@ -35,7 +36,7 @@ export default function StudentFeedback() {
                 } catch (err) {
                     console.log(err);
                     setError('Failed to fetch feedback');
-                    toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
+                    showToast.error('Failed to fetch feedback');
                 } finally {
                     setLoading(false);
                 }
@@ -47,7 +48,7 @@ export default function StudentFeedback() {
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         const formattedData = Object.entries(data).map(([key, value]) => {
             if (key.startsWith("question-")) {
-                if(key.startsWith("description-")) {
+                if (key.startsWith("description-")) {
                     return null;
                 }
                 const questionID = parseInt(key.replace("question-", ""), 10);
@@ -67,13 +68,13 @@ export default function StudentFeedback() {
 
         try {
             await api.post('/feedback/answer', { formData: formattedData });
-            toast.success("Feedback submitted successfully!", { position: "top-right", autoClose: 3000 });
+            showToast.success("Feedback submitted successfully!");
             setTimeout(() => {
                 router.push(`/`);
             }, 3000);
         } catch (error) {
             console.log(error);
-            toast.error('Failed to submit feedback', { position: "top-right", autoClose: 3000 });
+            showToast.error('Failed to submit feedback');
         }
     };
 

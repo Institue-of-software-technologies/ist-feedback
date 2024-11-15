@@ -5,8 +5,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
 import { Input } from "@/components/Forms";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
   questionText?: string;
@@ -25,13 +26,13 @@ const FeedbackQuestionCreate: React.FC = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/feedback-questions", data);
-      toast.success("Feedback question created successfully!", { position: "top-right", autoClose: 3000 });
+      showToast.success("Feedback question created successfully!");
       setTimeout(() => {
         router.push('/dashboard/feedback-questions');
       }, 2000);
     } catch (error) {
       console.error("Failed to create feedback question", error);
-      toast.error("Failed to create feedback question.", { position: "top-right", autoClose: 3000 });
+      showToast.error("Failed to create feedback question.");
     }
   };
 

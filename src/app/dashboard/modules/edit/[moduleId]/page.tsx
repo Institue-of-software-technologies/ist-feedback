@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { Module } from '@/db/models/Module';
 import { Course } from '@/types';
+import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
   moduleName: string;
@@ -57,10 +58,7 @@ const EditModule = () => {
   const handleSubmit = async (data: FormData) => {
     try {
       await api.put(`/modules/${moduleId}`, data);
-      toast.success('Module updated successfully!', {
-        position: "top-right",
-        autoClose: 2000, // Automatically close the toast after 2 seconds
-      });
+      showToast.success('Module updated successfully!');
 
       // Delay the redirect to allow the toast to display
       setTimeout(() => {
@@ -68,10 +66,7 @@ const EditModule = () => {
       }, 2000);
     } catch (err) {
       console.log(err)
-      toast.error('Failed to update module', {
-        position: "top-right",
-        autoClose: 3000, // Automatically close the toast after 3 seconds
-      });
+      showToast.error('Failed to update module');
     }
   };
 
@@ -83,7 +78,7 @@ const EditModule = () => {
     { label: "moduleName", type: "text", value: module?.moduleName },
     {
       label: "course",
-      type: "select", 
+      type: "select",
       value: module?.course?.courseName, // Set the default courseId here
       options: courses.map((course) => ({
         label: course.courseName,

@@ -3,17 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form, { Input } from '@/components/Forms';
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
 import { AnswerOptions } from '@/types';
+import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
   questionText: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating';
   options?: { optionText: string, description: boolean }[];
-  
 }
 
 const EditQuestion = () => {
@@ -40,7 +40,7 @@ const EditQuestion = () => {
           setFormData({
             questionText: fetchedQuestion.questionText,
             questionType: fetchedQuestion.questionType,
-            options: fetchedQuestion.options?.map((opt:AnswerOptions) => ({
+            options: fetchedQuestion.options?.map((opt: AnswerOptions) => ({
               optionText: opt.optionText,
               description: opt.description || false,
             })) || [{ optionText: "", description: false }],
@@ -92,19 +92,13 @@ const EditQuestion = () => {
           description: option.description, // Send description status to backend
         })),
       });
-      toast.success('Feedback question updated successfully!', {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      showToast.success('Feedback question updated successfully!');
       setTimeout(() => {
         router.push('/dashboard/feedback-questions');
       }, 2000);
     } catch (err) {
       console.log(err)
-      toast.error('Failed to update feedback question', {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      showToast.error('Failed to update feedback question');
     }
   };
 

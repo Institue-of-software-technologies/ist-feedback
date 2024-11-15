@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
-import { ClassTime} from '@/types'; // Adjust this path to your User type definition
+import { ClassTime } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 
 const ClassTimeFormManagement: React.FC = () => {
@@ -30,7 +31,7 @@ const ClassTimeFormManagement: React.FC = () => {
         setFilteredClassTimes(response.data.classTime);
       } catch (err) {
         console.log(err);
-        toast.error('Failed to fetch Class Time', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch Class Time');
       } finally {
         setLoading(false);
       }
@@ -46,10 +47,10 @@ const ClassTimeFormManagement: React.FC = () => {
         await api.delete(`/class-times/${confirmDelete.id}`);
         setClassTimes(classTimes.filter(classTime => classTime.id !== confirmDelete.id));
         setFilteredClassTimes(filteredClassTimes.filter(filteredClassTimes => filteredClassTimes.id !== confirmDelete.id));
-        toast.success('Class Time deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('Class Time deleted successfully');
       } catch (err) {
         console.log(err);
-        toast.error('Failed to delete Class Time', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete Class Time');
       }
     }
   };
@@ -59,7 +60,7 @@ const ClassTimeFormManagement: React.FC = () => {
 
     // Filter the course based on the search query
     if (value.trim() === '') {
-        setFilteredClassTimes(classTimes);  // Show all if search is empty
+      setFilteredClassTimes(classTimes);  // Show all if search is empty
     } else {
       const filtered = classTimes.filter(classTime =>
         classTime.classTime.toLowerCase().includes(value.toLowerCase())
@@ -67,10 +68,10 @@ const ClassTimeFormManagement: React.FC = () => {
       setFilteredClassTimes(filtered);
     }
   };
-  
+
   // Handle course editing
   const handleEdit = (classTime: ClassTime) => {
-    toast.info('Redirecting to edit Class Time...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit Class Time...',);
     router.push(`/dashboard/class-times/edit/${classTime.id}`);
   };
 

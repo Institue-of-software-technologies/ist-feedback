@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
 import Loading from '../../loading'
 import axios from "../../../../../lib/axios";
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { showToast } from "@/components/ToastMessage";
 
 interface FeedbackAnswer {
     id: number;
@@ -139,12 +140,12 @@ export default function FeedbackQuestionID() {
         // Customizable variables for logo
         const logoUrl = "https://raw.githubusercontent.com/Institue-of-software-technologies/ist-feedback/refs/heads/main/public/assets/image/logo.png";
         const logoScaleFactor = 0.1;
-        const logoVerticalPadding = 0; 
-        const logoHorizontalPadding = 0; 
+        const logoVerticalPadding = 0;
+        const logoHorizontalPadding = 0;
 
         // Embed the logo image from URL
         const logoBytes = await fetch(logoUrl).then((res) => res.arrayBuffer());
-        const logoImage = await pdfDoc.embedPng(logoBytes);  
+        const logoImage = await pdfDoc.embedPng(logoBytes);
 
         const logoWidth = logoImage.width * logoScaleFactor;
         const logoHeight = logoImage.height * logoScaleFactor;
@@ -153,13 +154,13 @@ export default function FeedbackQuestionID() {
 
         page.drawImage(logoImage, {
             x: logoXPosition,
-            y: yPosition - logoHeight - logoVerticalPadding, 
+            y: yPosition - logoHeight - logoVerticalPadding,
             width: logoWidth,
             height: logoHeight,
         });
 
         // Update yPosition after the logo
-        yPosition -= logoHeight + logoVerticalPadding + 20;  
+        yPosition -= logoHeight + logoVerticalPadding + 20;
 
         const addNewPageIfNeeded = () => {
             if (yPosition < pageMargin) {
@@ -253,7 +254,7 @@ export default function FeedbackQuestionID() {
                                 y: yPosition,
                                 size: descriptionFontSize,
                                 font,
-                                color: rgb(1, 0, 0), 
+                                color: rgb(1, 0, 0),
                             });
                             yPosition -= lineSpacing;
                             addNewPageIfNeeded();
@@ -423,25 +424,16 @@ export default function FeedbackQuestionID() {
             });
 
             if (response.status === 200) {
-                toast.success('PDF report sent successfully!', {
-                    position: 'top-right',
-                    autoClose: 2000,
-                });
+                showToast.success('PDF report sent successfully!');
             } else {
                 alert();
-                toast.error("Failed to send PDF report.", {
-                    position: 'top-right',
-                    autoClose: 3000,
-                })
+                showToast.error("Failed to send PDF report.")
             }
         } catch (error) {
             console.error("Error sending PDF:", error);
-            toast.error("An error occurred while sending the PDF report.", {
-                position: 'top-right',
-                autoClose: 3000,
-            })
+            showToast.error("An error occurred while sending the PDF report.")
         } finally {
-            setIsLoading(false); 
+            setIsLoading(false);
         }
     };
 

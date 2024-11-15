@@ -4,8 +4,9 @@ import React from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
     intakeName: string;
@@ -17,13 +18,13 @@ const NewIntakeForm: React.FC = () => {
     const onSubmit = async (data: FormData) => {
         try {
             await api.post("/intakes", data);
-            toast.success("Intake created successfully!", { position: "top-right", autoClose: 3000 });
+            showToast.success("Intake created successfully!");
             setTimeout(() => {
-                router.push('/dashboard/intakes'); 
+                router.push('/dashboard/intakes');
             }, 1000);
         } catch (error) {
             console.error("Failed to create intake", error);
-            toast.error("Failed to create intake", { position: "top-right", autoClose: 3000 });
+            showToast.error("Failed to create intake");
         }
     };
 
@@ -31,8 +32,8 @@ const NewIntakeForm: React.FC = () => {
 
     const generateYearOptions = () => {
         const yearRange = [];
-        for (let i = currentYear - 2 ; i <= currentYear + 3; i++) {
-            yearRange.push({label :`${i}`, value: i});
+        for (let i = currentYear - 2; i <= currentYear + 3; i++) {
+            yearRange.push({ label: `${i}`, value: i });
         }
         return yearRange;
     };
@@ -40,7 +41,7 @@ const NewIntakeForm: React.FC = () => {
     const inputs = [
         { label: "intakeName", type: "text" },
         {
-            label: "intakeYear", 
+            label: "intakeYear",
             type: "select",
             options: generateYearOptions()
         }

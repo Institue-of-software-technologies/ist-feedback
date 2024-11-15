@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios'; // Update path to your axios lib
 import { User } from '@/types'; // Update path to your User type
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { showToast } from '@/components/ToastMessage';
 
 const EditUser = () => {
   const router = useRouter();
@@ -22,10 +23,10 @@ const EditUser = () => {
         try {
           const response = await api.get(`/users/${userId}`);
           setUser(response.data);
-          setFormData({ 
-            username: response.data.username, 
-            email: response.data.email, 
-            roleId: response.data.roleId 
+          setFormData({
+            username: response.data.username,
+            email: response.data.email,
+            roleId: response.data.roleId
           });
         } catch (err) {
           console.log(err)
@@ -43,21 +44,15 @@ const EditUser = () => {
     e.preventDefault();
     try {
       await api.put(`/users/${userId}`, formData);
-      toast.success('User updated successfully!', {
-        position: "top-right",
-        autoClose: 2000, // Automatically close the toast after 2 seconds
-      });
-      
+      showToast.success('User updated successfully!');
+
       // Delay the redirect to allow the toast to display
       setTimeout(() => {
         router.push('/dashboard/users'); // Redirect to the user list
       }, 2000);
     } catch (err) {
       console.log(err)
-      toast.error('Failed to update user', {
-        position: "top-right",
-        autoClose: 3000, // Automatically close the toast after 3 seconds
-      });
+      showToast.error('Failed to update user');
     }
   };
 
@@ -73,25 +68,25 @@ const EditUser = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Username</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={formData.username}
             onChange={e => setFormData({ ...formData, username: e.target.value })}
-            className="mt-1 p-2 border border-gray-300 rounded w-full" 
+            className="mt-1 p-2 border border-gray-300 rounded w-full"
           />
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Email</label>
-          <input 
-            type="email" 
+          <input
+            type="email"
             value={formData.email}
             onChange={e => setFormData({ ...formData, email: e.target.value })}
-            className="mt-1 p-2 border border-gray-300 rounded w-full" 
+            className="mt-1 p-2 border border-gray-300 rounded w-full"
           />
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Role</label>
-          <select 
+          <select
             value={formData.roleId}
             onChange={e => setFormData({ ...formData, roleId: e.target.value })}
             className="mt-1 p-2 border border-gray-300 rounded w-full"
