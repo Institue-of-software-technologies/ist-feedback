@@ -52,7 +52,7 @@ const UserManagement: React.FC = () => {
         setFilteredRoles(response.data);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch roles', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch roles');
       } finally {
         setLoading(false);
       }
