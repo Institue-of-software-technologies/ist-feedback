@@ -62,7 +62,7 @@ export default function Home() {
       setUser(useRolesPermissions);
       showToast.success("Token found! Redirecting...");
       setTimeout(() => {
-        router.push(`/studets-feedback/${response.data.token.id}`);
+        router.push(`/student-feedback/${response.data.token.id}`);
       }, 2000);
     } catch (error) {
       console.error("Failed to get token", error);

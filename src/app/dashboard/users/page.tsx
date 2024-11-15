@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
-import { User } from '@/types'; // Adjust this path to your User type definition
+import { Role, User } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,8 +15,10 @@ import { showToast } from '@/components/ToastMessage';
 const UserManagement: React.FC = () => {
   const { user } = useUser();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // State to handle delete confirmation
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);  // Holds the filtered users
+  const [, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [, setFilteredRoles] = useState<Role[]>([]);
   const [search, setSearch] = useState<string>('');
   const router = useRouter();
 
@@ -38,6 +40,25 @@ const UserManagement: React.FC = () => {
     };
 
     fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await api.get('/roles', {
+          method: 'GET',
+        });
+        setRoles(response.data);
+        setFilteredRoles(response.data);
+      } catch (err) {
+        console.log(err)
+        toast.error('Failed to fetch roles', { position: "top-right", autoClose: 3000 });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoles();
   }, []);
 
   // Handle user deletion
