@@ -4,11 +4,12 @@ import React, { useState, useEffect, forwardRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
 import { ClassTime, Intake, Module, Trainer, FeedbackQuestion } from '@/types';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
   trainerId: string;
@@ -102,19 +103,13 @@ const EditFeedback = () => {
         tokenExpiration: selectedDate,
         multiSelectField: selectedFeedbackQuestions,
       });
-      toast.success('Feedback updated successfully!', {
-        position: 'top-right',
-        autoClose: 2000,
-      });
+      showToast.success('Feedback updated successfully!');
       setTimeout(() => {
         router.push('/dashboard/feedback');
       }, 2000);
     } catch (err) {
       console.log(err)
-      toast.error('Failed to update feedback', {
-        position: 'top-right',
-        autoClose: 3000,
-      });
+      showToast.error('Failed to update feedback');
     }
   };
 

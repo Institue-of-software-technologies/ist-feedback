@@ -4,8 +4,9 @@ import React from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
   classTimes: string;
@@ -16,21 +17,21 @@ const NewClassTimeForm: React.FC = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/class-times", data);
-      toast.success("class time created successfully!", { position: "top-right", autoClose: 3000 });
+      showToast.success("class time created successfully!");
       // Delay the redirect to allow the toast to display
       setTimeout(() => {
         router.push('/dashboard/class-times'); // Redirect to the class-time list
       }, 2000);
     } catch (error) {
       console.error("Failed to create class time", error);
-      toast.error("Failed to create class time", { position: "top-right", autoClose: 3000 });
+      showToast.error("Failed to create class time");
     }
   };
 
   const inputs = [
     { label: "classTime", type: "text" },
-    { label: "classTimeStart",type: "time"},
-    { label: "classTimeEnd",type: "time"},
+    { label: "classTimeStart", type: "time" },
+    { label: "classTimeEnd", type: "time" },
   ];
 
   return (

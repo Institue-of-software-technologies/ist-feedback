@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
-import { Course} from '@/types'; // Adjust this path to your User type definition
+import { Course } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 
 const CourseManagement: React.FC = () => {
@@ -31,7 +32,7 @@ const CourseManagement: React.FC = () => {
         setFilteredcourse(response.data.course);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch courses');
       } finally {
         setLoading(false);
       }
@@ -47,10 +48,10 @@ const CourseManagement: React.FC = () => {
         await api.delete(`/courses/${confirmDelete.id}`);
         setCourses(courses.filter(course => course.id !== confirmDelete.id));
         setFilteredcourse(filteredcourse.filter(filteredcourse => filteredcourse.id !== confirmDelete.id));
-        toast.success('course deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('course deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete course', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete course');
       }
     }
   };
@@ -69,10 +70,10 @@ const CourseManagement: React.FC = () => {
       setFilteredcourse(filtered);
     }
   };
-  
+
   // Handle course editing
   const handleEdit = (course: Course) => {
-    toast.info('Redirecting to edit user...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit course...');
     router.push(`/dashboard/courses/edit/${course.id}`);
   };
 

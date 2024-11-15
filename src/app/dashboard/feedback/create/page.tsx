@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { ClassTime, FeedbackQuestion, Intake, Module, Trainer } from "@/types";
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
   trainerId: number;
@@ -30,65 +31,51 @@ const NewFeedbackForm: React.FC = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/feedback", data);
-      toast.success("Feedback created successfully!", { position: "top-right", autoClose: 3000 });
+      showToast.success("Feedback created successfully!");
       setTimeout(() => {
         router.push('/dashboard/feedback');
       }, 1000);
     } catch (error) {
       console.error("Failed to create feedback", error);
-      toast.error("Failed to create feedback", { position: "top-right", autoClose: 3000 });
+      showToast.error("Failed to create feedback");
     }
   };
 
   useEffect(() => {
-    const fetchTrainers = async () => {
+    const fetchData = async () => {
+      setLoading(true); // Indicate loading state before starting the fetch operations
       try {
-        const response = await api.get(`/trainers`);
-        setTrainers(response.data.trainer);
+        // Fetch all data concurrently
+        const [
+          trainersResponse,
+          questionsResponse,
+          intakesResponse,
+          classTimesResponse,
+          modulesResponse,
+        ] = await Promise.all([
+          api.get(`/trainers`),
+          api.get(`/feedback-questions`),
+          api.get(`/intakes`),
+          api.get(`/class-times`),
+          api.get(`/modules`),
+        ]);
+
+        // Set state for each resource
+        setTrainers(trainersResponse.data.trainer);
+        setQuestions(questionsResponse.data.questions);
+        setIntakes(intakesResponse.data.intake);
+        setClassTimes(classTimesResponse.data.classTime);
+        setModules(modulesResponse.data);
       } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchQuestions = async () => {
-      try {
-        const response = await api.get(`/feedback-questions`);
-        setQuestions(response.data.questions);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchIntakes = async () => {
-      try {
-        const response = await api.get(`/intakes`);
-        setIntakes(response.data.intake);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchClassTimes = async () => {
-      try {
-        const response = await api.get(`/class-times`);
-        setClassTimes(response.data.classTime);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchModules = async () => {
-      try {
-        const response = await api.get(`/modules`);
-        setModules(response.data);
-      } catch (err) {
-        console.log(err);
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false); // Loading state complete
       }
     };
 
-    fetchTrainers();
-    fetchIntakes();
-    fetchClassTimes();
-    fetchModules();
-    fetchQuestions();
-    setLoading(false);
+    fetchData();
   }, []);
+
 
   if (loading) {
     return <div className="text-center">Loading...</div>;
