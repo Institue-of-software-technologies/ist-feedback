@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Role } from "@/types";
 import Loading from "@/app/loading";
+import { showToast } from "@/components/ToastMessage";
 
 interface FormData {
   username: string;
@@ -33,7 +34,7 @@ const NewUserForm: React.FC = () => {
         setFilteredRoles(response.data);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch roles', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch roles');
       } finally {
         setLoading(false);
       }
@@ -45,14 +46,14 @@ const NewUserForm: React.FC = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/users", data);
-      toast.success("User created successfully!", { position: "top-right", autoClose: 3000 });
+      showToast.success("User created successfully!");
       // Delay the redirect to allow the toast to display
       setTimeout(() => {
         router.push('/dashboard/users'); // Redirect to the user list
       }, 2000);
     } catch (error) {
       console.error("Failed to create user", error);
-      toast.error("Failed to create user", { position: "top-right", autoClose: 3000 });
+      showToast.error("Failed to create user");
     }
   };
 
@@ -61,7 +62,7 @@ const NewUserForm: React.FC = () => {
     { label: "email", type: "email" },
     { label: "password", type: "password" },
     {
-      label: 'role',
+      label: 'roleId',
       type: 'select',
       options: roles.map((role) => ({
         label: role.roleName,

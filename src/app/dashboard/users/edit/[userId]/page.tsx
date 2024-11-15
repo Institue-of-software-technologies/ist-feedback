@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios'; // Update path to your axios lib
 import { Role, User } from '@/types'; // Update path to your User type
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from '@/app/loading';
+import { showToast } from '@/components/ToastMessage';
 
 const EditUser = () => {
   const router = useRouter();
@@ -50,7 +51,7 @@ const EditUser = () => {
         setFilteredRoles(response.data.roles);
       } catch (err) {
         console.log(err);
-        toast.error('Failed to fetch roles', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch roles');
       } finally {
         setLoading(false);
       }
@@ -63,21 +64,14 @@ const EditUser = () => {
     e.preventDefault();
     try {
       await api.put(`/users/${userId}`, formData);
-      toast.success('User updated successfully!', {
-        position: "top-right",
-        autoClose: 2000, // Automatically close the toast after 2 seconds
-      });
-
+      showToast.success('User updated successfully!');
       // Delay the redirect to allow the toast to display
       setTimeout(() => {
         router.push('/dashboard/users'); // Redirect to the user list
       }, 2000);
     } catch (err) {
       console.log(err);
-      toast.error('Failed to update user', {
-        position: "top-right",
-        autoClose: 3000, // Automatically close the toast after 3 seconds
-      });
+      showToast.error('Failed to update user');
     }
   };
 
