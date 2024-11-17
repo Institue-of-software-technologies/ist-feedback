@@ -103,6 +103,7 @@ export default function StudentFeedback() {
                         <div className="text-left sm:text-right">
                             <p className="text-lg font-semibold text-gray-800 mt-5">Module Name: <span className="font-normal text-gray-600">{feedback?.module.moduleName}</span></p>
                             <p className="text-md text-gray-700 mt-1">Intake Name: <span className="font-normal">{feedback?.intake.intakeName}</span></p>
+                            <p className="text-md text-gray-700 mt-1">Year: <span className="font-normal">{feedback?.intake.intakeYear}</span></p>
                         </div>
                     </div>
                 </div>

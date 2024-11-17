@@ -79,6 +79,18 @@ export default {
       // General Permissions
       VIEW_DASHBOARD = 'view_dashboard',
       RECEIVE_NOTIFICATIONS = 'receive_notifications',
+
+      //update_admin_Permissions
+      MANAGE_MODULES='manage_modules',
+      UPDATE_MODULES='update_modules',
+      DELETE_MODULES='delete_modules',
+      VIEW_MODULES='view_modules',
+
+      UPDATE_FEEDBACKS='update_feedbacks',
+      DELETE_FEEDBACKS='delete_feedbacks',
+      VIEW_FEEDBACKS = 'view_feedbacks',
+
+      MANAGE_PROFILE='manage_profile',
     }
 
     // Hash passwords
@@ -203,15 +215,29 @@ export default {
       { roleId: 1, permissionId: 53, createdAt: new Date(), updatedAt: new Date() }, // RECEIVE_NOTIFICATIONS
       { roleId: 2, permissionId: 52, createdAt: new Date(), updatedAt: new Date() }, // VIEW_DASHBOARD
       { roleId: 2, permissionId: 53, createdAt: new Date(), updatedAt: new Date() }, // RECEIVE_NOTIFICATIONS
+
+      //update_admin_Permissions
+      { roleId: 2, permissionId: 54, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 55, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 56, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 57, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 58, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 59, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 60, createdAt: new Date(), updatedAt: new Date() },
+      
+      //profile_permissions
+      { roleId: 1, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
 ]);
 
-    
-  },
 
-  async down(queryInterface: QueryInterface) {
-    await queryInterface.bulkDelete('Role_Permissions', {}, {});
-    await queryInterface.bulkDelete('Permissions', {}, {});
-    await queryInterface.bulkDelete('Roles', {}, {});
-    await queryInterface.bulkDelete('Users', {}, {});
-  },
+    
+},
+
+async down(queryInterface: QueryInterface) {
+  await queryInterface.bulkDelete('Role_Permissions', {}, {});
+  await queryInterface.bulkDelete('Permissions', {}, {});
+  await queryInterface.bulkDelete('Roles', {}, {});
+  await queryInterface.bulkDelete('Users', {}, {});
+},
 };

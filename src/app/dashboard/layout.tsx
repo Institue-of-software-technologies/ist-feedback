@@ -17,7 +17,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
-import { PiChalkboardTeacherFill } from "react-icons/pi";
+import { PiChalkboardTeacherFill, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
 import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
@@ -179,6 +179,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       sideIcon: <SiGoogleforms size={'30px'} />,
       createLink: '/dashboard/feedback-reports/send',
     },
+    {
+      name: 'My Profile',
+      permission: 'manage_profile',
+      viewLabel: 'Manage Profile',
+      viewLink: `/dashboard/user-profile/${user?.id}`,
+      icon: <PiUserCircleGearDuotone size={'40px'} />,
+      sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
+    },
   ];
 
   // Get the currently active tab details
@@ -215,7 +223,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
   if (!user || !user.permissions.includes('view_dashboard')) {
     return <div className="text-red-600 text-center mt-20">You do not have access to this page.</div>;
   }
-
   return (
     <Suspense fallback={<Loading />}>
       <div className="flex h-screen bg-background text-foreground overflow-x-hidden">
