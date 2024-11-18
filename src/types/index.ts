@@ -20,16 +20,16 @@ export interface Module {
   moduleName: string;
   courseId: string;
   course: {
-    id: number,
-    courseName: string
-  }
+    id: number;
+    courseName: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
 
-export interface ClassTime{
+export interface ClassTime {
   id: number;
-  classTime:string;
+  classTime: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,24 +41,25 @@ export interface Feedback {
   classTimeId: number;
   moduleId: number;
   studentToken: string;
+  tokenStartTime: string;
   tokenExpiration: string;
   trainer: {
     id: number;
     trainerName: string;
     email: string;
     course: {
-      courseName: string
-    }
+      courseName: string;
+    };
   };
   intake: {
     intakeYear: string;
     id: number;
     intakeName: string;
-  };  
+  };
   classTime: {
     id: number;
     classTime: string;
-  };  
+  };
   module: {
     id: number;
     moduleName: string;
@@ -73,21 +74,21 @@ export interface Intake {
 
 export interface Trainer {
   id: number;
-  trainerName:string;
-  email:string;
+  trainerName: string;
+  email: string;
 }
 
 export interface ClassTime {
   id: number;
-  classTime:string;
-  classTimeStart:string;
-  classTimeEnd:string;
+  classTime: string;
+  classTimeStart: string;
+  classTimeEnd: string;
 }
 
 export interface Module {
   id: number;
-  moduleName:string;
-  courseId:string;
+  moduleName: string;
+  courseId: string;
 }
 
 export interface User {
@@ -98,7 +99,7 @@ export interface User {
   roleId: number;
   createdAt: string;
   updatedAt: string;
-  role:  {
+  role: {
     id: number;
     roleName: string;
   }; // Add role object here
@@ -107,7 +108,7 @@ export interface FeedbackQuestion {
   feedbackQuestion: string;
   id: number;
   questionText: string;
-  questionType: 'open-ended' | 'closed-ended' | 'rating';
+  questionType: "open-ended" | "closed-ended" | "rating";
 }
 
 export interface FeedbackQuestionSelect {
@@ -118,11 +119,13 @@ export interface FeedbackQuestionSelect {
     id: number;
     questionText: string;
     questionType: string;
-    answerOption:[{
-      description: string;
-      id:number;
-      optionText:string;
-    }]
+    answerOption: [
+      {
+        description: string;
+        id: number;
+        optionText: string;
+      }
+    ];
   };
 }
 
