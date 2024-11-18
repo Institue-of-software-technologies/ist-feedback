@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, context: Context) {
         {
           model: Intake,
           as: "intake",
-          attributes: ["id", "intakeName"],
+          attributes: ["id", "intakeName","intakeYear"],
         },
       ],
     });

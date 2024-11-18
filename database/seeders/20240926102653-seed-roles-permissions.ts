@@ -89,6 +89,8 @@ export default {
       UPDATE_FEEDBACKS='update_feedbacks',
       DELETE_FEEDBACKS='delete_feedbacks',
       VIEW_FEEDBACKS = 'view_feedbacks',
+
+      MANAGE_PROFILE='manage_profile',
     }
 
     // Hash passwords
@@ -222,6 +224,10 @@ export default {
       { roleId: 2, permissionId: 58, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 2, permissionId: 59, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 2, permissionId: 60, createdAt: new Date(), updatedAt: new Date() },
+
+      //profile_permissions
+      { roleId: 1, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
 ]);
 
 
