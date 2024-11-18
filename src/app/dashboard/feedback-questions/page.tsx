@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios';
 import { FeedbackQuestion } from '@/types';
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 const FeedbackQuestions: React.FC = () => {
   const { user } = useUser();
@@ -30,7 +31,7 @@ const FeedbackQuestions: React.FC = () => {
         setFilteredquestion(response.data.questions);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch feedback questions', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch feedback questions');
       } finally {
         setLoading(false);
       }
@@ -46,10 +47,10 @@ const FeedbackQuestions: React.FC = () => {
         await api.delete(`/feedback-questions/${confirmDelete.id}`);
         setQuestions(questions.filter(question => question.id !== confirmDelete.id));
         setFilteredquestion(filteredquestion.filter(filteredquestion => filteredquestion.id !== confirmDelete.id));
-        toast.success('Feedback question deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('Feedback question deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete feedback question', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete feedback question');
       }
     }
   };
@@ -71,7 +72,7 @@ const FeedbackQuestions: React.FC = () => {
 
   // Handle feedback question editing
   const handleEdit = (question: FeedbackQuestion) => {
-    toast.info('Redirecting to edit user...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit question...');
     router.push(`/dashboard/feedback-questions/edit/${question.id}`);
   };
 

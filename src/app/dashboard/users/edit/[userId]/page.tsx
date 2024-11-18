@@ -3,14 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios'; // Update path to your axios lib
-import { User } from '@/types'; // Update path to your User type
-import { toast, ToastContainer } from 'react-toastify';
+import { Role, User } from '@/types'; // Update path to your User type
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loading from '@/app/loading';
+import { showToast } from '@/components/ToastMessage';
 
 const EditUser = () => {
   const router = useRouter();
   const { userId } = useParams(); // Get the `userId` from the URL
   const [, setUser] = useState<User | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [, setFilteredRoles] = useState<Role[]>([]);
   const [formData, setFormData] = useState({ username: '', email: '', roleId: '' });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +26,10 @@ const EditUser = () => {
         try {
           const response = await api.get(`/users/${userId}`);
           setUser(response.data);
-          setFormData({ 
-            username: response.data.username, 
-            email: response.data.email, 
-            roleId: response.data.roleId 
+          setFormData({
+            username: response.data.username,
+            email: response.data.email,
+            roleId: response.data.roleId
           });
         } catch (err) {
           console.log(err)
@@ -38,30 +42,46 @@ const EditUser = () => {
     }
   }, [userId]);
 
+  // Fetch roles data on mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await api.get('/roles');
+        setRoles(response.data.roles);
+        setFilteredRoles(response.data.roles);
+      } catch (err) {
+        console.log(err);
+        showToast.error('Failed to fetch roles');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRoles();
+  }, []);
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await api.put(`/users/${userId}`, formData);
-      toast.success('User updated successfully!', {
-        position: "top-right",
-        autoClose: 2000, // Automatically close the toast after 2 seconds
-      });
-      
+      showToast.success('User updated successfully!');
       // Delay the redirect to allow the toast to display
       setTimeout(() => {
         router.push('/dashboard/users'); // Redirect to the user list
       }, 2000);
     } catch (err) {
-      console.log(err)
-      toast.error('Failed to update user', {
-        position: "top-right",
-        autoClose: 3000, // Automatically close the toast after 3 seconds
-      });
+      console.log(err);
+      showToast.error('Failed to update user');
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  // Handle form input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  if (loading) return <Loading />;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
@@ -73,31 +93,36 @@ const EditUser = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Username</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={formData.username}
             onChange={e => setFormData({ ...formData, username: e.target.value })}
-            className="mt-1 p-2 border border-gray-300 rounded w-full" 
+            className="mt-1 p-2 border border-gray-300 rounded w-full"
           />
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Email</label>
-          <input 
-            type="email" 
+          <input
+            type="email"
             value={formData.email}
             onChange={e => setFormData({ ...formData, email: e.target.value })}
-            className="mt-1 p-2 border border-gray-300 rounded w-full" 
+            className="mt-1 p-2 border border-gray-300 rounded w-full"
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Role</label>
-          <select 
+          <label className="block text-gray-700">Role</label>
+          <select
+            name="roleId"
             value={formData.roleId}
-            onChange={e => setFormData({ ...formData, roleId: e.target.value })}
-            className="mt-1 p-2 border border-gray-300 rounded w-full"
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
           >
-            <option value="1">Super Admin</option>
-            <option value="2">Admin</option>
+            <option value="" disabled>Select a role</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.roleName}
+              </option>
+            ))}
           </select>
         </div>
         <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">

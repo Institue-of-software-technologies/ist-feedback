@@ -98,7 +98,10 @@ export interface User {
   roleId: number;
   createdAt: string;
   updatedAt: string;
-  role: Role; // Add role object here
+  role:  {
+    id: number;
+    roleName: string;
+  }; // Add role object here
 }
 export interface FeedbackQuestion {
   feedbackQuestion: string;

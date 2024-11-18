@@ -4,14 +4,15 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
 import { Course, Trainer } from '@/types';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import Loading from '../../../loading';
+import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
   trainerName: string;
-  email:string;
+  email: string;
   courseId: string;
 }
 
@@ -58,20 +59,14 @@ const EditTrainer = () => {
     console.log(data);
     try {
       await api.put(`/trainers/${trainerId}`, data);
-      toast.success('Trainer updated successfully!', {
-        position: 'top-right',
-        autoClose: 2000,
-      });
+      showToast.success('Trainer updated successfully!');
 
       setTimeout(() => {
         router.push('/dashboard/trainers');
       }, 2000);
     } catch (err) {
       console.log(err)
-      toast.error('Failed to update trainer', {
-        position: 'top-right',
-        autoClose: 3000,
-      });
+      showToast.error('Failed to update trainer');
     }
   };
 

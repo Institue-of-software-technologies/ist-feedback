@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
 import { Feedback } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
+import { showToast } from '@/components/ToastMessage';
 
 const FeedBackManagement: React.FC = () => {
     const { user } = useUser();
@@ -34,7 +35,7 @@ const FeedBackManagement: React.FC = () => {
                 }
             } catch (err) {
                 console.error('Failed to fetch feedbacks:', err);
-                toast.error('Failed to fetch feedbacks', { position: "top-right", autoClose: 3000 });
+                showToast.error('Failed to fetch feedbacks', { position: "top-right", autoClose: 3000 });
             } finally {
                 setLoading(false);
             }
@@ -60,7 +61,7 @@ const FeedBackManagement: React.FC = () => {
 
     // Handle feedback view
     const handleView = (feedback: Feedback) => {
-        toast.info('Redirecting to View Feedback Report...', { position: "top-right", autoClose: 1500 });
+        showToast.info('Redirecting to View Feedback Report...');
         router.push(`/dashboard/feedback-reports/${feedback.id}`);
     };
 

@@ -2,20 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
-import { User } from '@/types'; // Adjust this path to your User type definition
+import { Role, User } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 
 const UserManagement: React.FC = () => {
   const { user } = useUser();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // State to handle delete confirmation
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);  // Holds the filtered users
+  const [, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [, setFilteredRoles] = useState<Role[]>([]);
   const [search, setSearch] = useState<string>('');
   const router = useRouter();
 
@@ -30,13 +33,32 @@ const UserManagement: React.FC = () => {
         setFilteredUsers(response.data);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch users');
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await api.get('/roles', {
+          method: 'GET',
+        });
+        setRoles(response.data);
+        setFilteredRoles(response.data);
+      } catch (err) {
+        console.log(err)
+        showToast.error('Failed to fetch roles');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoles();
   }, []);
 
   // Handle user deletion
@@ -46,10 +68,10 @@ const UserManagement: React.FC = () => {
         await api.delete(`/users/${confirmDelete.id}`);
         setUsers(users.filter(user => user.id !== confirmDelete.id));
         setFilteredUsers(filteredUsers.filter(user => user.id !== confirmDelete.id));
-        toast.success('User deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('User deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete user', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete user');
       }
     }
   };
@@ -69,10 +91,10 @@ const UserManagement: React.FC = () => {
       setFilteredUsers(filtered);
     }
   };
-  
+
   // Handle user editing
   const handleEdit = (user: User) => {
-    toast.info('Redirecting to edit user...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit user...');
     router.push(`/dashboard/users/edit/${user.id}`);
   };
 
@@ -87,13 +109,13 @@ const UserManagement: React.FC = () => {
   return (
     <div>
       <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
-        <Table<User>
-          columns={columns}
-          data={filteredUsers}
-          onSearch={handleSearch}
-          onEdit={user && user.permissions.includes('update_users')?handleEdit:undefined}
-          onDelete={user && user.permissions.includes('update_users')?handleDelete:undefined}
-        />
+      <Table<User>
+        columns={columns}
+        data={filteredUsers}
+        onSearch={handleSearch}
+        onEdit={user && user.permissions.includes('update_users') ? handleEdit : undefined}
+        onDelete={user && user.permissions.includes('update_users') ? handleDelete : undefined}
+      />
     </div>
   );
 };

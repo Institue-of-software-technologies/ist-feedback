@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
 import { Module } from '@/types'; // Adjust this path to your Module type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 const ModuleManagement: React.FC = () => {
   const { user } = useUser();
@@ -29,7 +30,7 @@ const ModuleManagement: React.FC = () => {
         setFilteredModules(response.data);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch modules', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch modules');
       } finally {
         setLoading(false);
       }
@@ -45,17 +46,17 @@ const ModuleManagement: React.FC = () => {
         await api.delete(`/modules/${confirmDelete.id}`);
         setModules(courseModule.filter(module => module.id !== confirmDelete.id));
         setFilteredModules(filteredModules.filter(module => module.id !== confirmDelete.id));
-        toast.success('Module deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('Module deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete module', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete module');
       }
     }
   };
 
   const handleSearch = (value: string) => {
     console.log(search);
-    
+
     setSearch(value);
 
     // Filter the modules based on the search query
@@ -68,10 +69,10 @@ const ModuleManagement: React.FC = () => {
       setFilteredModules(filtered);
     }
   };
-  
+
   // Handle module editing
   const handleEdit = (module: Module) => {
-    toast.info('Redirecting to edit module...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit module...');
     router.push(`/dashboard/modules/edit/${module.id}`);
   };
 
@@ -90,13 +91,13 @@ const ModuleManagement: React.FC = () => {
           <p>No Modules available at the moment.</p>
         </div>
       ) : (
-      <Table<Module>
-        columns={columns}
-        data={filteredModules}
-        onSearch={handleSearch}
-        onEdit={user && user.permissions.includes('update_modules') ? handleEdit : undefined}
-        onDelete={user && user.permissions.includes('delete_modules') ? handleDelete : undefined}
-      />)}
+        <Table<Module>
+          columns={columns}
+          data={filteredModules}
+          onSearch={handleSearch}
+          onEdit={user && user.permissions.includes('update_modules') ? handleEdit : undefined}
+          onDelete={user && user.permissions.includes('delete_modules') ? handleDelete : undefined}
+        />)}
     </div>
   );
 };
