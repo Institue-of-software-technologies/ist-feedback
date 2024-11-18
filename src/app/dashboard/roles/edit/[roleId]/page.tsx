@@ -81,7 +81,7 @@ const EditRoles = () => {
     {
       label: "Permissions",
       type: "multiple",
-      defultSelect: selectedPermissions,
+      defaultSelect: selectedPermissions,
       options: permissions.map((perm) => ({
         label: perm.permissionName, // Use the nested permissionName
         value: perm.id, // Use the nested permission id
