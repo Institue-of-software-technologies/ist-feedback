@@ -225,7 +225,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
   }
   return (
     <Suspense fallback={<Loading />}>
-      <div className="flex h-screen bg-background text-foreground overflow-x-hidden">
+      <div className="flex h-full min-h-screen bg-background text-foreground">
         <ToastContainer />
 
         {/* Sidebar for Mobile */}
@@ -369,7 +369,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           )}
 
           {/* Main Content */}
-          <main className="flex-grow p-2 bg-background text-foreground overflow-x-auto">
+          <main className="flex-grow p-2 bg-background text-foreground">
             {currentView === 'view' && (
               <div>
                 {activeTab === 'Dashboard' && (

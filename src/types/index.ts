@@ -103,11 +103,14 @@ export interface User {
     roleName: string;
   }; // Add role object here
 }
+
 export interface FeedbackQuestion {
   feedbackQuestion: string;
   id: number;
   questionText: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating';
+  minRating?: number;
+  maxRating?: number;
 }
 
 export interface FeedbackQuestionSelect {
@@ -139,4 +142,11 @@ export interface Trainer {
     id: number;
     courseName: string;
   };
+}
+
+export interface RecentActivities {
+  id: number;
+  entityType: string;
+  activityType: string;
+  description: string;
 }

@@ -1,14 +1,15 @@
 import { Course } from '@/db/models/Course';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/Course - Fetch all Course
+// GET /api/Course - Fetch all Courses
 export async function GET() {
   try {
-    const course = await Course.findAll();
-    return NextResponse.json({ course });
+    const courses = await Course.findAll();
+    const courseCount = await Course.count();
+    return NextResponse.json({ courses, count: courseCount });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ message: 'Error fetching course', error: errorMessage }, { status: 500 });
+    return NextResponse.json({ message: 'Error fetching courses', error: errorMessage }, { status: 500 });
   }
 }
 
