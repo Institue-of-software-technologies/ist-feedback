@@ -20,6 +20,7 @@ const UserManagement: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [, setFilteredRoles] = useState<Role[]>([]);
   const [search, setSearch] = useState<string>('');
+  // const [formLoading, setformLoading] = useState<boolean>(false);
   const router = useRouter();
 
   // Fetch users from your API

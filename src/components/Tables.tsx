@@ -222,19 +222,19 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                                         {onEdit && (
                                             <button onClick={() => onEdit(row)} className="text-blue-500 hover:underline">
                                                 <PencilSquareIcon className="h-5 w-5 mr-1" />
-                                                Edit
+                                                <span>Edit</span>
                                             </button>
                                         )}
                                         {onDelete && (
                                             <button onClick={() => setConfirmDelete(row)} className="text-red-500 hover:underline">
                                                 <TrashIcon className="h-5 w-5 mr-1" />
-                                                Delete
+                                                <span>Delete</span>
                                             </button>
                                         )}
                                         {onView && (
                                             <button onClick={() => onView(row)} className="text-green-500 hover:underline">
                                                 <EyeIcon className="h-5 w-5 mr-1" />
-                                                View
+                                                <span>View</span>
                                             </button>
                                         )}
                                     </td>
