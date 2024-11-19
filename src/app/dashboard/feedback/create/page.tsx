@@ -15,6 +15,7 @@ interface FormData {
   classTimeId: number;
   moduleId: number;
   questionId: number;
+  tokenStartTime: Date;
   tokenExpiration: Date;
 }
 
@@ -124,6 +125,10 @@ const NewFeedbackForm: React.FC = () => {
         label: `${question.questionText} - ${question.questionType}`,
         value: question.id,
       })),
+    },
+    {
+      label: "tokenStartTime",
+      type: "date",
     },
     {
       label: "tokenExpiration",
