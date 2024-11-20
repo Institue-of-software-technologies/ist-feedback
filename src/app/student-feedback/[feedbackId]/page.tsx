@@ -140,15 +140,27 @@ export default function StudentFeedback() {
                                                     type="radio"
                                                     id={`option-${question.feedbackQuestion.id}-${option.id}`}
                                                     value={option.optionText}
-                                                    {...register(questionKey, { required: "This field is required" })}
+                                                    {...register(questionKey, {
+                                                        required: "This field is required",
+                                                        onChange: () => {
+                                                            // Clear the description field when a different option is selected
+                                                            question.feedbackQuestion.answerOption.forEach((opt) => {
+                                                                if (opt.optionText !== option.optionText) {
+                                                                    setValue(`description-${question.feedbackQuestion.id}`, ""); // Clear the description field
+                                                                }
+                                                            });
+                                                        },
+                                                    })}
                                                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                                 />
-                                                <label htmlFor={`option-${question.feedbackQuestion.id}-${option.id}`} className="ml-2 block text-lg text-gray-900">
+                                                <label
+                                                    htmlFor={`option-${question.feedbackQuestion.id}-${option.id}`}
+                                                    className="ml-2 block text-lg text-gray-900"
+                                                >
                                                     {option.optionText}
                                                 </label>
                                             </div>
 
-                                            {/* Display the textarea below the radio option if it is selected */}
                                             {isSelected && option.description && (
                                                 <div className="mt-2">
                                                     <textarea
@@ -161,9 +173,9 @@ export default function StudentFeedback() {
                                                 </div>
                                             )}
                                         </div>
-
                                     );
                                 })}
+
 
                                 {question.feedbackQuestion.questionType === "rating" && (
                                     <div className="flex justify-center items-center mt-7 overflow-x-auto">

@@ -5,10 +5,10 @@ module.exports = {
     // Create AFTER INSERT trigger
     await queryInterface.sequelize.query(`
         CREATE TRIGGER after_classtime_insert
-        AFTER INSERT ON classtimes
+        AFTER INSERT ON ClassTimes
         FOR EACH ROW
         BEGIN
-            INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+            INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
             VALUES ('Classtime', NEW.id, 'Created', CONCAT('New classtime', NEW.classTime, ' was added'), NOW());
         END
         `);
@@ -16,10 +16,10 @@ module.exports = {
         // Create AFTER UPDATE trigger
         await queryInterface.sequelize.query(`
             CREATE TRIGGER after_classtime_update
-            AFTER UPDATE ON classtimes
+            AFTER UPDATE ON ClassTimes
             FOR EACH ROW
             BEGIN
-              INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+              INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
               VALUES ('Classtime', NEW.id, 'Updated', CONCAT('Classtime ', NEW.classTime, ' has been updated'), NOW());
             END
         `);
