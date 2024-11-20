@@ -12,7 +12,7 @@ import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 interface Context {
   params: { feedbackId: number };
 }
-export async function GET(request: NextRequest, context: Context) {
+export async function GET(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
     const feedback = await Feedback.findOne({
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, context: Context) {
         {
           model: Intake,
           as: "intake",
-          attributes: ["id", "intakeName","intakeYear"],
+          attributes: ["id", "intakeName","intakeYear"],  
         },
       ],
     });
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
-    const { trainerId, intakeId, classTimeId, tokenExpiration ,multiSelectField } =
+    const { trainerId, intakeId, classTimeId, tokenExpiration ,tokenStartTime,multiSelectField } =
       await req.json();
 
     const feedback = await Feedback.findByPk(feedbackId);
@@ -116,6 +116,10 @@ export async function PUT(req: NextRequest, context: Context) {
     }
     if (classTimeId !== null) {
       feedback.classTimeId = classTimeId;
+    }
+
+    if (tokenStartTime) {
+      feedback.tokenStartTime = new Date(tokenStartTime);
     }
 
     if (tokenExpiration) {

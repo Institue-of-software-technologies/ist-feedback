@@ -46,26 +46,35 @@ export async function GET() {
     });
 
     // Format the tokenExpiration dates and send formatted feedback data to the client
-    const formattedFeedbacks = feedbacks.map((feedback) => {
-      // Convert the tokenExpiration to a formatted string (e.g., using toLocaleString)
-      const formattedExpiration = new Date(
-        feedback.tokenExpiration
-      ).toLocaleString("en-KE", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-        timeZoneName: "short",
-      });
-
-      return {
-        ...feedback.toJSON(), // Spread the rest of the feedback fields
-        tokenExpiration: formattedExpiration, // Replace tokenExpiration with the formatted value
-      };
-    });
+    const formattedFeedbacks = feedbacks.map((feedback) => ({
+      ...feedback.toJSON(),
+      tokenStartTime: new Date(feedback.tokenStartTime).toLocaleString(
+        "en-KE",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZoneName: "short",
+        }
+      ),
+      tokenExpiration: new Date(feedback.tokenExpiration).toLocaleString(
+        "en-KE",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZoneName: "short",
+        }
+      ),
+    }));
 
     return NextResponse.json({
       message: "Feedback retrieved successfully",
@@ -112,6 +121,7 @@ export async function POST(req: Request) {
       intakeId,
       classTimeId,
       moduleId,
+      tokenStartTime,
       tokenExpiration,
       multiSelectField,
     } = await req.json();
@@ -123,6 +133,7 @@ export async function POST(req: Request) {
       !classTimeId ||
       !moduleId ||
       !tokenExpiration
+      // !tokenStartTime
     ) {
       return NextResponse.json(
         { error: "All fields are required" },
@@ -130,18 +141,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // Parse tokenExpiration date from input
-    const Expiration = new Date(tokenExpiration);
+    // Parse and validate tokenStartTime and tokenExpiration
+    const startTime = new Date(tokenStartTime);
+    const expirationTime = new Date(tokenExpiration);
 
-    if (isNaN(Expiration.getTime())) {
+    if (isNaN(startTime.getTime()) || isNaN(expirationTime.getTime())) {
       return NextResponse.json(
-        { error: "Invalid token expiration date" },
+        { error: "Invalid date for tokenStartTime or tokenExpiration" },
         { status: 400 }
       );
     }
 
-    // Convert tokenExpiration to UTC
-    const utcExpiration = new Date(Expiration.toISOString()); // Converts to UTC
+    if (startTime >= expirationTime) {
+      return NextResponse.json(
+        { error: "tokenStartTime must be earlier than tokenExpiration" },
+        { status: 400 }
+      );
+    }
+
+    // Convert dates to UTC
+    const utcStartTime = new Date(startTime.toISOString());
+    const utcExpiration = new Date(expirationTime.toISOString());
 
     const studentToken = await generateUniqueToken();
 
@@ -151,7 +171,8 @@ export async function POST(req: Request) {
       classTimeId,
       moduleId,
       studentToken,
-      tokenExpiration: utcExpiration, // Store in UTC
+      tokenStartTime: utcStartTime,
+      tokenExpiration: utcExpiration,
     });
 
     for (const feedbackSelectQuestion of multiSelectField) {
@@ -173,4 +194,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
 

@@ -17,7 +17,8 @@ const URL = process.env.URL;
 export async function GET() {
   try {
     const users = await User.findAll({ include: [{ model: Role, as: 'role' }] });
-    return NextResponse.json(users, { status: 200 });
+    const userCount = await User.count();
+    return NextResponse.json({ users, count: userCount }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching users', error }, { status: 500 });
   }

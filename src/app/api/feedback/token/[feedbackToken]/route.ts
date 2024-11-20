@@ -10,15 +10,16 @@ export async function GET(
   { params }: { params: { feedbackToken: string } }
 ) {
   try {
-    const { feedbackToken } = params; // Correctly destructure the params from the context
+    const { feedbackToken } = params; // Destructure params from the context
 
-   const token = await Feedback.findOne({
-     where: {
-       studentToken: feedbackToken,
-       tokenExpiration: { [Op.gt]: Sequelize.literal("CURRENT_TIMESTAMP") },
-     },
-   });
-
+    // Find the token and check that it's within the valid time range
+    const token = await Feedback.findOne({
+      where: {
+        studentToken: feedbackToken,
+        tokenStartTime: { [Op.lte]: Sequelize.literal("CURRENT_TIMESTAMP") }, // Start time must be in the past or now
+        tokenExpiration: { [Op.gt]: Sequelize.literal("CURRENT_TIMESTAMP") }, // Expiration must be in the future
+      },
+    });
 
     if (!token) {
       return NextResponse.json(
@@ -27,6 +28,7 @@ export async function GET(
       );
     }
 
+    // Fetch role permissions
     const rolePermissions = await RolePermission.findAll({
       where: { roleId: 3 },
       include: [
@@ -37,6 +39,8 @@ export async function GET(
         },
       ],
     });
+
+    // Map permissions to their names
     const permissions = rolePermissions.map(
       (rp) => rp.permission?.permissionName || ""
     );
@@ -47,7 +51,7 @@ export async function GET(
       role: "student",
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json(
       { error: "Failed to retrieve token" },
       { status: 500 }

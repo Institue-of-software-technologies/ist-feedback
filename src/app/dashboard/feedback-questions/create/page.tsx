@@ -13,6 +13,8 @@ interface FormData {
   questionText?: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating' | null;
   options?: { text: string; description?: boolean }[];
+  minRating?: number;
+  maxRating?: number;
 }
 
 const FeedbackQuestionCreate: React.FC = () => {
@@ -20,6 +22,8 @@ const FeedbackQuestionCreate: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     questionType: null,
     options: [{ text: "", description: false }],
+    minRating: 1,
+    maxRating: 5,
   });
   const [showDetailsForm, setShowDetailsForm] = useState(false);
 
@@ -107,6 +111,8 @@ const FeedbackQuestionCreate: React.FC = () => {
         />
       )}
       {/* Second form based on selected question type */}
+      
+      {/* Form for Open-Ended questions */}
       {showDetailsForm && formData.questionType === 'open-ended' && (
         <>
           <div>
@@ -125,6 +131,7 @@ const FeedbackQuestionCreate: React.FC = () => {
         </>
       )}
 
+      {/* Form for Closed-Ended questions */}
       {showDetailsForm && formData.questionType === 'closed-ended' && (
         <>
           <div>
@@ -175,6 +182,58 @@ const FeedbackQuestionCreate: React.FC = () => {
             >
               Add Answer
             </button>
+
+            <button
+              onClick={() => onSubmit(formData)}
+              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Submit
+            </button>
+
+            <button
+              onClick={handleGoBack}
+              className="mt-4 ml-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+            >
+              Back
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Form for Rating questions */}
+      {showDetailsForm && formData.questionType === 'rating' && (
+        <>
+          <div>
+            <h1>Type the rating question and specify the scale</h1>
+            
+            <input
+              type="text"
+              placeholder="Enter your question"
+              value={formData.questionText || ""}
+              onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
+              className="border p-2 w-full mb-2"
+            />
+
+            <div className="flex items-center mb-2">
+              <label className="mr-2">Maximum Rating:</label>
+              <input
+                type="number"
+                value={formData.maxRating || 5}
+                min={1}
+                max={5}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    maxRating: parseInt(e.target.value, 10) || 5,
+                  })
+                }
+                className="border p-2 w-20"
+              />
+            </div>
+
+            <div className="flex items-center mb-2 mx-auto">
+              <label className="mr-2">Max: 5</label>
+            </div>
 
             <button
               onClick={() => onSubmit(formData)}

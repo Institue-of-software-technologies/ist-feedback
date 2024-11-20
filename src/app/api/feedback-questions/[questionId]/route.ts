@@ -16,9 +16,10 @@ export async function GET(req: NextRequest, context: Context) {
         {
           model: AnswerOption,
           as: "answerOption",
-          attributes: ["id", "optionText","description"],
+          attributes: ["id", "optionText", "description"],
         },
       ],
+      attributes: ["id", "questionText", "questionType", "minRating", "maxRating"],
     });
 
     if (!question) {
@@ -40,22 +41,39 @@ export async function GET(req: NextRequest, context: Context) {
 }
 
 // PUT /api/feedback-questions/[questionId] - Update a feedback question by ID
-
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
-    const { questionText, questionType, options } = await req.json();
+    const { questionText, questionType, options, minRating, maxRating } = await req.json();
 
     // Validate questionType if provided
     const validTypes = ["open-ended", "closed-ended", "rating"];
     if (questionType && !validTypes.includes(questionType)) {
       return NextResponse.json(
         {
-          message:
-            "Invalid questionType. Must be one of: open-ended, closed-ended, or rating.",
+          message: "Invalid questionType. Must be one of: open-ended, closed-ended, or rating.",
         },
         { status: 400 }
       );
+    }
+
+    // Validate ratings if question type is 'rating'
+    if (questionType === "rating") {
+      if (typeof minRating !== "number" || typeof maxRating !== "number") {
+        return NextResponse.json(
+          { message: "minRating and maxRating must be numbers." },
+          { status: 400 }
+        );
+      }
+      if (minRating < 1 || maxRating > 5 || minRating >= maxRating) {
+        return NextResponse.json(
+          {
+            message:
+              "Invalid rating range. minRating should be at least 1, maxRating should be up to 5, and minRating should be less than maxRating.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Find the question and include associated answer options
@@ -73,6 +91,8 @@ export async function PUT(req: NextRequest, context: Context) {
     // Update the question details
     question.questionText = questionText ?? question.questionText;
     question.questionType = questionType ?? question.questionType;
+    question.minRating = questionType === "rating" ? minRating : null;
+    question.maxRating = questionType === "rating" ? maxRating : null;
 
     // If it's a closed-ended question, update the answer options
     if (questionType === "closed-ended" && Array.isArray(options)) {
@@ -83,7 +103,7 @@ export async function PUT(req: NextRequest, context: Context) {
       const newOptions = options.map(
         (option: { optionText: string; description: boolean }) => ({
           optionText: option.optionText,
-          description: option.description || false, // Ensure description defaults to false
+          description: option.description || false,
           feedbackQuestionId: question.id,
         })
       );

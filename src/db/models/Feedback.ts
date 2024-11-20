@@ -13,6 +13,7 @@ export class Feedback extends Model {
   classTimeId!: number;
   moduleId!: number;
   studentToken!: string;
+  tokenStartTime!: Date;
   tokenExpiration!: Date;
   
   trainer?: Trainer;
@@ -69,6 +70,10 @@ Feedback.init({
     type: DataTypes.STRING,
     allowNull: false,
   },  
+  tokenStartTime: {
+    type: DataTypes.DATE,
+    allowNull: false, 
+  },
   tokenExpiration: {
     type: DataTypes.DATE,
     allowNull: false,

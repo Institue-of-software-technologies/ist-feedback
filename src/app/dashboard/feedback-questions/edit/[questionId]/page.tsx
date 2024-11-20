@@ -11,9 +11,11 @@ import { AnswerOptions } from '@/types';
 import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
-  questionText: string;
-  questionType: 'open-ended' | 'closed-ended' | 'rating';
-  options?: { optionText: string, description: boolean }[];
+  questionText?: string;
+  questionType: 'open-ended' | 'closed-ended' | 'rating' | null;
+  options?: { optionText: string; description?: boolean }[];
+  minRating?: number;
+  maxRating?: number;
 }
 
 const EditQuestion = () => {
@@ -21,8 +23,7 @@ const EditQuestion = () => {
   const { questionId } = useParams();
   const [, setQuestion] = useState<FeedbackQuestion | null>(null);
   const [formData, setFormData] = useState<FormData>({
-    questionText: "",
-    questionType: "open-ended",
+    questionType: null,
     options: [{ optionText: "", description: false }],
   });
   const [showDetailsForm, setShowDetailsForm] = useState(false); // Whether to show the second form
@@ -91,6 +92,7 @@ const EditQuestion = () => {
           optionText: option.optionText,
           description: option.description, // Send description status to backend
         })),
+        minRating: 1,
       });
       showToast.success('Feedback question updated successfully!');
       setTimeout(() => {
@@ -122,7 +124,6 @@ const EditQuestion = () => {
       label: "questionType",
       type: "select",
       name: "questionType",
-      value: formData.questionType,
       options: [
         { label: "Open Ended", value: "open-ended" },
         { label: "Closed Ended", value: "closed-ended" },
@@ -242,16 +243,55 @@ const EditQuestion = () => {
         </>
       )}
 
-      {/* Rating question type placeholder */}
+      {/* Form for Rating questions */}
       {showDetailsForm && formData.questionType === 'rating' && (
         <>
-          <div>Rating question form not implemented yet</div>
-          <button
-            onClick={handleGoBack}
-            className="mt-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-          >
-            Back
-          </button>
+          <div>
+            <h1>Type the rating question and specify the scale</h1>
+            
+            <input
+              type="text"
+              placeholder="Enter your question"
+              value={formData.questionText || ""}
+              onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
+              className="border p-2 w-full mb-2"
+            />
+
+            <div className="flex items-center mb-2">
+              <label className="mr-2">Maximum Rating:</label>
+              <input
+                type="number"
+                value={formData.maxRating || 5}
+                min={1}
+                max={5}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    maxRating: parseInt(e.target.value, 10) || 5,
+                  })
+                }
+                className="border p-2 w-20"
+              />
+            </div>
+
+            <div className="flex items-center mb-2 mx-auto">
+              <label className="mr-2">Max: 5</label>
+            </div>
+
+            <button
+              onClick={() => handleSubmit(formData)}
+              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Submit
+            </button>
+
+            <button
+              onClick={handleGoBack}
+              className="mt-4 ml-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+            >
+              Back
+            </button>
+          </div>
         </>
       )}
     </div>
