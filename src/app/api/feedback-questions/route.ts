@@ -10,7 +10,7 @@ export async function GET() {
         {
           model: AnswerOption,
           as: "answerOption",
-          attributes: ["optionText","description"],
+          attributes: ["optionText", "description"],
         },
       ],
     });
@@ -25,10 +25,10 @@ export async function GET() {
   }
 }
 
-// POST /api/feedback-questions - Create a new Feedback Question with options (if closed-ended)
+// POST /api/feedback-questions - Create a new Feedback Question with options (if closed-ended) or custom rating range (if rating type)
 export async function POST(req: NextRequest) {
   try {
-    const { questionText, questionType, options } = await req.json();
+    const { questionText, questionType, options, minRating, maxRating } = await req.json();
 
     // Validate the questionType to ensure it's one of the valid options
     const validTypes = ["open-ended", "closed-ended", "rating"];
@@ -42,9 +42,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate ratings if question type is 'rating'
+    if (questionType === "rating") {
+      if (typeof minRating !== "number" || typeof maxRating !== "number") {
+        return NextResponse.json(
+          { message: "minRating and maxRating must be numbers." },
+          { status: 400 }
+        );
+      }
+      if (minRating < 1 || maxRating > 5 || minRating >= maxRating) {
+        return NextResponse.json(
+          {
+            message:
+              "Invalid rating range. minRating should be at least 1, maxRating should be up to 5, and minRating should be less than maxRating.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const question = await FeedbackQuestion.create({
       questionText,
       questionType,
+      minRating: questionType === "rating" ? minRating : null,
+      maxRating: questionType === "rating" ? maxRating : null,
     });
 
     // If the question type is 'closed-ended', handle answer options
