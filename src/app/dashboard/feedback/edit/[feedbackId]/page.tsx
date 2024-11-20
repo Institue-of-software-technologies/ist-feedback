@@ -17,6 +17,7 @@ interface FormData {
   moduleId: string;
   intakeId: string;
   feedbackQuestions: string[];
+  tokenStartTime: Date;
   tokenExpiration: Date;
 }
 
@@ -28,16 +29,16 @@ interface CustomInputProps {
 const EditFeedback = () => {
   const router = useRouter();
   const { feedbackId } = useParams();
-  const [, setFeedbacks] = useState(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [feedbackQuestions, setFeedbackQuestions] = useState<FeedbackQuestion[]>([]);
   const [selectedFeedbackQuestions, setSelectedFeedbackQuestions] = useState<string[]>([]);
+  const [tokenStartTime, setTokenStartTime] = useState<Date | null>(null);
+  const [tokenExpiration, setTokenExpiration] = useState<Date | null>(null);
 
   const { register, handleSubmit, setValue } = useForm<FormData>();
 
@@ -49,8 +50,6 @@ const EditFeedback = () => {
           const feedback = response.data.feedback;
           const questions = response.data.feedbackQuestions;
 
-          setFeedbacks(feedback);
-
           setValue('trainerId', feedback.trainerId?.toString() || '');
           setValue('classTimeId', feedback.classTimeId?.toString() || '');
           setValue('moduleId', feedback.moduleId?.toString() || '');
@@ -60,10 +59,10 @@ const EditFeedback = () => {
           setSelectedFeedbackQuestions(selectedQuestions);
           setValue('feedbackQuestions', selectedQuestions);
 
-          const tokenExpiration = new Date(feedback.tokenExpiration);
-          setSelectedDate(tokenExpiration);
+          setTokenStartTime(new Date(feedback.tokenStartTime));
+          setTokenExpiration(new Date(feedback.tokenExpiration));
         } catch (err) {
-          console.log("Failed to fetch feedback", err);
+          console.log('Failed to fetch feedback', err);
           setError('Failed to fetch feedback');
         } finally {
           setLoading(false);
@@ -81,7 +80,7 @@ const EditFeedback = () => {
           api.get(`/intakes`),
           api.get(`/class-times`),
           api.get(`/modules`),
-          api.get(`/feedback-questions`)
+          api.get(`/feedback-questions`),
         ]);
         setTrainers(trainersResponse.data.trainer);
         setIntakes(intakesResponse.data.intake);
@@ -89,7 +88,7 @@ const EditFeedback = () => {
         setModules(modulesResponse.data);
         setFeedbackQuestions(feedbackQuestionsResponse.data.questions);
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.error('Error fetching data:', err);
       }
     };
 
@@ -100,7 +99,8 @@ const EditFeedback = () => {
     try {
       await api.put(`/feedback/${feedbackId}`, {
         ...data,
-        tokenExpiration: selectedDate,
+        tokenStartTime,
+        tokenExpiration,
         multiSelectField: selectedFeedbackQuestions,
       });
       showToast.success('Feedback updated successfully!');
@@ -108,7 +108,7 @@ const EditFeedback = () => {
         router.push('/dashboard/feedback');
       }, 2000);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       showToast.error('Failed to update feedback');
     }
   };
@@ -117,8 +117,8 @@ const EditFeedback = () => {
     setSelectedFeedbackQuestions((prevSelected) => {
       const isAlreadySelected = prevSelected.includes(questionId);
       const updatedSelected = isAlreadySelected
-        ? prevSelected.filter(id => id !== questionId) // Remove if already selected
-        : [...prevSelected, questionId];               // Add if not selected
+        ? prevSelected.filter((id) => id !== questionId)
+        : [...prevSelected, questionId];
       setValue('feedbackQuestions', updatedSelected);
       return updatedSelected;
     });
@@ -129,7 +129,7 @@ const EditFeedback = () => {
       <div className="relative w-full">
         <input
           onClick={onClick}
-          value={value || ""}
+          value={value || ''}
           ref={ref}
           readOnly
           className="w-full p-2 bg-gray-100 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
@@ -139,20 +139,21 @@ const EditFeedback = () => {
     )
   );
 
-  CustomInput.displayName = "CustomInput";
+  CustomInput.displayName = 'CustomInput';
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div className='text-red-500'>{error}</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className='p-6'>
+    <div className="p-6">
       <ToastContainer />
-      <h3 className='text-2xl font-bold mb-4'>Edit Feedback</h3>
+      <h3 className="text-2xl font-bold mb-4">Edit Feedback</h3>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
+        {/* Trainer Selection */}
         <div>
           <label htmlFor="trainerId">Trainer</label>
           <select id="trainerId" {...register('trainerId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {trainers.map(trainer => (
+            {trainers.map((trainer) => (
               <option key={trainer.id} value={trainer.id.toString()}>
                 {trainer.trainerName}
               </option>
@@ -160,10 +161,11 @@ const EditFeedback = () => {
           </select>
         </div>
 
+        {/* Class Time Selection */}
         <div>
           <label htmlFor="classTimeId">Class Time</label>
           <select id="classTimeId" {...register('classTimeId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {classTimes.map(classTime => (
+            {classTimes.map((classTime) => (
               <option key={classTime.id} value={classTime.id.toString()}>
                 {classTime.classTime}
               </option>
@@ -171,10 +173,11 @@ const EditFeedback = () => {
           </select>
         </div>
 
+        {/* Feedback Questions */}
         <div>
           <label htmlFor="feedbackQuestions">Feedback Questions</label>
           <div className="mt-2">
-            {feedbackQuestions.map(question => (
+            {feedbackQuestions.map((question) => (
               <div key={question.id} className="flex items-center mb-2">
                 <input
                   type="checkbox"
@@ -192,10 +195,11 @@ const EditFeedback = () => {
           </div>
         </div>
 
+        {/* Module Selection */}
         <div>
           <label htmlFor="moduleId">Module</label>
           <select id="moduleId" {...register('moduleId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {modules.map(module => (
+            {modules.map((module) => (
               <option key={module.id} value={module.id.toString()}>
                 {module.moduleName}
               </option>
@@ -203,10 +207,11 @@ const EditFeedback = () => {
           </select>
         </div>
 
+        {/* Intake Selection */}
         <div>
           <label htmlFor="intakeId">Intake</label>
           <select id="intakeId" {...register('intakeId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {intakes.map(intake => (
+            {intakes.map((intake) => (
               <option key={intake.id} value={intake.id.toString()}>
                 {intake.intakeName}
               </option>
@@ -214,11 +219,29 @@ const EditFeedback = () => {
           </select>
         </div>
 
+        {/* Token Start Time */}
         <div className="flex flex-col mb-3">
-          <label htmlFor="tokenExpiration" className="mb-1">Token Expiration</label>
+          <label htmlFor="tokenStartTime" className="mb-1">
+            Token Start Time
+          </label>
           <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
+            selected={tokenStartTime}
+            onChange={(date) => setTokenStartTime(date)}
+            customInput={<CustomInput />}
+            showTimeSelect
+            dateFormat="MMMM d, yyyy h:mm aa"
+            className="w-full mt-1"
+          />
+        </div>
+
+        {/* Token Expiration */}
+        <div className="flex flex-col mb-3">
+          <label htmlFor="tokenExpiration" className="mb-1">
+            Token Expiration
+          </label>
+          <DatePicker
+            selected={tokenExpiration}
+            onChange={(date) => setTokenExpiration(date)}
             customInput={<CustomInput />}
             showTimeSelect
             dateFormat="MMMM d, yyyy h:mm aa"

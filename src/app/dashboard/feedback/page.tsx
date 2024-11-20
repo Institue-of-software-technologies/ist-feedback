@@ -93,6 +93,22 @@ const FeedBackManagement: React.FC = () => {
     { header: 'Intake Name', accessor: 'intake.intakeName' },
     { header: 'Intake Year', accessor: 'intake.intakeYear' },
     {
+      header: 'Token Start Time',
+      accessor: 'tokenStartTime',
+      Cell: ({ value }: { value: string }) => {
+        const date = new Date(value);
+        return date.toLocaleString('en-KE', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: '2-digit',
+          hour: '2-digit',
+          hour12: false,
+          timeZoneName: 'short',
+        });
+      },
+    },
+    {
       header: 'Token Expiration',
       accessor: 'tokenExpiration',
       Cell: ({ value }: { value: string }) => {

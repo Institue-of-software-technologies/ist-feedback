@@ -18,6 +18,7 @@ export default function StudentFeedback() {
     const [feedback, setFeedback] = useState<Feedback | null>(null);
     const [feedbackQuestion, setFeedbackQuestion] = useState<FeedbackQuestionSelect[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { feedbackId } = useParams();
     const router = useRouter();
@@ -46,6 +47,7 @@ export default function StudentFeedback() {
     }, [feedbackId]);
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        setIsLoading(true); // Set loading to true when the form is submitted
         const formattedData = Object.entries(data).map(([key, value]) => {
             if (key.startsWith("question-")) {
                 if (key.startsWith("description-")) {
@@ -70,11 +72,13 @@ export default function StudentFeedback() {
             await api.post('/feedback/answer', { formData: formattedData });
             showToast.success("Feedback submitted successfully!");
             setTimeout(() => {
-                router.push(`/`);
+                router.push(`/`); // Redirect after a delay
             }, 3000);
         } catch (error) {
             console.log(error);
             showToast.error('Failed to submit feedback');
+        } finally {
+            setIsLoading(false); // Ensure loading is set to false after submission
         }
     };
 
@@ -192,10 +196,38 @@ export default function StudentFeedback() {
                 <div className="flex justify-center mt-6">
                     <button
                         type="submit"
+                        disabled={isLoading}
                         className="px-6 py-2 text-lg font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
                     >
-                        Submit Feedback
+                        {isLoading ? (
+                            <div className="flex items-center">
+                                <svg
+                                    className="animate-spin h-5 w-5 mr-2 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    ></path>
+                                </svg>
+                                sending feedback...
+                            </div>
+                        ) : (
+                            'Submit Feedback'
+                        )}
                     </button>
+
                 </div>
             </form>
         </div>

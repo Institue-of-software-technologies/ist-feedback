@@ -7,6 +7,7 @@ import { User } from '@/types';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from '../../loading';
+import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
   userId: number;
@@ -45,16 +46,10 @@ const UserProfile = () => {
     setformLoading(true);
     try {
       await api.put(`/users`, { ...data, userId });
-      toast.success('Profile updated successfully!', {
-        position: "top-right",
-        autoClose: 2000, // Automatically close the toast after 2 seconds
-      });
+      showToast.success('Profile updated successfully!');
     } catch (err) {
       console.log(err);
-      toast.error('Failed to update user profile', {
-        position: "top-right",
-        autoClose: 3000, // Automatically close the toast after 3 seconds
-      });
+      showToast.error('Failed to update user profile');
     } finally {
       setformLoading(false); // Stop loading once the request is done
     }
