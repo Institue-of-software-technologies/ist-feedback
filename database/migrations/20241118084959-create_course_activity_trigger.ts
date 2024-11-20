@@ -8,7 +8,7 @@ module.exports = {
       AFTER INSERT ON Courses
       FOR EACH ROW
       BEGIN
-        INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+        INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('Course', NEW.id, 'Created', CONCAT('Course ', NEW.courseName, ' was added'), NOW());
       END
     `);
@@ -19,7 +19,7 @@ module.exports = {
       AFTER UPDATE ON Courses
       FOR EACH ROW
       BEGIN
-        INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+        INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('Courses', NEW.id, 'Updated', CONCAT('The ', NEW.courseName, ' has been updated'), NOW());
       END
       `);

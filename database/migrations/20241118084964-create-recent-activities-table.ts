@@ -1,46 +1,49 @@
-'use strict';
+"use strict";
 
 module.exports = {
     up: async (queryInterface: any, Sequelize: any) => {
-    await queryInterface.createTable('AnswerOptions', {
+    await queryInterface.createTable("RecentActivities", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
       },
-      optionText: {
+      entityType: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: false,
       },
-      feedbackQuestionId: {
+      entityId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: 'FeedbackQuestions',
-          key: 'id',
-        },
-        onDelete: 'CASCADE',
+      },
+      activityType: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       description: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.STRING,
         allowNull: true,
+      },
+      timestamp: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
 
   down: async (queryInterface: any) => {
-    await queryInterface.dropTable('AnswerOptions');
+    await queryInterface.dropTable("RecentActivities");
   },
 };

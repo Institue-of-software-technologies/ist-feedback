@@ -5,10 +5,10 @@ module.exports = {
     // Create AFTER INSERT trigger
     await queryInterface.sequelize.query(`
       CREATE TRIGGER after_feedback_questions_insert
-      AFTER INSERT ON feedbackquestions
+      AFTER INSERT ON FeedbackQuestions
       FOR EACH ROW
       BEGIN
-        INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+        INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('Feedbackquestions', NEW.id, 'Created', CONCAT('A new ', NEW.questionType, ' question has been posted'), NOW());
       END
     `);
@@ -16,10 +16,10 @@ module.exports = {
     // Create AFTER UPDATE trigger
     await queryInterface.sequelize.query(`
       CREATE TRIGGER after_feedback_questions_update
-      AFTER UPDATE ON feedbackquestions
+      AFTER UPDATE ON FeedbackQuestions
       FOR EACH ROW
       BEGIN
-        INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+        INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('Feedbackquestions', NEW.id, 'Updated', CONCAT('The ', NEW.questionType, ' question with ID ', NEW.id, ' has been updated'), NOW());
       END
     `);

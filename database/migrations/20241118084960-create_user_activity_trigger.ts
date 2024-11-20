@@ -8,7 +8,7 @@ module.exports = {
       AFTER INSERT ON Users
       FOR EACH ROW
       BEGIN
-        INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+        INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('User', NEW.id, 'Created', CONCAT('User ', NEW.username, ' was created'), NOW());
       END
     `);
@@ -19,7 +19,7 @@ module.exports = {
       AFTER UPDATE ON Users
       FOR EACH ROW
       BEGIN
-        INSERT INTO recentactivities (entityType, entityId, activityType, description, timestamp)
+        INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('User', NEW.id, 'Updated', CONCAT('User ', NEW.username, ' has been updated'), NOW());
       END
       `);

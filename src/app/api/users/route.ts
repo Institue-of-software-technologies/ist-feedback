@@ -16,14 +16,17 @@ const URL = process.env.URL;
 // GET: Fetch all users
 export async function GET() {
   try {
-    const users = await User.findAll({ include: [{ model: Role, as: 'role' }] });
-    const userCount = await User.count();
-    return NextResponse.json({ users, count: userCount }, { status: 200 });
+    const users = await User.findAll({
+      include: [{ model: Role, as: "role" }],
+    });
+    return NextResponse.json(users, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: 'Error fetching users', error }, { status: 500 });
+    return NextResponse.json(
+      { message: "Error fetching users", error },
+      { status: 500 }
+    );
   }
 }
-
 // POST: Create a new user
 export async function POST(req: Request) {
   try {
