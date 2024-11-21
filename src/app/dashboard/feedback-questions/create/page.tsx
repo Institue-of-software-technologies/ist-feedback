@@ -22,8 +22,8 @@ const FeedbackQuestionCreate: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     questionType: null,
     options: [{ text: "", description: false }],
-    minRating: 1,
-    maxRating: 5,
+    minRating: 1, // This sets minRating to default to 1
+    maxRating: 10, // This sets maxRating to default to 10
   });
   const [showDetailsForm, setShowDetailsForm] = useState(false);
 
@@ -218,13 +218,13 @@ const FeedbackQuestionCreate: React.FC = () => {
               <label className="mr-2">Maximum Rating:</label>
               <input
                 type="number"
-                value={formData.maxRating || 5}
+                value={formData.maxRating || 10}
                 min={1}
-                max={5}
+                max={10}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    maxRating: parseInt(e.target.value, 10) || 5,
+                    maxRating: parseInt(e.target.value, 10) || 10,
                   })
                 }
                 className="border p-2 w-20"
@@ -232,7 +232,7 @@ const FeedbackQuestionCreate: React.FC = () => {
             </div>
 
             <div className="flex items-center mb-2 mx-auto">
-              <label className="mr-2">Max: 5</label>
+              <label className="mr-2">Max Value: 10</label>
             </div>
 
             <button

@@ -92,7 +92,8 @@ const EditQuestion = () => {
           optionText: option.optionText,
           description: option.description, // Send description status to backend
         })),
-        minRating: 1,
+        minRating: 1, // This sets minRating to default to 1
+        maxRating: 10, // This sets maxRating to default to 10
       });
       showToast.success('Feedback question updated successfully!');
       setTimeout(() => {
@@ -132,7 +133,7 @@ const EditQuestion = () => {
     },
   ];
 
-  // Second form for open-ended questions
+  // Inputs for second form for open-ended questions
   const openEndedInputs: Input[] = [
     { label: "questionText", type: "text", name: "questionText", value: formData.questionText },
     { label: "questionType", type: "hidden", name: "questionType", value: "open-ended" },
@@ -261,13 +262,13 @@ const EditQuestion = () => {
               <label className="mr-2">Maximum Rating:</label>
               <input
                 type="number"
-                value={formData.maxRating || 5}
+                value={formData.maxRating || 10}
                 min={1}
-                max={5}
+                max={10}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    maxRating: parseInt(e.target.value, 10) || 5,
+                    maxRating: parseInt(e.target.value, 10) || 10,
                   })
                 }
                 className="border p-2 w-20"
@@ -275,7 +276,7 @@ const EditQuestion = () => {
             </div>
 
             <div className="flex items-center mb-2 mx-auto">
-              <label className="mr-2">Max: 5</label>
+              <label className="mr-2">Max Value: 10</label>
             </div>
 
             <button
