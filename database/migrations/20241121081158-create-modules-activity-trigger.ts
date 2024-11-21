@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 
 module.exports = {
-    up: async (queryInterface: any, Sequelize: any) => {
+  up: async (queryInterface: any, Sequelize: any) => {
     // Create AFTER INSERT trigger
     await queryInterface.sequelize.query(`
-      CREATE TRIGGER after_course_insert
-      AFTER INSERT ON Courses
+      CREATE TRIGGER after_module_insert
+      AFTER INSERT ON Modules
       FOR EACH ROW
       BEGIN
         INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
-        VALUES ('Course', NEW.id, 'Created', CONCAT('Course ', NEW.courseName, ' was added'), NOW());
+        VALUES ('Module', NEW.id, 'Created', CONCAT('Module ', NEW.moduleName, ' was created'), NOW());
       END
     `);
 
     // Create AFTER UPDATE trigger
     await queryInterface.sequelize.query(`
-      CREATE TRIGGER after_course_update
-      AFTER UPDATE ON Courses
+      CREATE TRIGGER after_module_update
+      AFTER UPDATE ON Modules
       FOR EACH ROW
       BEGIN
         INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
-        VALUES ('Courses', NEW.id, 'Updated', CONCAT('The ', NEW.courseName, ' has been updated'), NOW());
+        VALUES ('Module', NEW.id, 'Updated', CONCAT('Module ', NEW.moduleName, ' has been updated'), NOW());
       END
     `);
   },
@@ -28,12 +28,12 @@ module.exports = {
   down: async (queryInterface: any) => {
     // Drop AFTER INSERT trigger
     await queryInterface.sequelize.query(`
-      DROP TRIGGER IF EXISTS after_course_insert
+      DROP TRIGGER IF EXISTS after_module_insert
     `);
 
     // Drop AFTER UPDATE trigger
     await queryInterface.sequelize.query(`
-      DROP TRIGGER IF EXISTS after_course_update
+      DROP TRIGGER IF EXISTS after_module_update
     `);
   },
 };

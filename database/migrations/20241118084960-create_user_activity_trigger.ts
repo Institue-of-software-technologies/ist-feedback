@@ -22,7 +22,7 @@ module.exports = {
         INSERT INTO RecentActivities (entityType, entityId, activityType, description, timestamp)
         VALUES ('User', NEW.id, 'Updated', CONCAT('User ', NEW.username, ' has been updated'), NOW());
       END
-      `);
+    `);
   },
 
   down: async (queryInterface: any) => {
