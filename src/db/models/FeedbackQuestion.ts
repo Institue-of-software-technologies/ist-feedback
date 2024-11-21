@@ -7,6 +7,7 @@ export class FeedbackQuestion extends Model {
   questionType!: 'open-ended' | 'closed-ended' | 'rating';
   minRating?: number;
   maxRating?: number;
+  ratingDescriptions?: Record<number, string>;
 }
 
 FeedbackQuestion.init({
@@ -30,6 +31,10 @@ FeedbackQuestion.init({
   },
   maxRating: {
     type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  ratingDescriptions: {
+    type: DataTypes.JSON,
     allowNull: true,
   },
 }, {

@@ -19,7 +19,14 @@ export async function GET(req: NextRequest, context: Context) {
           attributes: ["id", "optionText", "description"],
         },
       ],
-      attributes: ["id", "questionText", "questionType", "minRating", "maxRating"],
+      attributes: [
+        "id",
+        "questionText",
+        "questionType",
+        "minRating",
+        "maxRating",
+        "ratingDescriptions",
+      ],
     });
 
     if (!question) {
@@ -44,7 +51,14 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
-    const { questionText, questionType, options, minRating, maxRating } = await req.json();
+    const {
+      questionText,
+      questionType,
+      options,
+      minRating,
+      maxRating,
+      ratingDescriptions,
+    } = await req.json();
 
     // Validate questionType if provided
     const validTypes = ["open-ended", "closed-ended", "rating"];
@@ -74,6 +88,14 @@ export async function PUT(req: NextRequest, context: Context) {
           { status: 400 }
         );
       }
+
+      // Validate ratingDescriptions if provided
+      if (ratingDescriptions && typeof ratingDescriptions !== "object") {
+        return NextResponse.json(
+          { message: "ratingDescriptions must be an object with numeric keys and string values." },
+          { status: 400 }
+        );
+      }
     }
 
     // Find the question and include associated answer options
@@ -93,6 +115,8 @@ export async function PUT(req: NextRequest, context: Context) {
     question.questionType = questionType ?? question.questionType;
     question.minRating = questionType === "rating" ? minRating : null;
     question.maxRating = questionType === "rating" ? maxRating : null;
+    question.ratingDescriptions =
+      questionType === "rating" ? ratingDescriptions : null;
 
     // If it's a closed-ended question, update the answer options
     if (questionType === "closed-ended" && Array.isArray(options)) {

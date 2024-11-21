@@ -28,7 +28,14 @@ export async function GET() {
 // POST /api/feedback-questions - Create a new Feedback Question with options (if closed-ended) or custom rating range (if rating type)
 export async function POST(req: NextRequest) {
   try {
-    const { questionText, questionType, options, minRating, maxRating } = await req.json();
+    const {
+      questionText,
+      questionType,
+      options,
+      minRating,
+      maxRating,
+      ratingDescriptions,
+    } = await req.json();
 
     // Validate the questionType to ensure it's one of the valid options
     const validTypes = ["open-ended", "closed-ended", "rating"];
@@ -59,6 +66,34 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+
+      // Validate ratingDescriptions if provided
+      if (ratingDescriptions && typeof ratingDescriptions !== "object") {
+        return NextResponse.json(
+          { message: "ratingDescriptions must be an object mapping numbers to text." },
+          { status: 400 }
+        );
+      }
+
+      if (ratingDescriptions) {
+        for (const [key, value] of Object.entries(ratingDescriptions)) {
+          const numericKey = Number(key);
+          if (
+            isNaN(numericKey) ||
+            numericKey < minRating ||
+            numericKey > maxRating ||
+            typeof value !== "string"
+          ) {
+            return NextResponse.json(
+              {
+                message:
+                  "Each key in ratingDescriptions must be a number within the rating range, and values must be strings.",
+              },
+              { status: 400 }
+            );
+          }
+        }
+      }
     }
 
     const question = await FeedbackQuestion.create({
@@ -66,6 +101,7 @@ export async function POST(req: NextRequest) {
       questionType,
       minRating: questionType === "rating" ? minRating : null,
       maxRating: questionType === "rating" ? maxRating : null,
+      ratingDescriptions: questionType === "rating" ? ratingDescriptions : null,
     });
 
     // If the question type is 'closed-ended', handle answer options
@@ -99,3 +135,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
