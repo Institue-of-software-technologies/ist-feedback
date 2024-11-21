@@ -29,7 +29,6 @@ interface CustomInputProps {
   value?: string;
   onClick?: () => void;
 }
-
 const Form = <T extends FieldValues>({
   Input,
   onSubmit,
@@ -98,11 +97,9 @@ const Form = <T extends FieldValues>({
       [id]: !prev[id],
     }));
   };
-
   const defaultButtonColor = "bg-blue-500";
   const defaultHoverColor = "hover:bg-blue-600";
   const defaultButtonText = "Submit";
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {Input.map((input) => (
@@ -142,39 +139,61 @@ const Form = <T extends FieldValues>({
                     )}
                   </ListboxOption>
                 ))}
-              </ListboxOptions>
-            </Listbox>
-          ) : input.type === "date" ? (
-            <DatePicker
-              selected={input.label === "tokenExpiration" ? expirationDate : startDate}
-              onChange={input.label === "tokenExpiration" ? handleExpirationDateChange : handleDateChange}
-              customInput={<CustomInput />}
-              showTimeSelect
-              dateFormat="MMMM d, yyyy h:mm aa"
-            />
-          ) : input.type === "time" ? (
-            <>
-              <div className="mb-4">
-                {/* <label htmlFor={input.label} className="block mb-2 text-sm font-medium text-gray-900 mt-2">{input.label}</label> */}
-                <div className="relative">
-                  <div className="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                      <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <input type="time" id={input.label} className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" min="09:00" max="18:00" defaultValue={input.value} required {...register(`${input.label}` as Path<T>, { required: `${input.label} is required` })} />
-                </div>
-
+              </select>
+            ) : input.type === "multiple" ? (
+              <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
+                <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                  {SelectedValue.length > 0
+                    ? SelectedValue.map((value) => input.options?.find(opt => opt.value === value)?.label).join(", ")
+                    : "Select multiple options..."}
+                </ListboxButton>
+                <ListboxOptions className="mt-2 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  {input.options?.map((option) => (
+                    <ListboxOption key={option.value} value={option.value} className="cursor-pointer select-none p-2">
+                      {({ selected }) => (
+                        <>
+                          <span className={selected ? "font-semibold" : "font-normal"}>
+                            {option.label}
+                          </span>
+                        </>
+                      )}
+                    </ListboxOption>
+                  ))}
+                </ListboxOptions>
+              </Listbox>
+            ) : input.type === "date" ? (
+              <DatePicker
+                selected={
+                  selectedDate || new Date(input.value ? input.value.replace(' ', 'T') : new Date())
+                }
+                onChange={(date) => handleDateChange(date)}
+                customInput={<CustomInput />}
+                showTimeSelect
+                dateFormat="MMMM d, yyyy h:mm aa"
+                className="w-full"
+              />
+            ) : input.type === "time" ? (
+              <div className="relative">
+                <input
+                  type="time"
+                  id={input.label}
+                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  min="09:00"
+                  max="18:00"
+                  defaultValue={input.value}
+                  required
+                  {...register(`${input.label}` as Path<T>, { required: `${input.label} is required` })}
+                />
               </div>
-            </>
-          ) : input.type === "password" ? (
-            <>
+            ) : input.type === "password" ? (
               <div className="relative">
                 <input
                   id={input.label}
                   type={showPasswordState[input.label] ? "text" : "password"}
                   defaultValue={input.value}
-                  {...register(input.label as Path<T>, input.require ? { required: `${input.label} is required` } : {})}
+                  {...register(input.label as Path<T>, {
+                    required: input.require ? `${input.label} is required` : undefined,
+                  })}
                   className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
                 <button
@@ -218,17 +237,24 @@ const Form = <T extends FieldValues>({
                   )}
                 </button>
               </div>
-            </>
-          ) : (
-            <input
-              id={input.label}
-              type={input.type}
-              defaultValue={input.value}
-              {...register(input.label as Path<T>, { required: `${input.label} is required` })}
-              className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          )}
-        </div>
+            ) : (
+              <input
+                id={input.label}
+                type={input.type}
+                defaultValue={input.value}
+                {...register(input.label as Path<T>, {
+                  required: input.require ? `${input.label} is required` : undefined,
+                  pattern: input.type === "text" ? /^[A-Za-z\s]*$/ : undefined
+                })}
+                className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            )}
+
+            {errors[input.label] && (
+              <p className="text-red-600 text-sm mt-1">{(errors[input.label] as unknown as { message: string })?.message || `Invalid input`}</p>
+            )}
+          </div>
+        )
       ))}
 
       <button
@@ -265,8 +291,6 @@ const Form = <T extends FieldValues>({
           buttonText || defaultButtonText
         )}
       </button>
-
-
     </form>
   );
 };

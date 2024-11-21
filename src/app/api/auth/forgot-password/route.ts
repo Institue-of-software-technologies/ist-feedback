@@ -5,13 +5,25 @@ import { render } from '@react-email/components';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { PasswordReset } from "@/db/models/PasswordReset";
+import Joi from 'joi';
+import { validateBody } from "../../authToken/middleware";
 
 const user = process.env.MAIL_USERNAME;
 const pass = process.env.MAIL_PASSWORD;
 const URL = process.env.URL;
 
+const validationSchema = Joi.object({
+    email: Joi.string().email().required(),
+});
+
+
 export async function POST(request: NextRequest) {
     const body = await request.json();
+
+    const validationErrorResponse = validateBody(validationSchema, body);
+    if (validationErrorResponse) {
+        return validationErrorResponse; // Return validation error if any
+    }
     const { email } = body;
     const now = new Date();
     
