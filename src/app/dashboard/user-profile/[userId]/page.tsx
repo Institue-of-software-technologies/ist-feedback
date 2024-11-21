@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '../../../../../lib/axios';
 import Form from '@/components/Forms';
 import { User } from '@/types';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from '../../loading';
 import { showToast } from '@/components/ToastMessage';

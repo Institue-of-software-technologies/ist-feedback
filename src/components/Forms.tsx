@@ -40,6 +40,8 @@ const Form = <T extends FieldValues>({
   const { register, handleSubmit, setValue } = useForm<T>();
 
   const [selectedMultiValue, setSelectedMultiValue] = useState<number[]>([]);
+  const [SelectedValue, setSelectedValue] = useState<number[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [expirationDate, setExpirationDate] = useState<Date | null>(null);
   const [showPasswordState, setShowPasswordState] = useState<{ [key: string]: boolean }>({});
@@ -102,6 +104,7 @@ const Form = <T extends FieldValues>({
   const defaultButtonText = "Submit";
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
       {Input.map((input) => (
         <div key={input.label} className="mb-4">
           <label htmlFor={input.label} className="block text-sm font-medium text-gray-700">
@@ -139,7 +142,8 @@ const Form = <T extends FieldValues>({
                     )}
                   </ListboxOption>
                 ))}
-              </select>
+              </ListboxOptions>
+            </Listbox>
             ) : input.type === "multiple" ? (
               <Listbox value={SelectedValue} onChange={handleMultiSelectChange} multiple>
                 <ListboxButton className="block w-full p-2 border border-gray-300 rounded-md shadow-sm">

@@ -9,6 +9,7 @@ export default {
       SUPER_ADMIN = 'super_admin',
       ADMIN = 'admin',
       STUDENT = 'student',
+      TRAINER = 'trainer',
     }
 
     enum Permissions {
