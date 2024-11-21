@@ -16,6 +16,7 @@ interface FormData {
   options?: { optionText: string; description?: boolean }[];
   minRating?: number;
   maxRating?: number;
+  ratingDescriptions?: { [key: number]: string };
 }
 
 const EditQuestion = () => {
@@ -93,7 +94,8 @@ const EditQuestion = () => {
           description: option.description, // Send description status to backend
         })),
         minRating: 1, // This sets minRating to default to 1
-        maxRating: 10, // This sets maxRating to default to 10
+        maxRating: formData.maxRating || 10, // This sets maxRating to default to 10
+        ratingDescriptions: formData.ratingDescriptions || {},
       });
       showToast.success('Feedback question updated successfully!');
       setTimeout(() => {
@@ -118,6 +120,13 @@ const EditQuestion = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
+
+  const handleRatingDescriptionChange = (rating: number, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      ratingDescriptions: { ...prev.ratingDescriptions, [rating]: value },
+    }));
+  };
 
   // First form for selecting the question type
   const typeSelectionInputs: Input[] = [
@@ -246,54 +255,82 @@ const EditQuestion = () => {
 
       {/* Form for Rating questions */}
       {showDetailsForm && formData.questionType === 'rating' && (
-        <>
-          <div>
-            <h1>Type the rating question and specify the scale</h1>
-            
+        <div>
+          <h1 className="text-xl font-bold mb-4">Create a Rating Question</h1>
+
+          {/* Input for Question Text */}
+          <label className="block mb-2 font-medium">Question Text:</label>
+          <input
+            type="text"
+            placeholder="Enter your question (e.g., How satisfied are you?)"
+            value={formData.questionText || ""}
+            onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
+            className="border p-2 w-full mb-4"
+          />
+
+          {/* Input for Maximum Rating */}
+          <div className="flex items-center mb-4">
+            <label className="mr-2">Maximum Rating:</label>
             <input
-              type="text"
-              placeholder="Enter your question"
-              value={formData.questionText || ""}
-              onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
-              className="border p-2 w-full mb-2"
+              type="number"
+              value={formData.maxRating || 10}
+              min={1}
+              max={10}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  maxRating: parseInt(e.target.value, 10) || 10,
+                })
+              }
+              className="border p-2 w-20"
             />
+            <span className="ml-4 text-sm text-gray-500">
+              (Max Value: 10)
+            </span>
+          </div>
 
-            <div className="flex items-center mb-2">
-              <label className="mr-2">Maximum Rating:</label>
-              <input
-                type="number"
-                value={formData.maxRating || 10}
-                min={1}
-                max={10}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    maxRating: parseInt(e.target.value, 10) || 10,
-                  })
-                }
-                className="border p-2 w-20"
-              />
-            </div>
+          {/* Rating Descriptions */}
+          <h2 className="text-lg font-bold mb-2">Rating Descriptions:</h2>
+          <p className="mb-4 text-gray-600">
+            Optionally, provide descriptions for each rating value (e.g., 
+            *1 = Very Unsatisfied*, *5 = Neutral*, *10 = Very Satisfied*).
+          </p>
 
-            <div className="flex items-center mb-2 mx-auto">
-              <label className="mr-2">Max Value: 10</label>
-            </div>
+          {/* Dynamic Input Fields for Descriptions */}
+          {[...(Array((formData.maxRating || 10) - (formData.minRating || 1) + 1))].map((_, i) => {
+            const ratingValue = (formData.minRating || 1) + i;
+            return (
+              <div key={ratingValue} className="mb-4">
+                <label className="block mb-2 font-medium">
+                  Description for Rating {ratingValue}:
+                </label>
+                <input
+                  type="text"
+                  placeholder={`Enter a description for rating ${ratingValue}`}
+                  value={formData.ratingDescriptions?.[ratingValue] || ""}
+                  onChange={(e) => handleRatingDescriptionChange(ratingValue, e.target.value)}
+                  className="border p-2 w-full"
+                />
+              </div>
+            );
+          })}
 
+          {/* Submit and Back Buttons */}
+          <div className="mt-6 flex items-center justify-between">
             <button
               onClick={() => handleSubmit(formData)}
-              className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
               Submit
             </button>
-
             <button
               onClick={handleGoBack}
-              className="mt-4 ml-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
             >
               Back
             </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
