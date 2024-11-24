@@ -155,7 +155,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
     },
     {
       name: "Feedback Questions",
-      permission: "manage_feedback",
+      permission: "manage_feedback_questions",
       viewLabel: "View Feedback Question",
       createLabel: "Create Feedback Question",
       viewLink: "/dashboard/feedback-questions",

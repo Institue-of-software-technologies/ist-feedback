@@ -23,8 +23,12 @@ const FeedBackManagement: React.FC = () => {
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
-        const response = await api.get('/feedback', {
+        const response = await api.get(`/feedback`, {
           method: 'GET',
+          headers: {
+            'user-role': `${user?.role}`, 
+            'user-id': `${user?.id}`,
+          },
         });
 
         // Ensure response contains 'feedbacks' array (plural)
@@ -43,7 +47,7 @@ const FeedBackManagement: React.FC = () => {
     };
 
     fetchFeedbacks();
-  }, []);
+  }, [user?.id, user?.role]);
 
   // Handle feedback deletion
   const handleDelete = async (confirmDelete: Feedback) => {
@@ -85,7 +89,7 @@ const FeedBackManagement: React.FC = () => {
 
   const columns = [
     { header: 'Student Token', accessor: 'studentToken' },
-    { header: 'Trainer Name', accessor: 'trainer.trainerName' },
+    { header: 'Trainer Name', accessor: 'trainer.username' },
     { header: 'Course', accessor: 'trainer.course.courseName' },
     { header: 'Module Name', accessor: 'module.moduleName' },
     // { header: 'Course Name', accessor: 'module.course.courseName' },

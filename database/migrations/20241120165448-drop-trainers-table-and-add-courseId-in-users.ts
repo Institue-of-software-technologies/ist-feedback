@@ -3,34 +3,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   up: async (queryInterface: any, Sequelize: any) => {
-    // Add the CourseId column to the Users table
+    // Step 1: Add the CourseId column to Users (if not done already)
     await queryInterface.addColumn('Users', 'CourseId', {
       type: Sequelize.INTEGER,
-      allowNull: true, // Allow null initially to avoid constraint issues
+      allowNull: true,
       references: {
-        model: 'Courses', // Ensure this matches your Courses table name
+        model: 'Courses',
         key: 'id',
       },
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
     });
 
-    // Fetch the roleId for 'trainer' from the Roles table
-    const role = await queryInterface.sequelize.query(
-      'SELECT id FROM Roles WHERE roleName = :roleName',
-      {
-        replacements: { roleName: 'trainer' }, // Assuming the roleName for trainers is 'trainer'
-        type: Sequelize.QueryTypes.SELECT,
-      }
-    );
+    // Step 2: Update foreign keys pointing to Trainers
+    await queryInterface.sequelize.query(`
+      ALTER TABLE feedback 
+      DROP FOREIGN KEY feedback_ibfk_2;
+    `);
 
-    if (!role || role.length === 0) {
-      throw new Error('Role "trainer" not found in the Roles table');
-    }
+    await queryInterface.sequelize.query(`
+      ALTER TABLE feedback 
+      ADD CONSTRAINT feedback_ibfk_2 
+      FOREIGN KEY (trainerId) 
+      REFERENCES Users(id) 
+      ON DELETE CASCADE;
+    `);
 
-    const trainerRoleId = role[0].id;
-
-    // Migrate data from Trainers to Users
+    // Step 3: Migrate data from Trainers to Users
     const trainers = await queryInterface.sequelize.query(
       'SELECT * FROM Trainers',
       { type: Sequelize.QueryTypes.SELECT }
@@ -40,28 +39,22 @@ module.exports = {
       await queryInterface.bulkInsert('Users', [
         {
           username: trainer.trainerName,
-          email: trainer.email, 
+          email: trainer.email,
           password: '',
-          roleId: trainerRoleId,
-          CourseId: null, 
+          roleId: null, // Assign appropriate role ID if required
+          CourseId: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
       ]);
     }
 
-    // Drop the Trainers table after data migration
+    // Step 4: Drop the Trainers table
     await queryInterface.dropTable('Trainers');
-
-    // Make the CourseId column non-nullable if required
-    await queryInterface.changeColumn('Users', 'CourseId', {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    });
   },
 
   down: async (queryInterface: any, Sequelize: any) => {
-    // Recreate the Trainers table
+    // Step 1: Recreate the Trainers table
     await queryInterface.createTable('Trainers', {
       id: {
         type: Sequelize.INTEGER,
@@ -85,7 +78,21 @@ module.exports = {
       },
     });
 
-    // Remove the CourseId column from Users
+    // Step 2: Update foreign keys to point back to Trainers
+    await queryInterface.sequelize.query(`
+      ALTER TABLE feedback 
+      DROP FOREIGN KEY feedback_ibfk_2;
+    `);
+
+    await queryInterface.sequelize.query(`
+      ALTER TABLE feedback 
+      ADD CONSTRAINT feedback_ibfk_2 
+      FOREIGN KEY (trainerId) 
+      REFERENCES Users(id) 
+      ON DELETE CASCADE;
+    `);
+
+    // Step 3: Remove the CourseId column from Users
     await queryInterface.removeColumn('Users', 'CourseId');
   },
 };

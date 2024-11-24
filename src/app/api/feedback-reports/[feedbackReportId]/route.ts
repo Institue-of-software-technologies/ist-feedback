@@ -6,7 +6,7 @@ import { FeedbackAnswer } from "@/db/models/FeedbackAnswer";
 import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { Trainer } from "@/db/models/Trainer";
+import { User } from "@/db/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Context {
@@ -24,9 +24,9 @@ export async function GET(req: NextRequest, context: Context) {
           attributes: ["id"],
           include: [
             {
-              model: Trainer,
+              model: User,
               as: "trainer",
-              attributes: ["trainerName","email"],
+              attributes: ["username","email"],
               include: [
                 {
                   model: Course,

@@ -8,6 +8,8 @@ import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { ClassTime, FeedbackQuestion, Intake, Module, Trainer } from "@/types";
 import { showToast } from "@/components/ToastMessage";
+import { useUser } from "@/context/UserContext";
+import Loading from "@/app/loading";
 
 interface FormData {
   trainerId: number;
@@ -28,6 +30,7 @@ const NewFeedbackForm: React.FC = () => {
   const [modules, setModules] = useState<Module[]>([]);
   const [questions, setQuestions] = useState<FeedbackQuestion[]>([]);
   const [step, setStep] = useState<number>(1);
+  const { user } = useUser();
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -44,9 +47,8 @@ const NewFeedbackForm: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Indicate loading state before starting the fetch operations
+      setLoading(true);
       try {
-        // Fetch all data concurrently
         const [
           trainersResponse,
           questionsResponse,
@@ -54,15 +56,23 @@ const NewFeedbackForm: React.FC = () => {
           classTimesResponse,
           modulesResponse,
         ] = await Promise.all([
-          api.get(`/trainers`),
+          api.get(`/trainers`, {
+            headers: {
+              'user-role': `${user?.role}`,
+              'user-id': `${user?.id}`,
+            },
+          }),
           api.get(`/feedback-questions`),
           api.get(`/intakes`),
           api.get(`/class-times`),
           api.get(`/modules`),
         ]);
-
-        // Set state for each resource
-        setTrainers(trainersResponse.data.trainer);
+    
+        setTrainers(
+          Array.isArray(trainersResponse.data.trainers)
+            ? trainersResponse.data.trainers
+            : [trainersResponse.data.trainers]
+        );
         setQuestions(questionsResponse.data.questions);
         setIntakes(intakesResponse.data.intake);
         setClassTimes(classTimesResponse.data.classTime);
@@ -70,24 +80,23 @@ const NewFeedbackForm: React.FC = () => {
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
-        setLoading(false); // Loading state complete
+        setLoading(false);
       }
     };
+    
 
     fetchData();
-  }, []);
+  }, [user?.id, user?.role]);
 
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+  if (loading) return <Loading/>;
 
   const step1Inputs = [
     {
       label: "trainerId",
       type: "select",
       options: trainers.map((trainer) => ({
-        label: `${trainer.trainerName} - ${trainer.course.courseName}`,
+        label: `${trainer.username} - ${trainer.course.courseName}`,
         value: trainer.id,
       })),
     },

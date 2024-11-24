@@ -3,7 +3,7 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
-import { ClassTime, Intake, Module, Trainer, FeedbackQuestion } from '@/types';
+import { ClassTime, Intake, Module, FeedbackQuestion, User } from '@/types';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useForm } from 'react-hook-form';
@@ -31,7 +31,7 @@ const EditFeedback = () => {
   const { feedbackId } = useParams();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [trainers, setTrainers] = useState<User[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
@@ -82,7 +82,7 @@ const EditFeedback = () => {
           api.get(`/modules`),
           api.get(`/feedback-questions`),
         ]);
-        setTrainers(trainersResponse.data.trainer);
+        setTrainers(trainersResponse.data.trainers);
         setIntakes(intakesResponse.data.intake);
         setClassTimes(classTimesResponse.data.classTime);
         setModules(modulesResponse.data);
@@ -155,7 +155,7 @@ const EditFeedback = () => {
           <select id="trainerId" {...register('trainerId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             {trainers.map((trainer) => (
               <option key={trainer.id} value={trainer.id.toString()}>
-                {trainer.trainerName}
+                {trainer.username}
               </option>
             ))}
           </select>

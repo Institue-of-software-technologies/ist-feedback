@@ -3,21 +3,21 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios';
 import { Trainer } from '@/types';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useUser } from '@/context/UserContext';
+// import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
 import { showToast } from '@/components/ToastMessage';
 
 const TrainerManagement: React.FC = () => {
-  const { user } = useUser();
+  // const { user } = useUser();
   const [trainer, setTrainer] = useState<Trainer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filteredTrainer, setFilteredTrainer] = useState<Trainer[]>([]);
   const [search, setSearch] = useState<string>('');
-  const router = useRouter();
+  // const router = useRouter();
 
   // Fetch users from your API
   useEffect(() => {
@@ -26,8 +26,8 @@ const TrainerManagement: React.FC = () => {
         const response = await api.get('/trainers', {
           method: 'GET',
         });
-        setTrainer(response.data.trainer);
-        setFilteredTrainer(response.data.trainer);
+        setTrainer(response.data.trainers);
+        setFilteredTrainer(response.data.trainers);
       } catch (err) {
         console.log(err)
         showToast.error('Failed to fetch trainer');
@@ -41,25 +41,25 @@ const TrainerManagement: React.FC = () => {
   }, []);
 
   // Handle user deletion
-  const handleDelete = async (confirmDelete: Trainer) => {
-    if (confirmDelete) {
-      try {
-        await api.delete(`/trainers/${confirmDelete.id}`);
-        setTrainer(
-          trainer.filter((trainer) => trainer.id !== confirmDelete.id)
-        );
-        setFilteredTrainer(
-          filteredTrainer.filter(
-            (filteredTrainer) => filteredTrainer.id !== confirmDelete.id
-          )
-        );
-        showToast.success('Trainer deleted successfully');
-      } catch (err) {
-        console.log(err)
-        showToast.error('Failed to delete trainer');
-      }
-    }
-  };
+  // const handleDelete = async (confirmDelete: Trainer) => {
+  //   if (confirmDelete) {
+  //     try {
+  //       await api.delete(`/trainers/${confirmDelete.id}`);
+  //       setTrainer(
+  //         trainer.filter((trainer) => trainer.id !== confirmDelete.id)
+  //       );
+  //       setFilteredTrainer(
+  //         filteredTrainer.filter(
+  //           (filteredTrainer) => filteredTrainer.id !== confirmDelete.id
+  //         )
+  //       );
+  //       showToast.success('Trainer deleted successfully');
+  //     } catch (err) {
+  //       console.log(err)
+  //       showToast.error('Failed to delete trainer');
+  //     }
+  //   }
+  // };
 
   const handleSearch = (value: string) => {
     console.log(search);
@@ -76,15 +76,15 @@ const TrainerManagement: React.FC = () => {
   };
 
 
-  const handleEdit = (trainer: Trainer) => {
-    showToast.info('Redirecting to edit trainer...');
-    router.push(`/dashboard/trainers/edit/${trainer.id}`);
-  };
+  // const handleEdit = (trainer: Trainer) => {
+  //   showToast.info('Redirecting to edit trainer...');
+  //   router.push(`/dashboard/trainers/edit/${trainer.id}`);
+  // };
 
   if (loading) return <Loading />;
 
   const columns = [
-    { header: 'trainerName', accessor: 'trainerName' },
+    { header: 'trainerName', accessor: 'username' },
     { header: 'email', accessor: 'email' },
     { header: 'Course', accessor: 'course.courseName' },
   ];
@@ -101,16 +101,16 @@ const TrainerManagement: React.FC = () => {
           columns={columns}
           data={filteredTrainer}
           onSearch={handleSearch}
-          onEdit={
-            user && user.permissions.includes('update_trainers')
-              ? handleEdit
-              : undefined
-          }
-          onDelete={
-            user && user.permissions.includes('delete_trainers')
-              ? handleDelete
-              : undefined
-          }
+          // onEdit={
+          //   user && user.permissions.includes('update_trainers')
+          //     ? handleEdit
+          //     : undefined
+          // }
+          // onDelete={
+          //   user && user.permissions.includes('delete_trainers')
+          //     ? handleDelete
+          //     : undefined
+          // }
         />
       )}
     </div>
