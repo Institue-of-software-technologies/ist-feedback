@@ -3,11 +3,11 @@ import { ClassTime } from "@/db/models/ClassTime";
 import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { Trainer } from "@/db/models/Trainer";
 import { NextRequest, NextResponse } from "next/server";
 import { AnswerOption } from '@/db/models/AnswerOption';
 import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";  
+import { User } from '@/db/models/User';
 
 interface Context {
   params: { feedbackId: number };
@@ -19,9 +19,9 @@ export async function GET(req: NextRequest, context: Context) {
       where: { id: feedbackId },
       include: [
         {
-          model: Trainer,
+          model: User,
           as: "trainer",
-          attributes: ["id", "trainerName"],
+          attributes: ["id", "username"],
           include: [
             {
               model: Course,

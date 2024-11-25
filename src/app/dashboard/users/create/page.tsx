@@ -7,6 +7,7 @@ import api from "../../../../../lib/axios";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Role } from "@/types";
+import { Course } from "@/types";
 import Loading from "@/app/loading";
 import { showToast } from "@/components/ToastMessage";
 
@@ -20,7 +21,7 @@ interface FormData {
 const NewUserForm: React.FC = () => {
   const router = useRouter();
   const [roles, setRoles] = useState<Role[]>([]);
-  const [, setFilteredRoles] = useState<Role[]>([]);
+  const [course, setCourse] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
 
@@ -31,7 +32,6 @@ const NewUserForm: React.FC = () => {
           method: 'GET',
         });
         setRoles(response.data.roles);
-        setFilteredRoles(response.data);
       } catch (err) {
         console.log(err)
         showToast.error('Failed to fetch roles');
@@ -41,6 +41,22 @@ const NewUserForm: React.FC = () => {
     };
 
     fetchRoles();
+
+    const fetchCourse = async () => {
+      try {
+        const response = await api.get('/courses', {
+          method: 'GET',
+        });
+        setCourse(response.data.course);
+      } catch (err) {
+        console.log(err)
+        showToast.error('Failed to fetch courses');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourse();
   }, []);
 
   const onSubmit = async (data: FormData) => {
@@ -67,6 +83,14 @@ const NewUserForm: React.FC = () => {
       options: roles.map((role) => ({
         label: role.roleName,
         value: role.id,
+      })),
+    },
+    {
+      label: 'courseId',
+      type: 'select',
+      options: course.map((course) => ({
+        label: course.courseName,
+        value: course.id,
       })),
     },
   ];

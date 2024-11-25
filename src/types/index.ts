@@ -74,7 +74,7 @@ export interface Intake {
 
 export interface Trainer {
   id: number;
-  trainerName: string;
+  username: string;
   email: string;
 }
 
@@ -102,6 +102,10 @@ export interface User {
   role: {
     id: number;
     roleName: string;
+  }; // Add role object here
+  course: {
+    id: number;
+    courseName: string;
   }; // Add role object here
 }
 

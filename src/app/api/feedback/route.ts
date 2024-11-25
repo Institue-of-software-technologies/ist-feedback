@@ -4,46 +4,92 @@ import { Feedback } from "@/db/models/Feedback";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { Trainer } from "@/db/models/Trainer";
-import { NextResponse } from "next/server";
+import { User } from "@/db/models/User";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Fetch feedbacks with associated trainer, module, course, classTime, and intake details
-    const feedbacks = await Feedback.findAll({
-      include: [
-        {
-          model: Trainer,
-          as: "trainer",
-          attributes: ["trainerName"],
-          include: [
-            {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
-        },
-        {
-          model: Module,
-          as: "module",
-          attributes: ["moduleName"],
-          include: [
-            {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
-        },
-        { model: ClassTime, as: "classTime", attributes: ["classTime"] },
-        {
-          model: Intake,
-          as: "intake",
-          attributes: ["intakeName", "intakeYear"],
-        },
-      ],
-    });
+    // Extract user information (e.g., role and ID) from request headers or a session token
+    const userRole = req.headers.get("user-role");
+    const userId = req.headers.get("user-id");
+
+    let feedbacks;
+
+    // Filter feedbacks based on the user's role
+    if (userRole === "trainer") {
+      // Fetch only feedbacks associated with the trainer
+      feedbacks = await Feedback.findAll({
+        where: { trainerId: userId }, // Assuming feedbacks have a `trainerId` field
+        include: [
+          {
+            model: User,
+            as: "trainer",
+            attributes: ["username"],
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["courseName"],
+              },
+            ],
+          },
+          {
+            model: Module,
+            as: "module",
+            attributes: ["moduleName"],
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["courseName"],
+              },
+            ],
+          },
+          { model: ClassTime, as: "classTime", attributes: ["classTime"] },
+          {
+            model: Intake,
+            as: "intake",
+            attributes: ["intakeName", "intakeYear"],
+          },
+        ],
+      });
+    } else {
+      // Fetch all feedbacks for other roles
+      feedbacks = await Feedback.findAll({
+        include: [
+          {
+            model: User,
+            as: "trainer",
+            attributes: ["username"],
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["courseName"],
+              },
+            ],
+          },
+          {
+            model: Module,
+            as: "module",
+            attributes: ["moduleName"],
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["courseName"],
+              },
+            ],
+          },
+          { model: ClassTime, as: "classTime", attributes: ["classTime"] },
+          {
+            model: Intake,
+            as: "intake",
+            attributes: ["intakeName", "intakeYear"],
+          },
+        ],
+      });
+    }
 
     // Format the tokenExpiration dates and send formatted feedback data to the client
     const formattedFeedbacks = feedbacks.map((feedback) => ({
