@@ -129,6 +129,9 @@ export interface FeedbackQuestionSelect {
         optionText: string;
       }
     ];
+    ratingDescriptions?: {
+      [key: number]: string;
+    };
   };
 }
 

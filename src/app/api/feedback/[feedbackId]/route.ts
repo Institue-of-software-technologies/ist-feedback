@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, context: Context) {
         {
           model: Intake,
           as: "intake",
-          attributes: ["id", "intakeName","intakeYear"],  
+          attributes: ["id", "intakeName", "intakeYear"],
         },
       ],
     });
@@ -56,14 +56,14 @@ export async function GET(req: NextRequest, context: Context) {
         {
           model: FeedbackQuestion,
           as: "feedbackQuestion",
-          attributes: ["id", "questionText", "questionType"],
+          attributes: ["id", "questionText", "questionType", "ratingDescriptions"],
           include: [
             {
               model: AnswerOption,
               as: "answerOption",
-              attributes: ["id", "optionText","description"],
+              attributes: ["id", "optionText", "description"],
             },
-          ]
+          ],
         },
       ],
     });
@@ -75,10 +75,9 @@ export async function GET(req: NextRequest, context: Context) {
       );
     }
 
-    return NextResponse.json({ feedback ,feedbackQuestions});
+    return NextResponse.json({ feedback, feedbackQuestions });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { message: "Error fetching Feedback", error: errorMessage },
       { status: 500 }

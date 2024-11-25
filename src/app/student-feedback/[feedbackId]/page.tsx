@@ -176,22 +176,41 @@ export default function StudentFeedback() {
                                     );
                                 })}
 
-
                                 {question.feedbackQuestion.questionType === "rating" && (
-                                    <div className="flex justify-center items-center mt-7 overflow-x-auto">
-                                        {numbers.map((number) => (
-                                            <button
-                                                key={number}
-                                                type="button"
-                                                className={`h-10 w-14 md:h-10 md:w-32 sm:h-12 sm:w-32 lg:h-14 lg:w-28 inline-flex items-center justify-center text-base lg:text-xl font-medium border border-gray-300 
-                            ${watch(questionKey) === number ? "bg-red-600 text-white" : "bg-white text-gray-800"} 
-                            focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 
-                            hover:bg-red-600 hover:text-white whitespace-nowrap`}
-                                                onClick={() => setValue(questionKey, number)}
-                                            >
-                                                {number}
-                                            </button>
-                                        ))}
+                                    <div>
+                                        {(() => {
+                                        console.log("Rating Descriptions:", question.feedbackQuestion.ratingDescriptions);
+                                        return null;
+                                        })()}
+                                    <div className="flex flex-col justify-center items-center mt-7 overflow-x-auto">
+                                        <div className="flex space-x-4">
+                                            {numbers.map((number) => (
+                                                <div key={number} className="flex flex-col items-center">
+                                                    <button
+                                                        type="button"
+                                                        className={`h-10 w-14 md:h-10 md:w-32 sm:h-12 sm:w-32 lg:h-14 lg:w-28 inline-flex items-center justify-center text-base lg:text-xl font-medium border border-gray-300 
+                                                        ${
+                                                            watch(questionKey) === number
+                                                                ? "bg-red-600 text-white"
+                                                                : "bg-white text-gray-800"
+                                                        } 
+                                                        focus:outline-none focus:ring-red-600 focus:ring-offset-2 
+                                                        hover:bg-red-600 hover:text-white whitespace-nowrap`}
+                                                        onClick={() => setValue(questionKey, number)}
+                                                    >
+                                                        {number}
+                                                    </button>
+
+                                                    {/* Display description below the button */}
+                                                    {question.feedbackQuestion.ratingDescriptions?.[number] && (
+                                                        <span className="mt-1 text-sm text-gray-600 text-center">
+                                                            {question.feedbackQuestion.ratingDescriptions[number]}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                     </div>
                                 )}
 

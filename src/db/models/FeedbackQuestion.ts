@@ -36,6 +36,10 @@ FeedbackQuestion.init({
   ratingDescriptions: {
     type: DataTypes.JSON,
     allowNull: true,
+    get() {
+      const rawValue = this.getDataValue('ratingDescriptions');
+      return typeof rawValue === 'string' ? JSON.parse(rawValue) : rawValue;
+    },
   },
 }, {
   sequelize,
