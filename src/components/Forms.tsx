@@ -224,6 +224,20 @@ const Form = <T extends FieldValues>({
                 )}
               </button>
             </div>
+          ) : input.type === "email" ? (
+              <input
+                id={input.label}
+                type={input.type}
+                defaultValue={input.value}
+                {...register(input.label as Path<T>, {
+                  required: input.require ? `${input.label} is required` : undefined,
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email address"
+                  }
+                })}
+                className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
           ) : (
             <input
               id={input.label}

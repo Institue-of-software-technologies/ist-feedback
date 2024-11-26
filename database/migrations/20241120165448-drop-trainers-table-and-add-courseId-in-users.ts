@@ -17,12 +17,12 @@ module.exports = {
 
     // Step 2: Update foreign keys pointing to Trainers
     await queryInterface.sequelize.query(`
-      ALTER TABLE feedback 
+      ALTER TABLE Feedback 
       DROP FOREIGN KEY feedback_ibfk_2;
     `);
 
     await queryInterface.sequelize.query(`
-      ALTER TABLE feedback 
+      ALTER TABLE Feedback 
       ADD CONSTRAINT feedback_ibfk_2 
       FOREIGN KEY (trainerId) 
       REFERENCES Users(id) 
