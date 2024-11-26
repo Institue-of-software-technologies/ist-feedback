@@ -24,6 +24,10 @@ const FeedBackManagement: React.FC = () => {
             try {
                 const response = await api.get('/feedback-reports', {
                     method: 'GET',
+                    headers: {
+                        'user-role': `${user?.role}`, 
+                        'user-id': `${user?.id}`,
+                    },
                 });
 
                 // Ensure response contains 'feedbacks' array (plural)
@@ -42,7 +46,7 @@ const FeedBackManagement: React.FC = () => {
         };
 
         fetchFeedbacks();
-    }, []);
+    }, [user?.id, user?.role]);
 
     const handleSearch = (value: string) => {
         console.log(search);
@@ -71,7 +75,7 @@ const FeedBackManagement: React.FC = () => {
 
     const columns = [
         { header: 'Student Token', accessor: 'studentToken' },
-        { header: 'Trainer Name', accessor: 'trainer.trainerName' },
+        { header: 'Trainer Name', accessor: 'trainer.username' },
         { header: 'Course', accessor: 'trainer.course.courseName' },
         { header: 'Class Time', accessor: 'classTime.classTime' },
         { header: 'Intake Name', accessor: 'intake.intakeName' },

@@ -8,6 +8,7 @@ import { PasswordReset } from '@/db/models/PasswordReset';
 import nodemailer from 'nodemailer';
 import InviteUserEmail from '../../../../emails/inviteUser';
 import { render } from '@react-email/components';
+import { Course } from '../../../db/models/Course';
 
 const user = process.env.MAIL_USERNAME;
 const pass = process.env.MAIL_PASSWORD;
@@ -17,7 +18,7 @@ const URL = process.env.URL;
 export async function GET() {
   try {
     const users = await User.findAll({
-      include: [{ model: Role, as: "role" }],
+      include: [{ model: Role, as: "roleUsers" },{ model: Course, as: "course" }],
     });
     return NextResponse.json(users, { status: 200 });
   } catch (error) {
@@ -31,7 +32,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { username, email, password, roleId } = body;
+    const { username, email, password, roleId,courseId } = body;
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
       email,
       password: hashedPassword,
       roleId,
+      courseId
     });
 
     // Generate a secure reset token

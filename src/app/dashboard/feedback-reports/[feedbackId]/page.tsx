@@ -159,6 +159,7 @@ export default function FeedbackQuestionID() {
             height: logoHeight,
         });
 
+
         // Update yPosition after the logo
         yPosition -= logoHeight + logoVerticalPadding + 20;
 
@@ -203,6 +204,8 @@ export default function FeedbackQuestionID() {
         // Separate open-ended and close-ended questions
         const openEndedQuestions = questions.filter(q => q.questionType === 'open-ended');
         const closeEndedQuestions = questions.filter(q => q.questionType === 'closed-ended');
+
+        yPosition -= 20;
 
         // Draw Close-ended questions first
         if (closeEndedQuestions.length > 0) {
@@ -337,6 +340,65 @@ export default function FeedbackQuestionID() {
             });
         }
 
+
+        // Ratings Feedback Section
+        page.drawText("Ratings Summary", {
+            x: pageMargin,
+            y: yPosition,
+            size: titleFontSize,
+            font: boldFont,
+            color: rgb(0, 0.53, 0.7),
+        });
+        yPosition -= 40;
+
+        // Aggregate and display ratings
+        const ratingQuestions = questions.filter(q => q.questionType === 'rating');
+        ratingQuestions.forEach((question) => {
+            const relatedAnswers = feedbackReport.filter(a => a.questionId === question.id);
+
+            // Calculate rating statistics
+            const ratings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Adjust to actual rating scale
+            const ratingCounts = ratings.map(rating =>
+                relatedAnswers.filter(answer => parseInt(answer.answerText) === rating).length
+            );
+            const totalRatings = ratingCounts.reduce((acc, count) => acc + count, 0);
+            const averageRating = totalRatings
+                ? (ratingCounts.reduce((sum, count, idx) => sum + count * ratings[idx], 0) / totalRatings).toFixed(2)
+                : "No ratings";
+
+            // Display question text and average rating
+            page.drawText(`${question.questionText}: Average Rating - ${averageRating}`, {
+                x: pageMargin,
+                y: yPosition,
+                size: tableFontSize,
+                font: boldFont,
+            });
+            yPosition -= lineSpacing;
+            addNewPageIfNeeded();
+
+            // Table Header
+            page.drawText("Rating", { x: pageMargin, y: yPosition, size: tableFontSize, font });
+            page.drawText("Count", { x: 300, y: yPosition, size: tableFontSize, font });
+            page.drawText("Percentage", { x: 500, y: yPosition, size: tableFontSize, font });
+            yPosition -= lineSpacing;
+            addNewPageIfNeeded();
+
+            // Table Data
+            ratingCounts.forEach((count, idx) => {
+                const percentage = totalRatings ? ((count / totalRatings) * 100).toFixed(2) + "%" : "0%";
+                page.drawText(ratings[idx].toString(), { x: pageMargin, y: yPosition, size: tableFontSize, font });
+                page.drawText(count.toString(), { x: 300, y: yPosition, size: tableFontSize, font });
+                page.drawText(percentage, { x: 500, y: yPosition, size: tableFontSize, font });
+                yPosition -= lineSpacing;
+                addNewPageIfNeeded();
+            });
+
+            // Add space after each question
+            yPosition -= lineSpacing;
+            addNewPageIfNeeded();
+        });
+
+
         return pdfDoc.save();
     };
 
@@ -469,82 +531,90 @@ export default function FeedbackQuestionID() {
                 </div>
             )}
 
-            {/* Render each question and its responses */}
-            {questions.map((question) => (
-                <div key={question.id} className="mb-8">
-                    <h2 className="text-xl font-semibold mb-2">Question: {question.questionText}</h2>
+            {/* Render each question and its responses, grouped by question type */}
+            {questions.length > 0 &&
+            <div>
+            {['open-ended', 'closed-ended', 'rating'].map(questionType => (
+                <div key={questionType} className="mb-8">
+                    <h2 className="text-xl font-semibold mb-2">{questionType} Questions</h2>
+                    {questions.filter(question => question.questionType === questionType).map(question => (
+                        <div key={question.id} className="mb-4">
+                            <h3 className="text-lg font-semibold mb-2">Question: {question.questionText}</h3>
 
-                    {/* If it's an open-ended question */}
-                    {question.questionType === "open-ended" && (
-                        <div className="p-3 border border-gray-300">
-                            <strong>Open-Ended Responses:</strong>
-                            <ul>
-                                {feedbackReport
-                                    .filter((answer) => answer.questionId === question.id)
-                                    .map((answer, index) => (
-                                        <li key={index}>
-                                            <strong>Response {index + 1}:</strong> {answer.answerText}
-                                            {answer.description && answer.description.trim() && (
-                                                <div className="ml-4">
-                                                    <strong>Description:</strong> {answer.description}
-                                                </div>
-                                            )}
-                                        </li>
-                                    ))}
-                            </ul>
+                            {/* If it's an open-ended question */}
+                            {question.questionType === "open-ended" && (
+                                <div className="p-3 border border-gray-300">
+                                    <strong>Open-Ended Responses:</strong>
+                                    <ul>
+                                        {feedbackReport
+                                            .filter(answer => answer.questionId === question.id)
+                                            .map((answer, index) => (
+                                                <li key={index}>
+                                                    <strong>Response {index + 1}:</strong> {answer.answerText}
+                                                    {answer.description && answer.description.trim() && (
+                                                        <div className="ml-4">
+                                                            <strong>Description:</strong> {answer.description}
+                                                        </div>
+                                                    )}
+                                                </li>
+                                            ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* For regular (non-open-ended) questions */}
+                            {question.questionType !== "open-ended" && (
+                                <table className="border border-gray-300 text-left text-sm">
+                                    <thead className="bg-gray-200">
+                                        <tr>
+                                            <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
+                                            <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
+                                            <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
+                                            // Filter descriptions for the current answer
+                                            feedbackReport
+                                                .filter(answer => answer.answerText === answerText)
+                                                .map(filteredAnswer => filteredAnswer.description);
+
+                                            return (
+                                                <>
+                                                    {/* Row for Answer, Responses, and Percentage */}
+                                                    <tr key={answerText} className="hover:bg-gray-50">
+                                                        <td className="p-3 border-b border-gray-300">{answerText}</td>
+                                                        <td className="p-3 border-b border-gray-300">{count}</td>
+                                                        <td className="p-3 border-b border-gray-300">{percentage}</td>
+                                                    </tr>
+
+                                                    {/* Row for Description, displayed only if there are descriptions */}
+                                                    {feedbackReport
+                                                        .filter(answer => answer.answerText === answerText)
+                                                        .map(filteredAnswer => (
+                                                            <>
+                                                                {/* Check if there are descriptions for the answer */}
+                                                                {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
+                                                                    <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
+                                                                        <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
+                                                                            <strong>Description:</strong> {filteredAnswer.description}
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </>
+                                                        ))}
+                                                </>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
-                    )}
-
-                    {/* For regular (non-open-ended) questions */}
-                    {question.questionType !== "open-ended" && (
-                        <table className="border border-gray-300 text-left text-sm">
-                            <thead className="bg-gray-200">
-                                <tr>
-                                    <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
-                                    <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
-                                    <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
-                                    // Filter descriptions for the current answer
-                                    feedbackReport
-                                        .filter((answer) => answer.answerText === answerText)
-                                        .map((filteredAnswer) => filteredAnswer.description);
-
-                                    return (
-                                        <>
-                                            {/* Row for Answer, Responses, and Percentage */}
-                                            <tr key={answerText} className="hover:bg-gray-50">
-                                                <td className="p-3 border-b border-gray-300">{answerText}</td>
-                                                <td className="p-3 border-b border-gray-300">{count}</td>
-                                                <td className="p-3 border-b border-gray-300">{percentage}</td>
-                                            </tr>
-
-                                            {/* Row for Description, displayed only if there are descriptions */}
-                                            {feedbackReport
-                                                .filter((answer) => answer.answerText === answerText)
-                                                .map((filteredAnswer) => (
-                                                    <>
-                                                        {/* Check if there are descriptions for the answer */}
-                                                        {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
-                                                            <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
-                                                                <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
-                                                                    <strong>Description:</strong> {filteredAnswer.description}
-                                                                </td>
-                                                            </tr>
-                                                        )}
-                                                    </>
-                                                ))}
-                                        </>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    )}
+                    ))}
                 </div>
             ))}
-
+                </div>
+}
 
 
             {/* Conditionally render buttons only if feedback report is available */}

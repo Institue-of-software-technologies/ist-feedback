@@ -2,9 +2,9 @@ import { ClassTime } from "@/db/models/ClassTime";
 import { Course } from "@/db/models/Course";
 import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
-import { Trainer } from "@/db/models/Trainer";
 import { Module } from "@/db/models/Module";
 import { NextResponse } from "next/server";
+import { User } from "@/db/models/User";
 
 export async function GET() {
   try {
@@ -14,9 +14,9 @@ export async function GET() {
 
       include: [
         {
-          model: Trainer,
+          model: User,
           as: "trainer",
-          attributes: ["trainerName"],
+          attributes: ["username"],
           include: [
             {
               model: Course,

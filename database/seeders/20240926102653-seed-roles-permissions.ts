@@ -9,6 +9,7 @@ export default {
       SUPER_ADMIN = 'super_admin',
       ADMIN = 'admin',
       STUDENT = 'student',
+      TRAINER = 'trainer',
     }
 
     enum Permissions {
@@ -91,6 +92,7 @@ export default {
       VIEW_FEEDBACKS = 'view_feedbacks',
 
       MANAGE_PROFILE='manage_profile',
+      MANAGE_FEEDBACK_QUESTIONS= 'manage_feedback_questions',
     }
 
     // Hash passwords
@@ -111,6 +113,11 @@ export default {
       },
       {
         roleName: Roles.STUDENT,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        roleName: Roles.TRAINER,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -228,6 +235,7 @@ export default {
       //profile_permissions
       { roleId: 1, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 2, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 62, createdAt: new Date(), updatedAt: new Date() },
 ]);
 
 

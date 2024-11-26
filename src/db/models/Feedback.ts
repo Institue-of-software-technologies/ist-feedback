@@ -1,10 +1,10 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from "../db_connection";
-import { Trainer } from './Trainer';
 import { ClassTime } from './ClassTime';
 import { Module } from './Module';
 import { Intake } from './Intake';
 import { FeedbackAnswer } from './FeedbackAnswer';
+import { User } from './User';
 
 export class Feedback extends Model {
   id!: number;
@@ -16,7 +16,7 @@ export class Feedback extends Model {
   tokenStartTime!: Date;
   tokenExpiration!: Date;
   
-  trainer?: Trainer;
+  trainer?: User;
   // intake?: Intake; // Add this manually for TypeScript to recognize the association
   classTime?: ClassTime;
   module?: Module;
@@ -33,7 +33,7 @@ Feedback.init({
   trainerId: {
     type: DataTypes.INTEGER,
     references: {
-      model: Trainer,
+      model: User,
       key: 'id',
     },
     onUpdate: 'CASCADE',
@@ -85,7 +85,7 @@ Feedback.init({
   timestamps: true,
 });
 
-Feedback.belongsTo(Trainer, {
+Feedback.belongsTo(User, {
   foreignKey: "trainerId",
   as: "trainer", 
 });
