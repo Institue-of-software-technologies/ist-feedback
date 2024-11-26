@@ -1,9 +1,10 @@
 "use client"
 import { useState } from "react";
-import { ToastContainer,toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import api from "../../../../lib/axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import 'react-toastify/dist/ReactToastify.css';
+import { showToast } from "@/components/ToastMessage";
 
 export default function ResetPassword(){
     const [isLoading, setIsLoading] = useState(false); // Add loading state
@@ -22,13 +23,13 @@ export default function ResetPassword(){
 
         const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
         if (!passwordRegex.test(newPassword)) {
-            toast.error("Password must be at least 8 characters long, contain uppercase, lowercase, a digit, and a special character.", { position: "top-right", autoClose: 4000 });
+            showToast.error("Password must be at least 8 characters long, contain uppercase, lowercase, a digit, and a special character.", { position: "top-right", autoClose: 4000 });
             setIsLoading(false);
             return;
           }
         // Check if the passwords match
         if (newPassword !== confirmPassword) {
-            toast.error("Passwords do not match!", { position: "top-right", autoClose: 3000 });
+            showToast.error("Passwords do not match!");
             setIsLoading(false);
             return; // Stop the submission if passwords don't match
         }
@@ -37,16 +38,16 @@ export default function ResetPassword(){
             const response = await api.post('/auth/reset-password', { token, email, newPassword });
 
             if (response.status === 200) {
-                toast.success(response.data.message, { position: "top-right", autoClose: 3000 });
+              showToast.success(response.data.message,);
                 setTimeout(() => {
                     router.push('/login');
                 }, 3000);
             } else {
-                toast.error(response.data.message, { position: "top-right", autoClose: 3000 });
+              showToast.error(response.data.message,);
             }
         } catch (error) {
             console.log(error);
-            toast.error('Invalid email or server error', { position: "top-right", autoClose: 3000 });
+          showToast.error('Invalid email or server error');
         } finally {
             setIsLoading(false);
         }

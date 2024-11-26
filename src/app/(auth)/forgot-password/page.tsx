@@ -1,50 +1,51 @@
 "use client"
 import { useState } from "react";
-import { ToastContainer,toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import api from "../../../../lib/axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
+import { showToast } from "@/components/ToastMessage";
 
-export default function ForgotPassword(){
-    const [isLoading, setIsLoading] = useState(false); // Add loading state
-    const [email, setEmail] = useState('');
-    const router = useRouter();
+export default function ForgotPassword() {
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [email, setEmail] = useState('');
+  const router = useRouter();
 
-    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsLoading(true); // Start loading when the form is submitted
-    
-        try {
-            const response = await api.post('/auth/forgot-password', { email });
-    
-            // Correct condition for status check
-            if (response.status === 200) {
-                toast.success(response.data.message, { position: "top-right", autoClose: 3000 });
-    
-                // Redirect after showing success message
-                setTimeout(() => {
-                    router.push('/login');
-                }, 3000);  // Delay of 3 seconds for toast to show before redirect
-            } else {
-                toast.error(response.data.message, { position: "top-right", autoClose: 3000 });
-            }
-        } catch (error) {
-            // Handle invalid email or other errors
-            toast.error('Invalid email or server error', { position: "top-right", autoClose: 3000 });
-            console.log(error)
-        } finally {
-            setIsLoading(false); // Stop loading once the request is done
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true); // Start loading when the form is submitted
 
-    return(
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-       <ToastContainer />
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+
+      // Correct condition for status check
+      if (response.status === 200) {
+        showToast.success(response.data.message, { position: "top-right", autoClose: 3000 });
+
+        // Redirect after showing success message
+        setTimeout(() => {
+          router.push('/login');
+        }, 3000);  // Delay of 3 seconds for toast to show before redirect
+      } else {
+        showToast.error(response.data.message, { position: "top-right", autoClose: 3000 });
+      }
+    } catch (error) {
+      // Handle invalid email or other errors
+      showToast.error('Invalid email or server error', { position: "top-right", autoClose: 3000 });
+      console.log(error)
+    } finally {
+      setIsLoading(false); // Stop loading once the request is done
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <ToastContainer />
       <div className="bg-white shadow-md rounded-lg p-8 max-w-sm w-full">
         <div className="text-center">
-        
-        
-        <h2 className="mt-4 border-b-2 border-red-600 pb-1 mx-auto w-fit text-black">
+
+
+          <h2 className="mt-4 border-b-2 border-red-600 pb-1 mx-auto w-fit text-black">
             <b>Forgot</b> your password?
           </h2>
 
@@ -111,5 +112,5 @@ export default function ForgotPassword(){
         </form>
       </div>
     </div>
-    )
+  )
 }
