@@ -532,6 +532,8 @@ export default function FeedbackQuestionID() {
             )}
 
             {/* Render each question and its responses, grouped by question type */}
+            {questions.length > 0 &&
+            <div>
             {['open-ended', 'closed-ended', 'rating'].map(questionType => (
                 <div key={questionType} className="mb-8">
                     <h2 className="text-xl font-semibold mb-2">{questionType} Questions</h2>
@@ -611,7 +613,8 @@ export default function FeedbackQuestionID() {
                     ))}
                 </div>
             ))}
-
+                </div>
+}
 
 
             {/* Conditionally render buttons only if feedback report is available */}
