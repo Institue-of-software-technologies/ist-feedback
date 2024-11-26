@@ -79,6 +79,11 @@ const FeedBackManagement: React.FC = () => {
     }
   };
 
+  const handleView = (feedback: Feedback) => {
+    showToast.info('Redirecting to View Feedback Report...');
+    router.push(`/dashboard/feedback-reports/${feedback.id}`);
+  };
+
   // Handle feedback editing
   const handleEdit = (feedback: Feedback) => {
     showToast.info('Redirecting to edit Feedback...');
@@ -146,6 +151,8 @@ const FeedBackManagement: React.FC = () => {
           onSearch={handleSearch}
           onEdit={user && user.permissions.includes('update_feedbacks') ? handleEdit : undefined}
           onDelete={user && user.permissions.includes('delete_feedbacks') ? handleDelete : undefined}
+          onView={user && user.permissions.includes('view_feedback_results') ? handleView : undefined}
+
         />
       )}
     </div>

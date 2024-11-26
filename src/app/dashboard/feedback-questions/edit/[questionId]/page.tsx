@@ -261,13 +261,13 @@ const EditQuestion = () => {
               <label className="mr-2">Maximum Rating:</label>
               <input
                 type="number"
-                value={formData.maxRating || 5}
+                value={formData.maxRating || 10}
                 min={1}
                 max={5}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    maxRating: parseInt(e.target.value, 10) || 5,
+                    maxRating: parseInt(e.target.value, 10) || 10,
                   })
                 }
                 className="border p-2 w-20"

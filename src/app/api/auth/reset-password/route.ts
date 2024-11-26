@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     await passwordReset.destroy();
 
     // Return a success response after updating the password
-    return NextResponse.json({ message: 'Password reset successful' }, { status: 200 });
+    return NextResponse.json({ message: 'Password reset successfully' }, { status: 200 });
   
   } catch (error) {
     console.error(error);

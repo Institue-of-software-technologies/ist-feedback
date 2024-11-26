@@ -20,7 +20,6 @@ import {
 import { VscFeedback } from "react-icons/vsc";
 import { PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
-import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,8 +43,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false); // State to manage sidebar visibility
   const [menuOpen, setMenuOpen] = useState<boolean>(false); // State to menu visibility
   const [loggedInUser] = useState<string | null>(user?.username ?? null);
-  
- 
+
+
   // Function to handle logout
   const handleLogout = async () => {
     try {
@@ -143,16 +142,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       sideIcon: <FaUserLock size={'30px'} />,
       createLink: '/dashboard/permissions/create',
     },
-    {
-      name: 'Trainer',
-      permission: 'manage_trainers',
-      viewLabel: 'View Trainers',
-      createLabel: 'Create Trainer',
-      viewLink: '/dashboard/trainers',
-      icon: <FaUsers size={'40px'} />,
-      sideIcon: <FaUsers size={'30px'} />,
-      createLink: '/dashboard/trainers/create',
-    },
+    // {
+    //   name: 'Trainer',
+    //   permission: 'manage_trainers',
+    //   viewLabel: 'View Trainers',
+    //   createLabel: 'Create Trainer',
+    //   viewLink: '/dashboard/trainers',
+    //   icon: <FaUsers size={'40px'} />,
+    //   sideIcon: <FaUsers size={'30px'} />,
+    //   createLink: '/dashboard/trainers/create',
+    // },
     {
       name: "Feedback Questions",
       permission: "manage_feedback_questions",
@@ -173,16 +172,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       sideIcon: <VscFeedback size={"30px"} />,
       createLink: "/dashboard/feedback/create",
     },
-    {
-      name: 'Feedback Reports',
-      permission: 'send_feedback_reports',
-      viewLabel: 'View Feedback Reports',
-      createLabel: 'Send Feedback Report',
-      viewLink: '/dashboard/feedback-reports/',
-      icon: <SiGoogleforms size={'40px'} />,
-      sideIcon: <SiGoogleforms size={'30px'} />,
-      createLink: '/dashboard/feedback-reports/send',
-    },
+    // {
+    //   name: 'Feedback Reports',
+    //   permission: 'send_feedback_reports',
+    //   viewLabel: 'View Feedback Reports',
+    //   createLabel: 'Send Feedback Report',
+    //   viewLink: '/dashboard/feedback-reports/',
+    //   icon: <SiGoogleforms size={'40px'} />,
+    //   sideIcon: <SiGoogleforms size={'30px'} />,
+    //   createLink: '/dashboard/feedback-reports/send',
+    // },
     {
       name: 'My Profile',
       permission: 'profile',
@@ -363,17 +362,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
                       role="menu"
                       aria-labelledby="options-menu"
                     >
-                        <label
-                          className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
-                        >
-                          <div className="flex items-center">
-                            <span className="m-1"><RiUserLine size={20}/></span>
-                            <span className="m-1">{loggedInUser}</span>
-                          </div>
-                        </label>
+                      <label
+                        className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
+                      >
+                        <div className="flex items-center">
+                          <span className="m-1"><RiUserLine size={20} /></span>
+                          <span className="m-1">{loggedInUser}</span>
+                        </div>
+                      </label>
                       {menuItems.map((options) => (
                         <label
-                          onClick={() =>{ handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen)}}
+                          onClick={() => { handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen) }}
                           key={options.name}
                           className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
                         >
@@ -384,7 +383,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
                         </label>
                       ))}
                       <label
-                        onClick={() =>{ handleLogout(); setMenuOpen(!menuOpen)}}
+                        onClick={() => { handleLogout(); setMenuOpen(!menuOpen) }}
                         className="flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                       >
                         <div className="flex items-center">
