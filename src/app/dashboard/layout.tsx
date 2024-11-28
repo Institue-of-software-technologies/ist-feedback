@@ -33,9 +33,10 @@ type DashboardLayoutProps = {
   overview: React.ReactNode;
   analysis: React.ReactNode;
   analytics: React.ReactNode;
+  recentactivities: React.ReactNode;
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analysis, analytics }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analysis, analytics, recentactivities }) => {
   const { user } = useUser();
   const router = useRouter(); // Router instance for programmatic navigation
   const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
@@ -442,6 +443,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                 {activeTab === 'Dashboard' && (
                   <div>
                     {analytics}
+                  </div>
+                )}                
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {recentactivities}
                   </div>
                 )}
                 {/* Render the content for viewing */}

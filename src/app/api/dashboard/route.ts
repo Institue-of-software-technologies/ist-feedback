@@ -5,18 +5,20 @@ import api from "../../../../lib/axios";
 interface Course {
   id: number;
   courseName: string;
+}
+
+interface Role {
+  id: number;
+  roleName: string;
+}
+
+interface Permission{
+  id: number;
+  permissionName: string;
   createdAt: string;
   updatedAt: string;
 }
 
-interface User {
-  id: number;
-  username: string;
-  role: {
-    id: number;
-    roleName: string;
-  };
-}
 
 interface Intake {
   id: number;
@@ -47,12 +49,14 @@ interface DashboardResponse {
   totalIntakes: number;
   totalModules: number;
   totalClassTimes: number;
-  totalUsers: number;
+  totalRoles: number;
+  totalPermissions: number;
   courses: Course[];
   intakes: Intake[];
   modules: Module[];
   classTimes: ClassTime[];
-  users: User[];
+  roles: Role[];
+  permissions: Permission[];
 }
 
 export async function GET() {
@@ -63,16 +67,16 @@ export async function GET() {
       intakesResponse,
       modulesResponse,
       classTimesResponse,
-      usersResponse,
+      rolesResponse,
+      permissionsResponse
     ] = await Promise.all([
       api.get<{ course: Course[] }>("/courses"),
       api.get<{ intake: Intake[] }>("/intakes"),
       api.get<Module[]>("/modules"),
       api.get<{ classTime: ClassTime[] }>("/class-times"),
-      api.get<{ users: User[] }>("/users"),
+      api.get<Role[] >("/roles"),
+      api.get< Permission[] >("/permissions"),
     ]);
-
-    const users = usersResponse.data?.users || [];
 
     // Compute counts and structure the response
     const response: DashboardResponse = {
@@ -80,12 +84,14 @@ export async function GET() {
       totalIntakes: intakesResponse.data.intake.length,
       totalModules: modulesResponse.data.length,
       totalClassTimes: classTimesResponse.data.classTime.length,
-      totalUsers: users.length,
+      totalRoles: rolesResponse.data.length,
+      totalPermissions: permissionsResponse.data.length,
       courses: coursesResponse.data.course,
       intakes: intakesResponse.data.intake,
       modules: modulesResponse.data,
       classTimes: classTimesResponse.data.classTime,
-      users,
+      roles: rolesResponse.data,
+      permissions: permissionsResponse.data,
     };
 
     // Return the structured response

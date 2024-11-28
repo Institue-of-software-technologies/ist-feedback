@@ -1,51 +1,129 @@
-import { FaChartLine, FaChartPie, FaEye } from 'react-icons/fa';
+"use client";
+import React, { useEffect, useState } from "react";
+import { Bar, Pie } from "react-chartjs-2";
+import axios from "axios";
+import {
+    Chart as ChartJS,
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend,
+} from "chart.js";
+import Loading from "@/app/loading";
 
-const AnalyticsPage = () => {
+// Register Chart.js components
+ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+
+const FeedbackDashboard = () => {
+    const [feedbackData, setFeedbackData] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const fetchFeedbackReports = async () => {
+            try {
+                const response = await axios.get("/api/analytics");
+                setFeedbackData(response.data.feedbackReports);
+            } catch (error) {
+                console.error("Error fetching feedback reports:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFeedbackReports();
+    }, []);
+
+    // Process data for visualizations
+    const processChartData = () => {
+        const questionCounts: { [key: string]: number } = {};
+        const feedbackPerTrainer: { [trainer: string]: number } = {};
+
+        feedbackData.forEach((report) => {
+            // Aggregate question types
+            const questionType = report.question.questionType;
+            questionCounts[questionType] = (questionCounts[questionType] || 0) + 1;
+
+            // Aggregate feedback per trainer
+            const trainerName = report.feedback.trainer.username;
+            feedbackPerTrainer[trainerName] = (feedbackPerTrainer[trainerName] || 0) + 1;
+        });
+
+        return { questionCounts, feedbackPerTrainer };
+    };
+
+    const { questionCounts, feedbackPerTrainer } = processChartData();
+
+    // Data for bar chart (feedback by question type)
+    const barChartData = {
+        labels: Object.keys(questionCounts),
+        datasets: [
+            {
+                label: "Number of Questions",
+                data: Object.values(questionCounts),
+                backgroundColor: ["rgba(75, 192, 192, 0.6)", "rgba(255, 99, 132, 0.6)"],
+            },
+        ],
+    };
+
+    // Data for pie chart (feedback by trainer)
+    const pieChartData = {
+        labels: Object.keys(feedbackPerTrainer),
+        datasets: [
+            {
+                label: "Feedback to Trainer",
+                data: Object.values(feedbackPerTrainer),
+                backgroundColor: [
+                    "rgba(75, 192, 192, 0.6)",  // Teal
+                    "rgba(255, 99, 132, 0.6)",  // Red
+                    "rgba(255, 206, 86, 0.6)",  // Yellow
+                    "rgba(54, 162, 235, 0.6)",  // Blue
+                    "rgba(153, 102, 255, 0.6)", // Purple
+                    "rgba(255, 159, 64, 0.6)",  // Orange
+                    "rgba(201, 203, 207, 0.6)", // Grey
+                    "rgba(66, 135, 245, 0.6)",  // Light Blue
+                    "rgba(99, 255, 132, 0.6)",  // Lime Green
+                    "rgba(255, 123, 172, 0.6)", // Pink
+                    "rgba(123, 99, 255, 0.6)",  // Violet
+                    "rgba(99, 191, 255, 0.6)",  // Sky Blue
+                    "rgba(192, 75, 192, 0.6)",  // Magenta
+                    "rgba(255, 223, 99, 0.6)",  // Gold
+                    "rgba(72, 61, 139, 0.6)",   // Dark Slate Blue
+                    "rgba(50, 205, 50, 0.6)",   // Lime
+                    "rgba(255, 127, 80, 0.6)",  // Coral
+                    "rgba(218, 112, 214, 0.6)", // Orchid
+                    "rgba(144, 238, 144, 0.6)", // Light Green
+                    "rgba(173, 216, 230, 0.6)", // Light Blue
+                ],
+
+            },
+        ],
+    };
+
+    if (loading) {
+        return <Loading />;
+    }
+
     return (
-        <div className="bg-white shadow-lg p-6 rounded-lg">
-            <h2 className="text-3xl font-bold mb-6">Analytics</h2>
+        <div className="container mx-auto p-2">
+            <h1 className="text-3xl font-bold mb-4">Feedback Analytics</h1>
 
-            {/* Key Analytics Sections */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-gray-100 p-4 rounded flex items-center">
-                    <FaChartLine className="text-blue-500 text-3xl mr-4" />
-                    <div>
-                        <h3 className="text-lg font-semibold">Feedback Trends</h3>
-                        <p className="text-base">Analyze trends from student feedback over time.</p>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Feedback by Question Type */}
+                <div className="bg-white shadow p-4 rounded">
+                    <h2 className="text-lg font-bold mb-2">Feedback by Question Type</h2>
+                    <Bar data={barChartData} />
                 </div>
-                <div className="bg-gray-100 p-4 rounded flex items-center">
-                    <FaChartPie className="text-green-500 text-3xl mr-4" />
-                    <div>
-                        <h3 className="text-lg font-semibold">Student Progress</h3>
-                        <p className="text-base">Track and visualize student progress with performance metrics.</p>
-                    </div>
-                </div>
-            </div>
 
-            {/* Action Buttons for Reports */}
-            <div className="bg-gray-100 p-4 rounded mb-6">
-                <h3 className="text-lg font-semibold mb-4">Generate Analytics Reports</h3>
-                <div className="space-y-4">
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center">
-                        <FaEye className="mr-2" /> View Feedback Insights
-                    </button>
-                    <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center">
-                        <FaEye className="mr-2" /> View Progress Reports
-                    </button>
-                </div>
-            </div>
-
-            {/* Visualizations Placeholder */}
-            <div className="bg-gray-100 p-4 rounded">
-                <h3 className="text-lg font-semibold mb-4">Recent Analytics</h3>
-                <div className="text-center text-gray-500">
-                    {/* Placeholder for charts/graphs */}
-                    <p>Charts and visualizations will appear here.</p>
+                {/* Feedback by Trainer */}
+                <div className="bg-white shadow p-4 rounded">
+                    <h2 className="text-lg font-bold mb-2">Feedback by Trainer</h2>
+                    <Pie data={pieChartData} />
                 </div>
             </div>
         </div>
     );
 };
 
-export default AnalyticsPage;
+export default FeedbackDashboard;
