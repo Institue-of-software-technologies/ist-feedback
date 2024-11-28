@@ -20,7 +20,6 @@ import {
 import { VscFeedback } from "react-icons/vsc";
 import { PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
-// import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -32,11 +31,11 @@ import { showToast } from '@/components/ToastMessage';
 type DashboardLayoutProps = {
     children: React.ReactNode;
     overview: React.ReactNode;
-    reports: React.ReactNode;
+    analysis: React.ReactNode;
     analytics: React.ReactNode;
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analytics }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analysis, analytics }) => {
     const { user } = useUser();
     const router = useRouter(); // Router instance for programmatic navigation
     const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
@@ -143,19 +142,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
             sideIcon: <FaUserLock size={'30px'} />,
             createLink: '/dashboard/permissions/create',
         },
-        {
-            name: 'Trainer',
-            permission: 'manage_trainers',
-            viewLabel: 'View Trainers',
-            createLabel: 'Create Trainer',
-            viewLink: '/dashboard/trainers',
-            icon: <FaUsers size={'40px'} />,
-            sideIcon: <FaUsers size={'30px'} />,
-            createLink: '/dashboard/trainers/create',
-        },
+        // {
+        //   name: 'Trainer',
+        //   permission: 'manage_trainers',
+        //   viewLabel: 'View Trainers',
+        //   createLabel: 'Create Trainer',
+        //   viewLink: '/dashboard/trainers',
+        //   icon: <FaUsers size={'40px'} />,
+        //   sideIcon: <FaUsers size={'30px'} />,
+        //   createLink: '/dashboard/trainers/create',
+        // },
         {
             name: "Feedback Questions",
-            permission: "manage_feedback",
+            permission: "manage_feedback_questions",
             viewLabel: "View Feedback Question",
             createLabel: "Create Feedback Question",
             viewLink: "/dashboard/feedback-questions",
@@ -430,15 +429,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                             <div>
                                 {activeTab === 'Dashboard' && (
                                     <div>
+                                        {analysis}
+                                    </div>
+                                )}
+                                {activeTab === 'Dashboard' && (
+                                    <div>
                                         {overview}
                                     </div>
                                 )}
 
-                                {/* {activeTab === 'Dashboard' && (
-                  <div>
-                    {reports}
-                  </div>
-                )} */}
 
                                 {activeTab === 'Dashboard' && (
                                     <div>

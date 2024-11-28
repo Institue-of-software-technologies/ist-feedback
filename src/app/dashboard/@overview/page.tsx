@@ -1,54 +1,104 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaClipboardList } from "react-icons/fa";
-import { RecentActivities } from '@/types';
+import axios from "axios";
+import { FaGraduationCap, FaUsers, FaBook, FaClock } from "react-icons/fa"; // FontAwesome icons
+
+// Skeleton loader for cards
+const SkeletonCard = () => (
+  <div className="rounded-lg shadow-lg p-6 bg-gray-300 animate-pulse">
+    <div className="flex items-center justify-between">
+      <div className="h-3 w-3 bg-gray-400 rounded-full"></div>
+      <div className="text-right">
+        <div className="h-4 bg-gray-400 rounded w-32 mb-2"></div>
+        <div className="h-6 bg-gray-400 rounded w-24"></div>
+      </div>
+    </div>
+  </div>
+);
 
 const OverviewPage = () => {
-  const [recentActivities, setRecentActivities] = useState<RecentActivities[]>([]);
+  // State variables for counts
+  const [totalCourses, setTotalCourses] = useState<number | null>(null);
+  const [totalIntakes, setTotalIntakes] = useState<number | null>(null);
+  const [totalModules, setTotalModules] = useState<number | null>(null);
+  const [totalClassTimes, setTotalClassTimes] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Add loading state
 
   useEffect(() => {
-    // Fetch recent activities
-    const fetchRecentActivities = async () => {
+    const fetchCounts = async () => {
       try {
-        const response = await fetch("/api/recent-activities");
-        if (response.ok) {
-          const data = await response.json();
-          setRecentActivities(data);
-        } else {
-          console.error("Failed to fetch recent activities");
-        }
+        // Fetch data from the dashboard API
+        const response = await axios.get("/api/dashboard");
+        setTotalCourses(response.data.totalCourses);
+        setTotalIntakes(response.data.totalIntakes);
+        setTotalModules(response.data.totalModules);
+        setTotalClassTimes(response.data.totalClassTimes);
       } catch (error) {
-        console.error("Failed to fetch recent activities", error);
+        console.error("Error fetching counts:", error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
-    fetchRecentActivities();
+    fetchCounts();
   }, []);
 
+  // Card data configuration
+  const cards = [
+    {
+      title: "Total Courses",
+      value: totalCourses,
+      icon: <FaGraduationCap size={40} className="text-indigo-500" />,
+      bgColor: "bg-gradient-to-r from-indigo-200 via-indigo-400 to-indigo-600",
+    },
+    {
+      title: "Total Intakes",
+      value: totalIntakes,
+      icon: <FaUsers size={40} className="text-green-500" />,
+      bgColor: "bg-gradient-to-r from-green-200 via-green-400 to-green-600",
+    },
+    {
+      title: "Total Modules",
+      value: totalModules,
+      icon: <FaBook size={40} className="text-yellow-500" />,
+      bgColor: "bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-600",
+    },
+    {
+      title: "Total Class Times",
+      value: totalClassTimes,
+      icon: <FaClock size={40} className="text-red-500" />,
+      bgColor: "bg-gradient-to-r from-red-200 via-red-400 to-red-600",
+    },
+  ];
+
   return (
-    <div className="bg-white shadow-lg p-6 rounded-lg">
-      <h2 className="text-3xl font-bold mb-6">Overview</h2>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-semibold mb-8 text-center">Dashboard Overview</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className={`rounded-lg shadow-lg p-6 ${card.bgColor} text-white transform hover:scale-105 transition-transform`}
+          >
+            <div className="flex items-center justify-between">
+              {card.icon}
 
-      {/* Recent Activities Section */}
-      <div className="bg-gray-100 p-4 rounded">
-        <h3 className="text-lg font-semibold mb-4 flex items-center">
-          <FaClipboardList className="text-orange-500 text-2xl mr-2" />
-          Recent Activities
-        </h3>
-
-        {/* If no recent activities, show a message */}
-        {recentActivities.length === 0 ? (
-          <p>No recent activity</p>
-        ) : (
-          <ul className="list-disc list-inside">
-            {recentActivities.map((activity) => (
-              <li key={activity.id}>
-                {activity.description}
-              </li>
-            ))}
-          </ul>
-        )}
+              <div className="text-right">
+                <h2 className="text-lg font-semibold">{card.title}</h2>
+                <p className="text-3xl font-bold">
+                  {loading ? (
+                    <SkeletonCard />
+                  ) : card.value !== null ? (
+                    card.value
+                  ) : (
+                    "No Data"
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
