@@ -31,11 +31,12 @@ import { showToast } from '@/components/ToastMessage';
 type DashboardLayoutProps = {
   children: React.ReactNode;
   overview: React.ReactNode;
-  reports: React.ReactNode;
+  analysis: React.ReactNode;
   analytics: React.ReactNode;
+  recentactivities: React.ReactNode;
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, reports, analytics }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analysis, analytics, recentactivities }) => {
   const { user } = useUser();
   const router = useRouter(); // Router instance for programmatic navigation
   const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
@@ -429,19 +430,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
               <div>
                 {activeTab === 'Dashboard' && (
                   <div>
+                    {analysis}
+                  </div>
+                )}
+                {activeTab === 'Dashboard' && (
+                  <div>
                     {overview}
                   </div>
                 )}
 
-                {activeTab === 'Dashboard' && (
-                  <div>
-                    {reports}
-                  </div>
-                )}
 
                 {activeTab === 'Dashboard' && (
                   <div>
                     {analytics}
+                  </div>
+                )}                
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {recentactivities}
                   </div>
                 )}
                 {/* Render the content for viewing */}
