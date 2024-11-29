@@ -16,8 +16,20 @@ import Loading from "@/app/loading";
 // Register Chart.js components
 ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
+// Define types for feedback report data
+interface FeedbackReport {
+    question: {
+        questionType: string;  // Type of the question (e.g., "Multiple Choice")
+    };
+    feedback: {
+        trainer: {
+            username: string;  // Trainer's username
+        };
+    };
+}
+
 const FeedbackDashboard = () => {
-    const [feedbackData, setFeedbackData] = useState<any[]>([]);
+    const [feedbackData, setFeedbackData] = useState<FeedbackReport[]>([]);  // Specify the type here
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -96,7 +108,6 @@ const FeedbackDashboard = () => {
                     "rgba(144, 238, 144, 0.6)", // Light Green
                     "rgba(173, 216, 230, 0.6)", // Light Blue
                 ],
-
             },
         ],
     };

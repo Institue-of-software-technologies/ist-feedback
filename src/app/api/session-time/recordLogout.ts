@@ -9,15 +9,20 @@ export async function recordLogout(userId: string | number): Promise<void> {
       throw new Error("Session token not found. User is not logged in.");
     }
 
-    const { id: userId } = await decrypt(sessionToken); // Extract the userId from the token
+    const { id: decryptedUserId } = await decrypt(sessionToken); // Extract the userId from the token
 
-    if (!userId) {
+    if (!decryptedUserId) {
       throw new Error("Invalid session token. Cannot retrieve userId.");
+    }
+
+    // Use userId passed into the function (for example, log or validate it)
+    if (userId !== decryptedUserId) {
+      throw new Error("User ID mismatch. The user trying to log out does not match the token.");
     }
 
     // Find the active session for this user
     const session = await Session.findOne({
-      where: { userId, logoutTime: null },
+      where: { userId: decryptedUserId, logoutTime: null },
       order: [["loginTime", "DESC"]],
     });
 

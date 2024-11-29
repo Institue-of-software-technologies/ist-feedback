@@ -7,9 +7,9 @@ import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
 import { User } from "@/db/models/User";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const feedbackReports = await FeedbackAnswer.findAll({
       include: [
