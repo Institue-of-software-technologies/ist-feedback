@@ -22,7 +22,7 @@ const CourseManagement: React.FC = () => {
 
   // Fetch course from your API
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchCourses = async () => {
       try {
         const response = await api.get('/courses', {
           method: 'GET',
@@ -38,7 +38,7 @@ const CourseManagement: React.FC = () => {
       }
     };
 
-    fetchUsers();
+    fetchCourses();
   }, []);
 
   // Handle course deletion
