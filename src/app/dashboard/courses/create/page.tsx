@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/ToastMessage";
+import Loading from '../../loading';
 
 interface FormData {
   courseName: string;
@@ -14,6 +15,12 @@ interface FormData {
 
 const NewCourseForm: React.FC = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(()=>{
+    setLoading(false);
+  },[])
+
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/courses", data);
@@ -25,12 +32,15 @@ const NewCourseForm: React.FC = () => {
     } catch (error) {
       console.error("Failed to create courses", error);
       showToast.error("Failed to create courses");
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   const inputs = [
-    { label: "courseName", type: "text" },
+    { label: "courseName", type: "text" }
   ];
+  if (loading) return <Loading />;
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">

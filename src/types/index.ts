@@ -27,13 +27,6 @@ export interface Module {
   updatedAt: string;
 }
 
-export interface ClassTime {
-  id: number;
-  classTime: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface Feedback {
   id: number;
   trainerId: number;
@@ -51,6 +44,14 @@ export interface Feedback {
       courseName: string;
     };
   };
+  courseTrainer: {
+    id: number,
+    trainerId: number,
+    courseId: number,
+    trainers_users: {
+      username: string
+    }
+  },
   intake: {
     intakeYear: string;
     id: number;
@@ -81,8 +82,6 @@ export interface Trainer {
 export interface ClassTime {
   id: number;
   classTime: string;
-  classTimeStart: string;
-  classTimeEnd: string;
 }
 
 export interface Module {
@@ -99,14 +98,21 @@ export interface User {
   roleId: number;
   createdAt: string;
   updatedAt: string;
-  role: {
+  roleUsers: {
     id: number;
     roleName: string;
   }; // Add role object here
-  course: {
-    id: number;
-    courseName: string;
-  }; // Add role object here
+  trainer_courses: [
+    {
+      id: number;
+      trainerId: number;
+      courseId: number;
+      course: {
+        id: number;
+        courseName: string;
+      }
+    }
+  ]
 }
 
 export interface FeedbackQuestion {
@@ -118,6 +124,15 @@ export interface FeedbackQuestion {
   maxRating?: number;
 }
 
+export interface trainer_courses {
+  id: number;
+  trainerId: number;
+  courseId: number;
+  Course: {
+    id: number;
+    courseName: string;
+  }
+}
 export interface FeedbackQuestionSelect {
   id: number;
   questionText: string;

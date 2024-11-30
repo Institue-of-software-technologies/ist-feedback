@@ -61,8 +61,6 @@ const EditClassTime = () => {
 
   const inputs = [
     { label: "classTime", type: "text", value: classTimes?.classTime },
-    { label: "classTimeStart", type: "time", value: classTimes?.classTimeStart },
-    { label: "classTimeEnd", type: "time", value: classTimes?.classTimeEnd }
   ];
 
   return (

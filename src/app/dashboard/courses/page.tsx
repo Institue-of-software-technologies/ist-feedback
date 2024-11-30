@@ -16,7 +16,7 @@ const CourseManagement: React.FC = () => {
   const { user } = useUser();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State to handle delete confirmation
-  const [filteredcourse, setFilteredcourse] = useState<Course[]>([]);  // Holds the filtered users
+  const [filteredCourse, setFilteredCourse] = useState<Course[]>([]);  // Holds the filtered users
   const [search, setSearch] = useState<string>('');
   const router = useRouter();
 
@@ -29,7 +29,7 @@ const CourseManagement: React.FC = () => {
         });
         console.log(response);
         setCourses(response.data.course);
-        setFilteredcourse(response.data.course);
+        setFilteredCourse(response.data.course);
       } catch (err) {
         console.log(err)
         showToast.error('Failed to fetch courses');
@@ -47,7 +47,7 @@ const CourseManagement: React.FC = () => {
       try {
         await api.delete(`/courses/${confirmDelete.id}`);
         setCourses(courses.filter(course => course.id !== confirmDelete.id));
-        setFilteredcourse(filteredcourse.filter(filteredcourse => filteredcourse.id !== confirmDelete.id));
+        setFilteredCourse(filteredCourse.filter(filteredCourse => filteredCourse.id !== confirmDelete.id));
         showToast.success('course deleted successfully');
       } catch (err) {
         console.log(err)
@@ -62,12 +62,12 @@ const CourseManagement: React.FC = () => {
 
     // Filter the course based on the search query
     if (value.trim() === '') {
-      setFilteredcourse(courses);  // Show all if search is empty
+      setFilteredCourse(courses);  // Show all if search is empty
     } else {
       const filtered = courses.filter(course =>
         course.courseName.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredcourse(filtered);
+      setFilteredCourse(filtered);
     }
   };
 
@@ -80,20 +80,20 @@ const CourseManagement: React.FC = () => {
   if (loading) return <Loading />;
 
   const columns = [
-    { header: 'courseName', accessor: 'courseName' }
+    { header: 'courseName', accessor: 'courseName' },
   ];
 
   return (
     <div>
       <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
-      {filteredcourse.length === 0 ? (
+      {filteredCourse.length === 0 ? (
         <div className="text-center p-4">
           <p>No courses available at the moment.</p>
         </div>
       ) : (
         <Table<Course>
           columns={columns}
-          data={filteredcourse}
+          data={filteredCourse}
           onSearch={handleSearch}
           onEdit={user && user.permissions.includes('update_courses') ? handleEdit : undefined}
           onDelete={user && user.permissions.includes('delete_courses') ? handleDelete : undefined}

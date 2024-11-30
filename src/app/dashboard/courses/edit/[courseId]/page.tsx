@@ -57,7 +57,7 @@ const EditCourse = () => {
   if (error) return <div className="text-red-500">{error}</div>;
 
   const inputs = [
-    { label: "courseName", type: "text", value: course?.courseName }
+    { label: "courseName", type: "text", value: course?.courseName || "" }
   ];
 
   return (

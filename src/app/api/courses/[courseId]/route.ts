@@ -10,7 +10,7 @@ interface Context {
 export async function GET(req: NextRequest, context: Context) {
   try {
     const { courseId } = context.params;
-    const course = await Course.findByPk(courseId);
+    const course = await Course.findOne({where: { id: courseId }});
 
     if (!course) {
       return NextResponse.json({ message: 'Course not found' }, { status: 404 });

@@ -4,8 +4,6 @@ import sequelize from "../db_connection";
 export class ClassTime extends Model {
   id!: number;
   classTime!: string ;
-  classTimeStart!: string;
-  classTimeEnd!: string;
 }
 
 ClassTime.init({
@@ -18,15 +16,7 @@ ClassTime.init({
   classTime: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
-  classTimeStart: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  classTimeEnd: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+  }
 }, {
   sequelize,
   modelName: 'ClassTime',

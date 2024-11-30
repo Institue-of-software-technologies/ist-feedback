@@ -30,8 +30,6 @@ const NewClassTimeForm: React.FC = () => {
 
   const inputs = [
     { label: "classTime", type: "text" },
-    { label: "classTimeStart", type: "time" },
-    { label: "classTimeEnd", type: "time" },
   ];
 
   return (

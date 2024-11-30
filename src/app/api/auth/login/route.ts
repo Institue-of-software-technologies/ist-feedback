@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-         message: "login successfull",
+         message: "login successful",
          client
       },
       { status: 200 },

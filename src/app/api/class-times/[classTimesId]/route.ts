@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { classTimesId } = context.params;
-    const { classTime,classTimeEnd,classTimeStart } = await req.json();
+    const { classTime } = await req.json();
 
     const classTimes = await ClassTime.findByPk(classTimesId);
 
@@ -36,8 +36,6 @@ export async function PUT(req: NextRequest, context: Context) {
     }
 
     classTimes.classTime = classTime;
-    classTimes.classTimeStart = classTimeStart;
-    classTimes.classTimeEnd = classTimeEnd;
     await classTimes.save();
 
     return NextResponse.json({ message: 'Class Time updated successfully', classTimes });

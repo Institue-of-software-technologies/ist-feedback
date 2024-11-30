@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { AnswerOption } from '@/db/models/AnswerOption';
 import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";  
-import { User } from '@/db/models/User';
+import { TrainerCourses, User } from "@/db/models/index";
 
 interface Context {
   params: { feedbackId: number };
@@ -19,16 +19,15 @@ export async function GET(req: NextRequest, context: Context) {
       where: { id: feedbackId },
       include: [
         {
-          model: User,
-          as: "trainer",
-          attributes: ["id", "username"],
+          model: TrainerCourses,
+          as: "courseTrainer",
           include: [
             {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
+              model: User,
+              as: "trainers_users",
+              attributes: ["username"],
+            }
+          ]
         },
         {
           model: ClassTime,
@@ -38,7 +37,14 @@ export async function GET(req: NextRequest, context: Context) {
         {
           model: Module,
           as: "module",
-          attributes: ["id", "moduleName"],
+          attributes: ["moduleName"],
+          include: [
+            {
+              model: Course,
+              as: "course",
+              attributes: ["id","courseName"],
+            },
+          ],
         },
         {
           model: Intake,

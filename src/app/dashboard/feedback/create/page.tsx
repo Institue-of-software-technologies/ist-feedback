@@ -6,7 +6,7 @@ import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { ClassTime, FeedbackQuestion, Intake, Module, Trainer } from "@/types";
+import { ClassTime, FeedbackQuestion, Intake, Module, User } from "@/types";
 import { showToast } from "@/components/ToastMessage";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/app/loading";
@@ -17,6 +17,7 @@ interface FormData {
   classTimeId: number;
   moduleId: number;
   questionId: number;
+  courseTrainerId: number;
   tokenStartTime: Date;
   tokenExpiration: Date;
 }
@@ -24,7 +25,7 @@ interface FormData {
 const NewFeedbackForm: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
-  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [trainers, setTrainers] = useState<User[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
@@ -95,10 +96,12 @@ const NewFeedbackForm: React.FC = () => {
     {
       label: "trainerId",
       type: "select",
-      options: trainers.map((trainer) => ({
-        label: `${trainer.username} - ${trainer.course.courseName}`,
-        value: trainer.id,
-      })),
+      options:  trainers.flatMap((trainer) =>
+        trainer.trainer_courses.map((course) => ({
+          label: `${trainer.username} - ${course.course.courseName}`,
+          value: course.id,
+        }))
+      )
     },
     {
       label: "moduleId",
@@ -153,6 +156,7 @@ const NewFeedbackForm: React.FC = () => {
       <ToastContainer />
       <h2 className="text-2xl font-bold mb-4">Create New Feedback - Step {step}</h2>
       <Form<FormData>
+        buttonText={step === 1 ? "Next":"Submit"}
         Input={step === 1 ? step1Inputs : step2Inputs}
         onSubmit={step === 2 ? onSubmit : handleNextStep}
       />
@@ -160,11 +164,6 @@ const NewFeedbackForm: React.FC = () => {
         {step > 1 && (
           <button onClick={handlePrevStep} className="bg-gray-300 text-gray-800 px-4 py-2 rounded">
             Previous
-          </button>
-        )}
-        {step === 1 && (
-          <button onClick={handleNextStep} className="bg-blue-500 text-white px-4 py-2 rounded">
-            Next
           </button>
         )}
       </div>
