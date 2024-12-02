@@ -115,7 +115,7 @@ export async function PUT(req: NextRequest, context: Context) {
 
     // Update feedback fields if the values are provided (null means no change)
     if (trainerId !== null) {
-      feedback.trainerId = trainerId;
+      feedback.courseTrainerId = trainerId;
     }
     if (intakeId !== null) {
       feedback.intakeId = intakeId;

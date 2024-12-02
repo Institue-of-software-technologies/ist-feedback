@@ -16,15 +16,20 @@ interface FeedbackAnswer {
     description: string;
     feedback: {
         id: number;
-        trainer: {
-            email: string;
-            trainerName: string;
+        courseTrainer: {
+            id: number,
+            trainerId: number,
+            courseId: number,
+            trainers_users: {
+                username: string
+                email: string
+            }
+        },
+        module: {
+            moduleName: string;
             course: {
                 courseName: string;
             };
-        };
-        module: {
-            moduleName: string;
         };
         intake: {
             intakeName: string;
@@ -171,11 +176,11 @@ export default function FeedbackQuestionID() {
         };
 
         // Draw general information about the feedback
-        page.drawText(`Trainer: ${feedbackDetails.trainer.trainerName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        page.drawText(`Trainer: ${feedbackDetails.courseTrainer.trainers_users.username}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
         yPosition -= lineSpacing;
         addNewPageIfNeeded();
 
-        page.drawText(`Course: ${feedbackDetails.trainer.course.courseName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        page.drawText(`Course: ${feedbackDetails.module.course.courseName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
         yPosition -= lineSpacing;
         addNewPageIfNeeded();
 
@@ -434,8 +439,8 @@ export default function FeedbackQuestionID() {
         // Send PDF as an email attachment
         sendPDF({
             pdfBytes,
-            receiverEmail: feedbackReport[0].feedback.trainer.email,
-            receiverName: feedbackReport[0].feedback.trainer.trainerName,
+            receiverEmail: feedbackReport[0].feedback.courseTrainer.trainers_users.email,
+            receiverName: feedbackReport[0].feedback.courseTrainer.trainers_users.username,
         });
     };
 
@@ -523,8 +528,8 @@ export default function FeedbackQuestionID() {
             {feedbackReport.length > 0 && (
                 <div className="mb-6 bg-gray-100 p-4 rounded-lg shadow-md">
                     <h1 className="text-4xl font-semibold mb-6">Feedback Report</h1>
-                    <p><strong>Trainer:</strong> {feedbackReport[0].feedback.trainer.trainerName}</p>
-                    <p><strong>Course:</strong> {feedbackReport[0].feedback.trainer.course.courseName}</p>
+                    <p><strong>Trainer:</strong> {feedbackReport[0].feedback.courseTrainer.trainers_users.username}</p>
+                    <p><strong>Course:</strong> {feedbackReport[0].feedback.module.course.courseName}</p>
                     <p><strong>Module:</strong> {feedbackReport[0].feedback.module.moduleName}</p>
                     <p><strong>Intake:</strong> {feedbackReport[0].feedback.intake.intakeName} - {feedbackReport[0].feedback.intake.intakeYear}</p>
                     <p><strong>Class Time:</strong> {feedbackReport[0].feedback.classTime.classTime}</p>
@@ -533,88 +538,88 @@ export default function FeedbackQuestionID() {
 
             {/* Render each question and its responses, grouped by question type */}
             {questions.length > 0 &&
-            <div>
-            {['open-ended', 'closed-ended', 'rating'].map(questionType => (
-                <div key={questionType} className="mb-8">
-                    <h2 className="text-xl font-semibold mb-2">{questionType} Questions</h2>
-                    {questions.filter(question => question.questionType === questionType).map(question => (
-                        <div key={question.id} className="mb-4">
-                            <h3 className="text-lg font-semibold mb-2">Question: {question.questionText}</h3>
+                <div>
+                    {['open-ended', 'closed-ended', 'rating'].map(questionType => (
+                        <div key={questionType} className="mb-8">
+                            <h2 className="text-xl font-semibold mb-2">{questionType} Questions</h2>
+                            {questions.filter(question => question.questionType === questionType).map(question => (
+                                <div key={question.id} className="mb-4">
+                                    <h3 className="text-lg font-semibold mb-2">Question: {question.questionText}</h3>
 
-                            {/* If it's an open-ended question */}
-                            {question.questionType === "open-ended" && (
-                                <div className="p-3 border border-gray-300">
-                                    <strong>Open-Ended Responses:</strong>
-                                    <ul>
-                                        {feedbackReport
-                                            .filter(answer => answer.questionId === question.id)
-                                            .map((answer, index) => (
-                                                <li key={index}>
-                                                    <strong>Response {index + 1}:</strong> {answer.answerText}
-                                                    {answer.description && answer.description.trim() && (
-                                                        <div className="ml-4">
-                                                            <strong>Description:</strong> {answer.description}
-                                                        </div>
-                                                    )}
-                                                </li>
-                                            ))}
-                                    </ul>
-                                </div>
-                            )}
+                                    {/* If it's an open-ended question */}
+                                    {question.questionType === "open-ended" && (
+                                        <div className="p-3 border border-gray-300">
+                                            <strong>Open-Ended Responses:</strong>
+                                            <ul>
+                                                {feedbackReport
+                                                    .filter(answer => answer.questionId === question.id)
+                                                    .map((answer, index) => (
+                                                        <li key={index}>
+                                                            <strong>Response {index + 1}:</strong> {answer.answerText}
+                                                            {answer.description && answer.description.trim() && (
+                                                                <div className="ml-4">
+                                                                    <strong>Description:</strong> {answer.description}
+                                                                </div>
+                                                            )}
+                                                        </li>
+                                                    ))}
+                                            </ul>
+                                        </div>
+                                    )}
 
-                            {/* For regular (non-open-ended) questions */}
-                            {question.questionType !== "open-ended" && (
-                                <table className="border border-gray-300 text-left text-sm">
-                                    <thead className="bg-gray-200">
-                                        <tr>
-                                            <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
-                                            <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
-                                            <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
-                                            // Filter descriptions for the current answer
-                                            feedbackReport
-                                                .filter(answer => answer.answerText === answerText)
-                                                .map(filteredAnswer => filteredAnswer.description);
-
-                                            return (
-                                                <>
-                                                    {/* Row for Answer, Responses, and Percentage */}
-                                                    <tr key={answerText} className="hover:bg-gray-50">
-                                                        <td className="p-3 border-b border-gray-300">{answerText}</td>
-                                                        <td className="p-3 border-b border-gray-300">{count}</td>
-                                                        <td className="p-3 border-b border-gray-300">{percentage}</td>
-                                                    </tr>
-
-                                                    {/* Row for Description, displayed only if there are descriptions */}
-                                                    {feedbackReport
+                                    {/* For regular (non-open-ended) questions */}
+                                    {question.questionType !== "open-ended" && (
+                                        <table className="border border-gray-300 text-left text-sm">
+                                            <thead className="bg-gray-200">
+                                                <tr>
+                                                    <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
+                                                    <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
+                                                    <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
+                                                    // Filter descriptions for the current answer
+                                                    feedbackReport
                                                         .filter(answer => answer.answerText === answerText)
-                                                        .map(filteredAnswer => (
-                                                            <>
-                                                                {/* Check if there are descriptions for the answer */}
-                                                                {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
-                                                                    <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
-                                                                        <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
-                                                                            <strong>Description:</strong> {filteredAnswer.description}
-                                                                        </td>
-                                                                    </tr>
-                                                                )}
-                                                            </>
-                                                        ))}
-                                                </>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            )}
+                                                        .map(filteredAnswer => filteredAnswer.description);
+
+                                                    return (
+                                                        <>
+                                                            {/* Row for Answer, Responses, and Percentage */}
+                                                            <tr key={answerText} className="hover:bg-gray-50">
+                                                                <td className="p-3 border-b border-gray-300">{answerText}</td>
+                                                                <td className="p-3 border-b border-gray-300">{count}</td>
+                                                                <td className="p-3 border-b border-gray-300">{percentage}</td>
+                                                            </tr>
+
+                                                            {/* Row for Description, displayed only if there are descriptions */}
+                                                            {feedbackReport
+                                                                .filter(answer => answer.answerText === answerText)
+                                                                .map(filteredAnswer => (
+                                                                    <>
+                                                                        {/* Check if there are descriptions for the answer */}
+                                                                        {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
+                                                                            <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
+                                                                                <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
+                                                                                    <strong>Description:</strong> {filteredAnswer.description}
+                                                                                </td>
+                                                                            </tr>
+                                                                        )}
+                                                                    </>
+                                                                ))}
+                                                        </>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     ))}
                 </div>
-            ))}
-                </div>
-}
+            }
 
 
             {/* Conditionally render buttons only if feedback report is available */}

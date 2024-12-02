@@ -64,6 +64,10 @@ export interface Feedback {
   module: {
     id: number;
     moduleName: string;
+    course: {
+      id: number;
+      courseName:string;
+    }
   };
 }
 
