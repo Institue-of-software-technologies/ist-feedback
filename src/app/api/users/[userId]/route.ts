@@ -1,17 +1,36 @@
 import { NextResponse } from 'next/server';
-import { User } from '@/db/models/User';
 import bcrypt from 'bcrypt';
-
+import { Course, TrainerCourses, User } from '@/db/models/index';
+import { Role } from '@/db/models/Role';
 // GET: Fetch user by ID
 export async function GET(req: Request, { params }: { params: { userId: string } }) {
   
   try {
-    const user = await User.findByPk(params.userId);
-    if (user) {
-      return NextResponse.json(user, { status: 200 });
-    } else {
+    const user = await User.findOne({
+       where: { id: params.userId },
+       include: [
+        {
+          model: Role,
+          as: "roleUsers",
+          attributes: ["id", "roleName"],
+        },
+        {
+          model: TrainerCourses,
+          as: "trainer_courses",
+          include: [
+            {
+              model: Course,
+              as: "course",
+              attributes: ["id", "courseName",], 
+            },
+          ],
+        },
+      ],
+      });
+    if (!user) {
       return NextResponse.json({ message: 'User not found - *' }, { status: 404 });
-    }
+    } 
+    return NextResponse.json({user});
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching user', error }, { status: 500 });
   }
@@ -21,26 +40,59 @@ export async function GET(req: Request, { params }: { params: { userId: string }
 export async function PUT(req: Request, { params }: { params: { userId: string } }) {
   try {
     const body = await req.json();
-    const { username, email, password, roleId } = body;
+    const { username, email, password, roleId, multiSelectField } = body;
+
+    console.log("Request body:", body); // Debugging request body
 
     const user = await User.findByPk(params.userId);
 
-    if (user) {
-      const updatedUser = await user.update({
-        username: username || user.username,
-        email: email || user.email,
-        password: password ? await bcrypt.hash(password, 10) : user.password,
-        roleId: roleId || user.roleId,
-      });
-
-      return NextResponse.json(updatedUser, { status: 200 });
-    } else {
-      return NextResponse.json({ message: 'User not found - here' }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
+
+    const updatedUser = await user.update({
+      username: username || user.username,
+      email: email || user.email,
+      password: password ? await bcrypt.hash(password, 10) : user.password,
+      roleId: roleId || user.roleId,
+    });
+
+    // Handle multiSelectField
+    if (multiSelectField && multiSelectField.length > 0) {
+      try {
+          // Assuming `userId` is the ID of the user you're updating (e.g., `3`)
+          const userId = 3; // Replace with dynamic value as needed
+  
+          // Delete existing trainer courses for this user
+          await TrainerCourses.destroy({
+              where: { trainerId: userId }
+          });
+  
+          // Insert new trainer courses based on the selected courses
+          const trainerCourses = multiSelectField.map((courseId: number) => ({
+              trainerId: userId,
+              courseId: courseId
+          }));
+  
+          // Insert the new records in bulk
+          await TrainerCourses.bulkCreate(trainerCourses);
+          console.log('Trainer courses updated successfully.');
+      } catch (error) {
+          console.error("Error updating trainer courses:", error);
+          return NextResponse.json({ message: 'Error updating user', error }, { status: 500 });
+      }
+  } else {
+      console.log('No courses selected.');
+  }
+
+    console.log("User successfully updated:", updatedUser);
+    return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
+    console.error("Error updating user:", error);
     return NextResponse.json({ message: 'Error updating user', error }, { status: 500 });
   }
 }
+
 
 // DELETE: Delete user by ID
 export async function DELETE(req: Request, { params }: { params: { userId: string } }) {

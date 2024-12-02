@@ -10,7 +10,8 @@ export interface Input {
   label: string;
   type: string;
   require?: boolean;
-  value?: string;
+  value?: string | number;
+  valueDate?: Date | null;
   name?: string;
   defaultSelect?: number[];
   options?: { label: string; value: number | string }[];
@@ -22,6 +23,7 @@ interface FormProps<T extends FieldValues> {
   buttonText?: string;
   hoverColor?: string;
   loading?: boolean;
+  buttonVisible?: boolean;
   onSubmit: (data: T) => void;
 }
 
@@ -36,6 +38,7 @@ const Form = <T extends FieldValues>({
   buttonText,
   hoverColor,
   loading,
+  buttonVisible = true
 }: FormProps<T>): JSX.Element => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<T>();
 
@@ -46,13 +49,13 @@ const Form = <T extends FieldValues>({
 
   const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
     ({ value, onClick }, ref) => (
-      <div className="relative w-full">
+      <div className="relative w-auto">
         <input
           onClick={onClick}
           value={value || ""}
           ref={ref}
           readOnly
-          className="w-full p-2 bg-gray-100 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           placeholder="Select date and time"
         />
       </div>
@@ -70,6 +73,17 @@ const Form = <T extends FieldValues>({
           input.defaultSelect as unknown as PathValue<T, Path<T>>
         );
       }
+      if (input.type === "select" && input.value) {
+        setValue(input.label as Path<T>, input.value as PathValue<T, Path<T>>);
+      }
+      if (input.type === "date" && input.label === "tokenStartTime" && input.valueDate) {
+        setStartDate(new Date(input.valueDate)); // Ensure valid date object
+        setValue("tokenStartTime" as Path<T>, new Date(input.valueDate) as PathValue<T, Path<T>>);
+      }
+      if (input.type === "date" && input.label === "tokenExpiration" && input.valueDate) {
+        setExpirationDate(new Date(input.valueDate)); // Ensure valid date object
+        setValue("tokenExpiration" as Path<T>, new Date(input.valueDate) as PathValue<T, Path<T>>);
+      }
     });
   }, [Input, setValue]);
 
@@ -83,14 +97,18 @@ const Form = <T extends FieldValues>({
 
   // Handle changes in start date
   const handleStartDateChange = (date: Date | null) => {
-    setStartDate(date);
-    setValue("tokenStartTime" as Path<T>, date as unknown as PathValue<T, Path<T>>);
+    if (date) {
+      setStartDate(date);
+      setValue("tokenStartTime" as Path<T>, date as PathValue<T, Path<T>>);
+    }
   };
-
+  
   const handleExpirationDateChange = (date: Date | null) => {
-    setExpirationDate(date);
-    setValue("tokenExpiration" as Path<T>, date as unknown as PathValue<T, Path<T>>);
-  };
+    if (date) {
+      setExpirationDate(date);
+      setValue("tokenExpiration" as Path<T>, date as PathValue<T, Path<T>>);
+    }
+  };  
 
   const togglePasswordVisibility = (id: string) => {
     setShowPasswordState((prev) => ({
@@ -112,6 +130,7 @@ const Form = <T extends FieldValues>({
           {input.type === "select" ? (
             <select
               id={input.label}
+              defaultValue={input.value || ""}
               {...register(input.label as Path<T>, { required: `${input.label} is required` })}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
@@ -144,17 +163,19 @@ const Form = <T extends FieldValues>({
               </ListboxOptions>
             </Listbox>
           ) : input.type === "date" && input.label === "tokenStartTime" ? (
-            <DatePicker
-              selected={startDate}
-              onChange={handleStartDateChange}
-              customInput={<CustomInput />}
-              showTimeSelect
-              dateFormat="MMMM d, yyyy h:mm aa"
-            />
+            <div className="w-auto">
+              <DatePicker
+                selected={startDate}
+                onChange={(date)=>handleStartDateChange(date)}
+                customInput={<CustomInput />}
+                showTimeSelect
+                dateFormat="MMMM d, yyyy h:mm aa"
+              />
+            </div>
           ) : input.type === "date" && input.label === "tokenExpiration" ? (
             <DatePicker
               selected={expirationDate}
-              onChange={handleExpirationDateChange}
+              onChange={(date)=>handleExpirationDateChange(date)}
               customInput={<CustomInput />}
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mm aa"
@@ -224,6 +245,20 @@ const Form = <T extends FieldValues>({
                 )}
               </button>
             </div>
+          ) : input.type === "email" ? (
+            <input
+              id={input.label}
+              type={input.type}
+              defaultValue={input.value}
+              {...register(input.label as Path<T>, {
+                required: input.require ? `${input.label} is required` : undefined,
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email address"
+                }
+              })}
+              className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
           ) : (
             <input
               id={input.label}
@@ -244,40 +279,42 @@ const Form = <T extends FieldValues>({
       )
       )}
 
-      <button
-        type="submit"
-        className={`${buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${hoverColor || defaultHoverColor}`}
-        disabled={loading} // Disable button while loading
-      >
-        {loading ? (
-          <div className="flex items-center">
-            <svg
-              className="animate-spin h-5 w-5 mr-2 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              ></path>
-            </svg>
-            Submiting...
-          </div>
+      {buttonVisible && (
+        <button
+          type="submit"
+          className={`${buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${hoverColor || defaultHoverColor}`}
+          disabled={loading} // Disable button while loading
+        >
+          {loading ? (
+            <div className="flex items-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-2 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              Submitting...
+            </div>
 
-        ) : (
-          buttonText || defaultButtonText
-        )}
-      </button>
+          ) : (
+            buttonText || defaultButtonText
+          )}
+        </button>
+      )}
 
     </form>
   );

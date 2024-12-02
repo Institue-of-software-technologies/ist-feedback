@@ -86,7 +86,7 @@ const UserManagement: React.FC = () => {
     { header: 'Username', accessor: 'username' },
     { header: 'Email', accessor: 'email' },
     { header: 'Role', accessor: 'roleUsers.roleName' },
-    { header: 'Course', accessor: 'course.courseName' }
+    // { header: 'Course', accessor: 'trainer_courses' }
   ];
 
   return (

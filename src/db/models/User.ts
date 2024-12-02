@@ -1,7 +1,8 @@
 import { DataTypes, Model} from 'sequelize';
 import sequelize from "../db_connection";
 import { Role } from './Role';
-import { Course } from './Course';
+
+
 
 export class User extends Model {
   id!: number;
@@ -10,8 +11,6 @@ export class User extends Model {
   password!: string;
   roleId!: number;
   courseId!: number;
-
-  courses?: Course;
 }
 
 User.init({
@@ -63,4 +62,4 @@ User.init({
 User.belongsTo(Role, { as: 'roleUsers', foreignKey: 'roleId' });
 Role.hasMany(User, { foreignKey: 'roleId' });
 
-User.belongsTo(Course, { foreignKey: 'courseId', as: 'course' });
+

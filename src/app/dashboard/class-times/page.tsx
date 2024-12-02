@@ -79,8 +79,6 @@ const ClassTimeFormManagement: React.FC = () => {
 
   const columns = [
     { header: 'classTime', accessor: 'classTime' },
-    { header: 'classTimeStart', accessor: 'classTimeStart' },
-    { header: 'classTimeEnd', accessor: 'classTimeEnd' }
   ];
 
   return (

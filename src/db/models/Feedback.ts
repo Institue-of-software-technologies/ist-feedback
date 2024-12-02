@@ -5,6 +5,7 @@ import { Module } from './Module';
 import { Intake } from './Intake';
 import { FeedbackAnswer } from './FeedbackAnswer';
 import { User } from './User';
+import { TrainerCourses } from './TrainerCourses';
 
 export class Feedback extends Model {
   id!: number;
@@ -30,15 +31,6 @@ Feedback.init({
     primaryKey: true,
     allowNull: false,
   },
-  trainerId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: User,
-      key: 'id',
-    },
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-  },
   classTimeId: {
     type: DataTypes.INTEGER,
     references: {
@@ -61,6 +53,15 @@ Feedback.init({
     type: DataTypes.INTEGER,
     references: {
       model: Intake,
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  },
+  courseTrainerId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: TrainerCourses,
       key: 'id',
     },
     onUpdate: 'CASCADE',
@@ -101,5 +102,9 @@ Feedback.belongsTo(ClassTime, {
 Feedback.belongsTo(Intake, {
   foreignKey: "intakeId",
   as: "intake",
+});
+Feedback.belongsTo(TrainerCourses, {
+  foreignKey: "courseTrainerId",
+  as: "courseTrainer",
 });
 

@@ -4,7 +4,7 @@ import { Feedback } from "@/db/models/Feedback";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { User } from "@/db/models/User";
+import { TrainerCourses, User } from "@/db/models/index";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -19,19 +19,23 @@ export async function GET(req: NextRequest) {
     if (userRole === "trainer") {
       // Fetch only feedbacks associated with the trainer
       feedbacks = await Feedback.findAll({
-        where: { trainerId: userId }, // Assuming feedbacks have a `trainerId` field
         include: [
           {
-            model: User,
-            as: "trainer",
-            attributes: ["username"],
+            model: TrainerCourses, // The model representing the trainer_courses table
+            as: 'courseTrainer',
+            where: { trainerId: userId }, // Filter where the trainerId matches the provided userId
+            required: true // This ensures that only feedbacks with a matching trainerId in the trainer_courses table are included
+          },
+          {
+            model: TrainerCourses,
+            as: "courseTrainer",
             include: [
               {
-                model: Course,
-                as: "course",
-                attributes: ["courseName"],
-              },
-            ],
+                model: User,
+                as: "trainers_users",
+                attributes: ["username"],
+              }
+            ]
           },
           {
             model: Module,
@@ -45,7 +49,16 @@ export async function GET(req: NextRequest) {
               },
             ],
           },
-          { model: ClassTime, as: "classTime", attributes: ["classTime"] },
+          {
+            model: ClassTime,
+            as: "classTime",
+            attributes: ["classTime"]
+          },
+          {
+            model: Intake,
+            as: "intake",
+            attributes: ["intakeName", "intakeYear"],
+          },
           {
             model: Intake,
             as: "intake",
@@ -58,16 +71,15 @@ export async function GET(req: NextRequest) {
       feedbacks = await Feedback.findAll({
         include: [
           {
-            model: User,
-            as: "trainer",
-            attributes: ["username"],
+            model: TrainerCourses,
+            as: "courseTrainer",
             include: [
               {
-                model: Course,
-                as: "course",
-                attributes: ["courseName"],
-              },
-            ],
+                model: User,
+                as: "trainers_users",
+                attributes: ["username"],
+              }
+            ]
           },
           {
             model: Module,
@@ -86,7 +98,7 @@ export async function GET(req: NextRequest) {
             model: Intake,
             as: "intake",
             attributes: ["intakeName", "intakeYear"],
-          },
+          }
         ],
       });
     }
@@ -212,7 +224,7 @@ export async function POST(req: Request) {
     const studentToken = await generateUniqueToken();
 
     const feedback = await Feedback.create({
-      trainerId,
+      courseTrainerId: trainerId,
       intakeId,
       classTimeId,
       moduleId,

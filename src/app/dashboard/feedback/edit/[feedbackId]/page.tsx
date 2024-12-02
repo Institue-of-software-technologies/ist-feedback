@@ -1,29 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, forwardRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios';
-import { ClassTime, Intake, Module, FeedbackQuestion, User } from '@/types';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useForm } from 'react-hook-form';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { showToast } from '@/components/ToastMessage';
+import Form from '@/components/Forms';
+import { ClassTime, Feedback, FeedbackQuestion, Intake, Module, User } from '@/types';
 
 interface FormData {
-  trainerId: string;
-  classTimeId: string;
-  moduleId: string;
-  intakeId: string;
+  trainerId: number;
+  classTimeId: number;
+  moduleId: number;
+  intakeId: number;
   feedbackQuestions: string[];
-  tokenStartTime: Date;
-  tokenExpiration: Date;
-}
-
-interface CustomInputProps {
-  value?: string;
-  onClick?: () => void;
+  tokenStartTime: string;
+  tokenExpiration: string;
 }
 
 const EditFeedback = () => {
@@ -31,16 +24,15 @@ const EditFeedback = () => {
   const { feedbackId } = useParams();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [trainers, setTrainers] = useState<User[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [feedbackQuestions, setFeedbackQuestions] = useState<FeedbackQuestion[]>([]);
-  const [selectedFeedbackQuestions, setSelectedFeedbackQuestions] = useState<string[]>([]);
+  const [selectedFeedbackQuestions, setSelectedFeedbackQuestions] = useState<number[]>([]);
   const [tokenStartTime, setTokenStartTime] = useState<Date | null>(null);
   const [tokenExpiration, setTokenExpiration] = useState<Date | null>(null);
-
-  const { register, handleSubmit, setValue } = useForm<FormData>();
 
   useEffect(() => {
     if (feedbackId) {
@@ -50,14 +42,8 @@ const EditFeedback = () => {
           const feedback = response.data.feedback;
           const questions = response.data.feedbackQuestions;
 
-          setValue('trainerId', feedback.trainerId?.toString() || '');
-          setValue('classTimeId', feedback.classTimeId?.toString() || '');
-          setValue('moduleId', feedback.moduleId?.toString() || '');
-          setValue('intakeId', feedback.intakeId?.toString() || '');
-
-          const selectedQuestions = questions.map((fq: { feedbackQuestion: { id: number } }) => fq.feedbackQuestion.id.toString());
-          setSelectedFeedbackQuestions(selectedQuestions);
-          setValue('feedbackQuestions', selectedQuestions);
+          setFeedback(feedback);
+          setSelectedFeedbackQuestions(questions.map((fq: { feedbackQuestion: { id: number } }) => fq.feedbackQuestion.id));
 
           setTokenStartTime(new Date(feedback.tokenStartTime));
           setTokenExpiration(new Date(feedback.tokenExpiration));
@@ -70,7 +56,7 @@ const EditFeedback = () => {
       };
       fetchFeedbacks();
     }
-  }, [feedbackId, setValue]);
+  }, [feedbackId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +81,7 @@ const EditFeedback = () => {
     fetchData();
   }, []);
 
-  const handleFormSubmit = async (data: FormData) => {
+  const handleFormSubmit = async (data:FormData) => {
     try {
       await api.put(`/feedback/${feedbackId}`, {
         ...data,
@@ -113,146 +99,77 @@ const EditFeedback = () => {
     }
   };
 
-  const toggleQuestionSelection = (questionId: string) => {
-    setSelectedFeedbackQuestions((prevSelected) => {
-      const isAlreadySelected = prevSelected.includes(questionId);
-      const updatedSelected = isAlreadySelected
-        ? prevSelected.filter((id) => id !== questionId)
-        : [...prevSelected, questionId];
-      setValue('feedbackQuestions', updatedSelected);
-      return updatedSelected;
-    });
-  };
-
-  const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
-    ({ value, onClick }, ref) => (
-      <div className="relative w-full">
-        <input
-          onClick={onClick}
-          value={value || ''}
-          ref={ref}
-          readOnly
-          className="w-full p-2 bg-gray-100 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
-          placeholder="Select date and time"
-        />
-      </div>
-    )
-  );
-
-  CustomInput.displayName = 'CustomInput';
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
+
+  const inputs = [
+    {
+      label: 'trainerId',
+      type: 'select',
+      value: feedback?.courseTrainer.trainerId,
+      options: trainers.map((trainer) => ({
+        label: trainer.username,
+        value: trainer.id,
+      })),
+    },
+    {
+      label: 'classTimeId',
+      type: 'select',
+      value: feedback?.classTimeId,
+      options: classTimes.map((classTime) => ({
+        label: classTime.classTime,
+        value: classTime.id,
+      })),
+    },
+    {
+      label: 'FeedbackQuestions',
+      type: 'multiple',
+      defaultSelect: selectedFeedbackQuestions,
+      options: feedbackQuestions.map((question) => ({
+        label: question.questionText,
+        value: question.id,
+      })),
+    },
+    {
+      label: 'model',
+      type: 'select',
+      value: feedback?.moduleId,
+      options: modules.map((module) => ({
+        label: module.moduleName,
+        value: module.id,
+      })),
+    },
+    {
+      label: 'intakeId',
+      type: 'select',
+      value: feedback?.intakeId,
+      options: intakes.map((intake) => ({
+        label: intake.intakeName,
+        value: intake.id,
+      })),
+    },
+    {
+      label: 'tokenStartTime',
+      type: 'date',
+      valueDate: tokenStartTime,
+      onChange: setTokenStartTime,
+    },
+    {
+      label: 'tokenExpiration',
+      type: 'date',
+      valueDate: tokenExpiration,
+      onChange: setTokenExpiration,
+    },
+  ];
 
   return (
     <div className="p-6">
       <ToastContainer />
       <h3 className="text-2xl font-bold mb-4">Edit Feedback</h3>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
-        {/* Trainer Selection */}
-        <div>
-          <label htmlFor="trainerId">Trainer</label>
-          <select id="trainerId" {...register('trainerId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {trainers.map((trainer) => (
-              <option key={trainer.id} value={trainer.id.toString()}>
-                {trainer.username}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Class Time Selection */}
-        <div>
-          <label htmlFor="classTimeId">Class Time</label>
-          <select id="classTimeId" {...register('classTimeId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {classTimes.map((classTime) => (
-              <option key={classTime.id} value={classTime.id.toString()}>
-                {classTime.classTime}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Feedback Questions */}
-        <div>
-          <label htmlFor="feedbackQuestions">Feedback Questions</label>
-          <div className="mt-2">
-            {feedbackQuestions.map((question) => (
-              <div key={question.id} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id={`question-${question.id}`}
-                  value={question.id.toString()}
-                  checked={selectedFeedbackQuestions.includes(question.id.toString())}
-                  onChange={() => toggleQuestionSelection(question.id.toString())}
-                  className="mr-2"
-                />
-                <label htmlFor={`question-${question.id}`} className="text-sm">
-                  {question.questionText}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Module Selection */}
-        <div>
-          <label htmlFor="moduleId">Module</label>
-          <select id="moduleId" {...register('moduleId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {modules.map((module) => (
-              <option key={module.id} value={module.id.toString()}>
-                {module.moduleName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Intake Selection */}
-        <div>
-          <label htmlFor="intakeId">Intake</label>
-          <select id="intakeId" {...register('intakeId')} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            {intakes.map((intake) => (
-              <option key={intake.id} value={intake.id.toString()}>
-                {intake.intakeName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Token Start Time */}
-        <div className="flex flex-col mb-3">
-          <label htmlFor="tokenStartTime" className="mb-1">
-            Token Start Time
-          </label>
-          <DatePicker
-            selected={tokenStartTime}
-            onChange={(date) => setTokenStartTime(date)}
-            customInput={<CustomInput />}
-            showTimeSelect
-            dateFormat="MMMM d, yyyy h:mm aa"
-            className="w-full mt-1"
-          />
-        </div>
-
-        {/* Token Expiration */}
-        <div className="flex flex-col mb-3">
-          <label htmlFor="tokenExpiration" className="mb-1">
-            Token Expiration
-          </label>
-          <DatePicker
-            selected={tokenExpiration}
-            onChange={(date) => setTokenExpiration(date)}
-            customInput={<CustomInput />}
-            showTimeSelect
-            dateFormat="MMMM d, yyyy h:mm aa"
-            className="w-full mt-1"
-          />
-        </div>
-
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Submit
-        </button>
-      </form>
+      <Form<FormData>
+        Input={inputs}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 };

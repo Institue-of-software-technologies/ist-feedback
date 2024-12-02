@@ -87,9 +87,9 @@ const NewUserForm: React.FC = () => {
     },
     {
       label: 'courseId',
-      type: 'select',
+      type: 'multiple',
       options: course.map((course) => ({
-        label: course.courseName,
+        label:`${course.courseName}`,
         value: course.id,
       })),
     },

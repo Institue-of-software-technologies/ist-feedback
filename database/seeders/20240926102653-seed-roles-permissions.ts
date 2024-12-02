@@ -82,17 +82,17 @@ export default {
       RECEIVE_NOTIFICATIONS = 'receive_notifications',
 
       //update_admin_Permissions
-      MANAGE_MODULES='manage_modules',
-      UPDATE_MODULES='update_modules',
-      DELETE_MODULES='delete_modules',
-      VIEW_MODULES='view_modules',
+      MANAGE_MODULES='manage_modules', //54
+      UPDATE_MODULES='update_modules', //55
+      DELETE_MODULES='delete_modules', //56
+      VIEW_MODULES='view_modules', //57
 
-      UPDATE_FEEDBACKS='update_feedbacks',
-      DELETE_FEEDBACKS='delete_feedbacks',
-      VIEW_FEEDBACKS = 'view_feedbacks',
+      UPDATE_FEEDBACKS='update_feedbacks', //58
+      DELETE_FEEDBACKS='delete_feedbacks', //59
+      VIEW_FEEDBACKS = 'view_feedbacks', //60
 
-      MANAGE_PROFILE='manage_profile',
-      MANAGE_FEEDBACK_QUESTIONS= 'manage_feedback_questions',
+      MANAGE_PROFILE='manage_profile',//61
+      MANAGE_FEEDBACK_QUESTIONS= 'manage_feedback_questions',//62
     }
 
     // Hash passwords
@@ -236,6 +236,12 @@ export default {
       { roleId: 1, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 2, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 2, permissionId: 62, createdAt: new Date(), updatedAt: new Date() },
+
+      // trainer_permisions 
+      { roleId: 4, permissionId: 52, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 4, permissionId: 58, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 4, permissionId: 60, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 4, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
 ]);
 
 
