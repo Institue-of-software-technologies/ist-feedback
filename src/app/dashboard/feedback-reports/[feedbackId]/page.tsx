@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { PDFDocument, PDFFont, StandardFonts, rgb } from "pdf-lib";
 import Loading from '../../loading'
 import axios from "../../../../../lib/axios";
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { showToast } from "@/components/ToastMessage";
 
 interface FeedbackAnswer {
     id: number;
@@ -15,15 +16,20 @@ interface FeedbackAnswer {
     description: string;
     feedback: {
         id: number;
-        trainer: {
-            email: string;
-            trainerName: string;
+        courseTrainer: {
+            id: number,
+            trainerId: number,
+            courseId: number,
+            trainers_users: {
+                username: string
+                email: string
+            }
+        },
+        module: {
+            moduleName: string;
             course: {
                 courseName: string;
             };
-        };
-        module: {
-            moduleName: string;
         };
         intake: {
             intakeName: string;
@@ -139,12 +145,12 @@ export default function FeedbackQuestionID() {
         // Customizable variables for logo
         const logoUrl = "https://raw.githubusercontent.com/Institue-of-software-technologies/ist-feedback/refs/heads/main/public/assets/image/logo.png";
         const logoScaleFactor = 0.1;
-        const logoVerticalPadding = 0; 
-        const logoHorizontalPadding = 0; 
+        const logoVerticalPadding = 0;
+        const logoHorizontalPadding = 0;
 
         // Embed the logo image from URL
         const logoBytes = await fetch(logoUrl).then((res) => res.arrayBuffer());
-        const logoImage = await pdfDoc.embedPng(logoBytes);  
+        const logoImage = await pdfDoc.embedPng(logoBytes);
 
         const logoWidth = logoImage.width * logoScaleFactor;
         const logoHeight = logoImage.height * logoScaleFactor;
@@ -153,13 +159,14 @@ export default function FeedbackQuestionID() {
 
         page.drawImage(logoImage, {
             x: logoXPosition,
-            y: yPosition - logoHeight - logoVerticalPadding, 
+            y: yPosition - logoHeight - logoVerticalPadding,
             width: logoWidth,
             height: logoHeight,
         });
 
+
         // Update yPosition after the logo
-        yPosition -= logoHeight + logoVerticalPadding + 20;  
+        yPosition -= logoHeight + logoVerticalPadding + 20;
 
         const addNewPageIfNeeded = () => {
             if (yPosition < pageMargin) {
@@ -169,11 +176,11 @@ export default function FeedbackQuestionID() {
         };
 
         // Draw general information about the feedback
-        page.drawText(`Trainer: ${feedbackDetails.trainer.trainerName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        page.drawText(`Trainer: ${feedbackDetails.courseTrainer.trainers_users.username}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
         yPosition -= lineSpacing;
         addNewPageIfNeeded();
 
-        page.drawText(`Course: ${feedbackDetails.trainer.course.courseName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
+        page.drawText(`Course: ${feedbackDetails.module.course.courseName}`, { x: pageMargin, y: yPosition, size: headerFontSize, font });
         yPosition -= lineSpacing;
         addNewPageIfNeeded();
 
@@ -202,6 +209,8 @@ export default function FeedbackQuestionID() {
         // Separate open-ended and close-ended questions
         const openEndedQuestions = questions.filter(q => q.questionType === 'open-ended');
         const closeEndedQuestions = questions.filter(q => q.questionType === 'closed-ended');
+
+        yPosition -= 20;
 
         // Draw Close-ended questions first
         if (closeEndedQuestions.length > 0) {
@@ -253,7 +262,7 @@ export default function FeedbackQuestionID() {
                                 y: yPosition,
                                 size: descriptionFontSize,
                                 font,
-                                color: rgb(1, 0, 0), 
+                                color: rgb(1, 0, 0),
                             });
                             yPosition -= lineSpacing;
                             addNewPageIfNeeded();
@@ -336,6 +345,65 @@ export default function FeedbackQuestionID() {
             });
         }
 
+
+        // Ratings Feedback Section
+        page.drawText("Ratings Summary", {
+            x: pageMargin,
+            y: yPosition,
+            size: titleFontSize,
+            font: boldFont,
+            color: rgb(0, 0.53, 0.7),
+        });
+        yPosition -= 40;
+
+        // Aggregate and display ratings
+        const ratingQuestions = questions.filter(q => q.questionType === 'rating');
+        ratingQuestions.forEach((question) => {
+            const relatedAnswers = feedbackReport.filter(a => a.questionId === question.id);
+
+            // Calculate rating statistics
+            const ratings = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Adjust to actual rating scale
+            const ratingCounts = ratings.map(rating =>
+                relatedAnswers.filter(answer => parseInt(answer.answerText) === rating).length
+            );
+            const totalRatings = ratingCounts.reduce((acc, count) => acc + count, 0);
+            const averageRating = totalRatings
+                ? (ratingCounts.reduce((sum, count, idx) => sum + count * ratings[idx], 0) / totalRatings).toFixed(2)
+                : "No ratings";
+
+            // Display question text and average rating
+            page.drawText(`${question.questionText}: Average Rating - ${averageRating}`, {
+                x: pageMargin,
+                y: yPosition,
+                size: tableFontSize,
+                font: boldFont,
+            });
+            yPosition -= lineSpacing;
+            addNewPageIfNeeded();
+
+            // Table Header
+            page.drawText("Rating", { x: pageMargin, y: yPosition, size: tableFontSize, font });
+            page.drawText("Count", { x: 300, y: yPosition, size: tableFontSize, font });
+            page.drawText("Percentage", { x: 500, y: yPosition, size: tableFontSize, font });
+            yPosition -= lineSpacing;
+            addNewPageIfNeeded();
+
+            // Table Data
+            ratingCounts.forEach((count, idx) => {
+                const percentage = totalRatings ? ((count / totalRatings) * 100).toFixed(2) + "%" : "0%";
+                page.drawText(ratings[idx].toString(), { x: pageMargin, y: yPosition, size: tableFontSize, font });
+                page.drawText(count.toString(), { x: 300, y: yPosition, size: tableFontSize, font });
+                page.drawText(percentage, { x: 500, y: yPosition, size: tableFontSize, font });
+                yPosition -= lineSpacing;
+                addNewPageIfNeeded();
+            });
+
+            // Add space after each question
+            yPosition -= lineSpacing;
+            addNewPageIfNeeded();
+        });
+
+
         return pdfDoc.save();
     };
 
@@ -371,8 +439,8 @@ export default function FeedbackQuestionID() {
         // Send PDF as an email attachment
         sendPDF({
             pdfBytes,
-            receiverEmail: feedbackReport[0].feedback.trainer.email,
-            receiverName: feedbackReport[0].feedback.trainer.trainerName,
+            receiverEmail: feedbackReport[0].feedback.courseTrainer.trainers_users.email,
+            receiverName: feedbackReport[0].feedback.courseTrainer.trainers_users.username,
         });
     };
 
@@ -423,25 +491,16 @@ export default function FeedbackQuestionID() {
             });
 
             if (response.status === 200) {
-                toast.success('PDF report sent successfully!', {
-                    position: 'top-right',
-                    autoClose: 2000,
-                });
+                showToast.success('PDF report sent successfully!');
             } else {
                 alert();
-                toast.error("Failed to send PDF report.", {
-                    position: 'top-right',
-                    autoClose: 3000,
-                })
+                showToast.error("Failed to send PDF report.")
             }
         } catch (error) {
             console.error("Error sending PDF:", error);
-            toast.error("An error occurred while sending the PDF report.", {
-                position: 'top-right',
-                autoClose: 3000,
-            })
+            showToast.error("An error occurred while sending the PDF report.")
         } finally {
-            setIsLoading(false); 
+            setIsLoading(false);
         }
     };
 
@@ -469,90 +528,98 @@ export default function FeedbackQuestionID() {
             {feedbackReport.length > 0 && (
                 <div className="mb-6 bg-gray-100 p-4 rounded-lg shadow-md">
                     <h1 className="text-4xl font-semibold mb-6">Feedback Report</h1>
-                    <p><strong>Trainer:</strong> {feedbackReport[0].feedback.trainer.trainerName}</p>
-                    <p><strong>Course:</strong> {feedbackReport[0].feedback.trainer.course.courseName}</p>
+                    <p><strong>Trainer:</strong> {feedbackReport[0].feedback.courseTrainer.trainers_users.username}</p>
+                    <p><strong>Course:</strong> {feedbackReport[0].feedback.module.course.courseName}</p>
                     <p><strong>Module:</strong> {feedbackReport[0].feedback.module.moduleName}</p>
                     <p><strong>Intake:</strong> {feedbackReport[0].feedback.intake.intakeName} - {feedbackReport[0].feedback.intake.intakeYear}</p>
                     <p><strong>Class Time:</strong> {feedbackReport[0].feedback.classTime.classTime}</p>
                 </div>
             )}
 
-            {/* Render each question and its responses */}
-            {questions.map((question) => (
-                <div key={question.id} className="mb-8">
-                    <h2 className="text-xl font-semibold mb-2">Question: {question.questionText}</h2>
+            {/* Render each question and its responses, grouped by question type */}
+            {questions.length > 0 &&
+                <div>
+                    {['open-ended', 'closed-ended', 'rating'].map(questionType => (
+                        <div key={questionType} className="mb-8">
+                            <h2 className="text-xl font-semibold mb-2">{questionType} Questions</h2>
+                            {questions.filter(question => question.questionType === questionType).map(question => (
+                                <div key={question.id} className="mb-4">
+                                    <h3 className="text-lg font-semibold mb-2">Question: {question.questionText}</h3>
 
-                    {/* If it's an open-ended question */}
-                    {question.questionType === "open-ended" && (
-                        <div className="p-3 border border-gray-300">
-                            <strong>Open-Ended Responses:</strong>
-                            <ul>
-                                {feedbackReport
-                                    .filter((answer) => answer.questionId === question.id)
-                                    .map((answer, index) => (
-                                        <li key={index}>
-                                            <strong>Response {index + 1}:</strong> {answer.answerText}
-                                            {answer.description && answer.description.trim() && (
-                                                <div className="ml-4">
-                                                    <strong>Description:</strong> {answer.description}
-                                                </div>
-                                            )}
-                                        </li>
-                                    ))}
-                            </ul>
-                        </div>
-                    )}
+                                    {/* If it's an open-ended question */}
+                                    {question.questionType === "open-ended" && (
+                                        <div className="p-3 border border-gray-300">
+                                            <strong>Open-Ended Responses:</strong>
+                                            <ul>
+                                                {feedbackReport
+                                                    .filter(answer => answer.questionId === question.id)
+                                                    .map((answer, index) => (
+                                                        <li key={index}>
+                                                            <strong>Response {index + 1}:</strong> {answer.answerText}
+                                                            {answer.description && answer.description.trim() && (
+                                                                <div className="ml-4">
+                                                                    <strong>Description:</strong> {answer.description}
+                                                                </div>
+                                                            )}
+                                                        </li>
+                                                    ))}
+                                            </ul>
+                                        </div>
+                                    )}
 
-                    {/* For regular (non-open-ended) questions */}
-                    {question.questionType !== "open-ended" && (
-                        <table className="border border-gray-300 text-left text-sm">
-                            <thead className="bg-gray-200">
-                                <tr>
-                                    <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
-                                    <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
-                                    <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
-                                    // Filter descriptions for the current answer
-                                    feedbackReport
-                                        .filter((answer) => answer.answerText === answerText)
-                                        .map((filteredAnswer) => filteredAnswer.description);
+                                    {/* For regular (non-open-ended) questions */}
+                                    {question.questionType !== "open-ended" && (
+                                        <table className="border border-gray-300 text-left text-sm">
+                                            <thead className="bg-gray-200">
+                                                <tr>
+                                                    <th className="p-3 border-b border-gray-300 w-1/4">Answer</th>
+                                                    <th className="p-3 border-b border-gray-300 w-1/6">Responses</th>
+                                                    <th className="p-3 border-b border-gray-300 w-1/6">Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {Object.entries(question.responses).map(([answerText, { count, percentage }]) => {
+                                                    // Filter descriptions for the current answer
+                                                    feedbackReport
+                                                        .filter(answer => answer.answerText === answerText)
+                                                        .map(filteredAnswer => filteredAnswer.description);
 
-                                    return (
-                                        <>
-                                            {/* Row for Answer, Responses, and Percentage */}
-                                            <tr key={answerText} className="hover:bg-gray-50">
-                                                <td className="p-3 border-b border-gray-300">{answerText}</td>
-                                                <td className="p-3 border-b border-gray-300">{count}</td>
-                                                <td className="p-3 border-b border-gray-300">{percentage}</td>
-                                            </tr>
-
-                                            {/* Row for Description, displayed only if there are descriptions */}
-                                            {feedbackReport
-                                                .filter((answer) => answer.answerText === answerText)
-                                                .map((filteredAnswer) => (
-                                                    <>
-                                                        {/* Check if there are descriptions for the answer */}
-                                                        {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
-                                                            <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
-                                                                <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
-                                                                    <strong>Description:</strong> {filteredAnswer.description}
-                                                                </td>
+                                                    return (
+                                                        <>
+                                                            {/* Row for Answer, Responses, and Percentage */}
+                                                            <tr key={answerText} className="hover:bg-gray-50">
+                                                                <td className="p-3 border-b border-gray-300">{answerText}</td>
+                                                                <td className="p-3 border-b border-gray-300">{count}</td>
+                                                                <td className="p-3 border-b border-gray-300">{percentage}</td>
                                                             </tr>
-                                                        )}
-                                                    </>
-                                                ))}
-                                        </>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-            ))}
 
+                                                            {/* Row for Description, displayed only if there are descriptions */}
+                                                            {feedbackReport
+                                                                .filter(answer => answer.answerText === answerText)
+                                                                .map(filteredAnswer => (
+                                                                    <>
+                                                                        {/* Check if there are descriptions for the answer */}
+                                                                        {filteredAnswer.description && filteredAnswer.description.trim() !== "" && (
+                                                                            <tr key={`${answerText}-desc`} className="hover:bg-gray-50">
+                                                                                <td colSpan={3} className="p-3 border-b border-gray-300 break-words">
+                                                                                    <strong>Description:</strong> {filteredAnswer.description}
+                                                                                </td>
+                                                                            </tr>
+                                                                        )}
+                                                                    </>
+                                                                ))}
+                                                        </>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            }
 
 
             {/* Conditionally render buttons only if feedback report is available */}

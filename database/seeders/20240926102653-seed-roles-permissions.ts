@@ -9,6 +9,7 @@ export default {
       SUPER_ADMIN = 'super_admin',
       ADMIN = 'admin',
       STUDENT = 'student',
+      TRAINER = 'trainer',
     }
 
     enum Permissions {
@@ -79,6 +80,19 @@ export default {
       // General Permissions
       VIEW_DASHBOARD = 'view_dashboard',
       RECEIVE_NOTIFICATIONS = 'receive_notifications',
+
+      //update_admin_Permissions
+      MANAGE_MODULES='manage_modules', //54
+      UPDATE_MODULES='update_modules', //55
+      DELETE_MODULES='delete_modules', //56
+      VIEW_MODULES='view_modules', //57
+
+      UPDATE_FEEDBACKS='update_feedbacks', //58
+      DELETE_FEEDBACKS='delete_feedbacks', //59
+      VIEW_FEEDBACKS = 'view_feedbacks', //60
+
+      MANAGE_PROFILE='manage_profile',//61
+      MANAGE_FEEDBACK_QUESTIONS= 'manage_feedback_questions',//62
     }
 
     // Hash passwords
@@ -99,6 +113,11 @@ export default {
       },
       {
         roleName: Roles.STUDENT,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        roleName: Roles.TRAINER,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -203,15 +222,36 @@ export default {
       { roleId: 1, permissionId: 53, createdAt: new Date(), updatedAt: new Date() }, // RECEIVE_NOTIFICATIONS
       { roleId: 2, permissionId: 52, createdAt: new Date(), updatedAt: new Date() }, // VIEW_DASHBOARD
       { roleId: 2, permissionId: 53, createdAt: new Date(), updatedAt: new Date() }, // RECEIVE_NOTIFICATIONS
+
+      //update_admin_Permissions
+      { roleId: 2, permissionId: 54, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 55, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 56, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 57, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 58, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 59, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 60, createdAt: new Date(), updatedAt: new Date() },
+
+      //profile_permissions
+      { roleId: 1, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 62, createdAt: new Date(), updatedAt: new Date() },
+
+      // trainer_permisions 
+      { roleId: 4, permissionId: 52, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 4, permissionId: 58, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 4, permissionId: 60, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 4, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
 ]);
 
-    
-  },
 
-  async down(queryInterface: QueryInterface) {
-    await queryInterface.bulkDelete('Role_Permissions', {}, {});
-    await queryInterface.bulkDelete('Permissions', {}, {});
-    await queryInterface.bulkDelete('Roles', {}, {});
-    await queryInterface.bulkDelete('Users', {}, {});
-  },
+    
+},
+
+async down(queryInterface: QueryInterface) {
+  await queryInterface.bulkDelete('Role_Permissions', {}, {});
+  await queryInterface.bulkDelete('Permissions', {}, {});
+  await queryInterface.bulkDelete('Roles', {}, {});
+  await queryInterface.bulkDelete('Users', {}, {});
+},
 };

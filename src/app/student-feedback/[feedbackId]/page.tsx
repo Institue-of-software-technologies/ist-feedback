@@ -2,12 +2,13 @@
 import { Feedback, FeedbackQuestionSelect } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../../../../lib/axios';
 import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import Loading from '../../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 interface FormValues {
     [key: string]: string | number;
@@ -17,6 +18,7 @@ export default function StudentFeedback() {
     const [feedback, setFeedback] = useState<Feedback | null>(null);
     const [feedbackQuestion, setFeedbackQuestion] = useState<FeedbackQuestionSelect[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { feedbackId } = useParams();
     const router = useRouter();
@@ -35,7 +37,7 @@ export default function StudentFeedback() {
                 } catch (err) {
                     console.log(err);
                     setError('Failed to fetch feedback');
-                    toast.error('Failed to fetch feedback', { position: "top-right", autoClose: 3000 });
+                    showToast.error('Failed to fetch feedback');
                 } finally {
                     setLoading(false);
                 }
@@ -45,9 +47,10 @@ export default function StudentFeedback() {
     }, [feedbackId]);
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
+        setIsLoading(true); // Set loading to true when the form is submitted
         const formattedData = Object.entries(data).map(([key, value]) => {
             if (key.startsWith("question-")) {
-                if(key.startsWith("description-")) {
+                if (key.startsWith("description-")) {
                     return null;
                 }
                 const questionID = parseInt(key.replace("question-", ""), 10);
@@ -67,13 +70,15 @@ export default function StudentFeedback() {
 
         try {
             await api.post('/feedback/answer', { formData: formattedData });
-            toast.success("Feedback submitted successfully!", { position: "top-right", autoClose: 3000 });
+            showToast.success("Feedback submitted successfully!");
             setTimeout(() => {
-                router.push(`/`);
+                router.push(`/`); // Redirect after a delay
             }, 3000);
         } catch (error) {
             console.log(error);
-            toast.error('Failed to submit feedback', { position: "top-right", autoClose: 3000 });
+            showToast.error('Failed to submit feedback');
+        } finally {
+            setIsLoading(false); // Ensure loading is set to false after submission
         }
     };
 
@@ -90,19 +95,20 @@ export default function StudentFeedback() {
             <ToastContainer />
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg shadow-lg p-6">
                 <h1 className="text-center text-2xl font-bold text-red-600">
-                    STUDENT FEEDBACK QUESTIONS FOR <b>{feedback?.trainer.course.courseName} {feedback?.intake.intakeName}</b>
+                    STUDENT FEEDBACK QUESTIONS FOR <b>{feedback?.module.course.courseName} {feedback?.intake.intakeName}</b>
                 </h1>
 
                 <div className="border border-gray-200 shadow-lg rounded-lg p-6 bg-white w-full sm:max-w-3xl lg:max-w-5xl mx-auto mt-8">
                     <div className="flex flex-col sm:flex-row sm:justify-between mb-4 space-y-4 sm:space-y-0">
                         <div>
-                            <p className="text-lg font-semibold text-gray-800">Trainer Name: <span className="font-normal text-gray-600">{feedback?.trainer.trainerName}</span></p>
-                            <p className="text-md text-gray-700 mt-4">Course: <span className="font-normal">{feedback?.trainer.course.courseName}</span></p>
+                            <p className="text-lg font-semibold text-gray-800">Trainer Name: <span className="font-normal text-gray-600">{feedback?.courseTrainer.trainers_users.username}</span></p>
+                            <p className="text-md text-gray-700 mt-4">Course: <span className="font-normal">{feedback?.module.course.courseName}</span></p>
                             <p className="text-md text-gray-700 mt-1">Class Time: <span className="font-normal">{feedback?.classTime.classTime}</span></p>
                         </div>
                         <div className="text-left sm:text-right">
-                            <p className="text-lg font-semibold text-gray-800 mt-5">Module Name: <span className="font-normal text-gray-600">{feedback?.module.moduleName}</span></p>
+                            <p className="text-lg font-semibold text-gray-800">Module Name: <span className="font-normal text-gray-600">{feedback?.module.moduleName}</span></p>
                             <p className="text-md text-gray-700 mt-1">Intake Name: <span className="font-normal">{feedback?.intake.intakeName}</span></p>
+                            <p className="text-md text-gray-700 mt-1">Year: <span className="font-normal">{feedback?.intake.intakeYear}</span></p>
                         </div>
                     </div>
                 </div>
@@ -134,15 +140,27 @@ export default function StudentFeedback() {
                                                     type="radio"
                                                     id={`option-${question.feedbackQuestion.id}-${option.id}`}
                                                     value={option.optionText}
-                                                    {...register(questionKey, { required: "This field is required" })}
+                                                    {...register(questionKey, {
+                                                        required: "This field is required",
+                                                        onChange: () => {
+                                                            // Clear the description field when a different option is selected
+                                                            question.feedbackQuestion.answerOption.forEach((opt) => {
+                                                                if (opt.optionText !== option.optionText) {
+                                                                    setValue(`description-${question.feedbackQuestion.id}`, ""); // Clear the description field
+                                                                }
+                                                            });
+                                                        },
+                                                    })}
                                                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                                 />
-                                                <label htmlFor={`option-${question.feedbackQuestion.id}-${option.id}`} className="ml-2 block text-lg text-gray-900">
+                                                <label
+                                                    htmlFor={`option-${question.feedbackQuestion.id}-${option.id}`}
+                                                    className="ml-2 block text-lg text-gray-900"
+                                                >
                                                     {option.optionText}
                                                 </label>
                                             </div>
 
-                                            {/* Display the textarea below the radio option if it is selected */}
                                             {isSelected && option.description && (
                                                 <div className="mt-2">
                                                     <textarea
@@ -155,9 +173,9 @@ export default function StudentFeedback() {
                                                 </div>
                                             )}
                                         </div>
-
                                     );
                                 })}
+
 
                                 {question.feedbackQuestion.questionType === "rating" && (
                                     <div className="flex justify-center items-center mt-7 overflow-x-auto">
@@ -190,10 +208,38 @@ export default function StudentFeedback() {
                 <div className="flex justify-center mt-6">
                     <button
                         type="submit"
+                        disabled={isLoading}
                         className="px-6 py-2 text-lg font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
                     >
-                        Submit Feedback
+                        {isLoading ? (
+                            <div className="flex items-center">
+                                <svg
+                                    className="animate-spin h-5 w-5 mr-2 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    ></path>
+                                </svg>
+                                sending feedback...
+                            </div>
+                        ) : (
+                            'Submit Feedback'
+                        )}
                     </button>
+
                 </div>
             </form>
         </div>

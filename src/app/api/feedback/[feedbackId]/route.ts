@@ -3,32 +3,31 @@ import { ClassTime } from "@/db/models/ClassTime";
 import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { Trainer } from "@/db/models/Trainer";
 import { NextRequest, NextResponse } from "next/server";
 import { AnswerOption } from '@/db/models/AnswerOption';
 import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";  
+import { TrainerCourses, User } from "@/db/models/index";
 
 interface Context {
   params: { feedbackId: number };
 }
-export async function GET(request: NextRequest, context: Context) {
+export async function GET(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
     const feedback = await Feedback.findOne({
       where: { id: feedbackId },
       include: [
         {
-          model: Trainer,
-          as: "trainer",
-          attributes: ["id", "trainerName"],
+          model: TrainerCourses,
+          as: "courseTrainer",
           include: [
             {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
+              model: User,
+              as: "trainers_users",
+              attributes: ["username"],
+            }
+          ]
         },
         {
           model: ClassTime,
@@ -38,12 +37,19 @@ export async function GET(request: NextRequest, context: Context) {
         {
           model: Module,
           as: "module",
-          attributes: ["id", "moduleName"],
+          attributes: ["moduleName"],
+          include: [
+            {
+              model: Course,
+              as: "course",
+              attributes: ["id","courseName"],
+            },
+          ],
         },
         {
           model: Intake,
           as: "intake",
-          attributes: ["id", "intakeName"],
+          attributes: ["id", "intakeName","intakeYear"],  
         },
       ],
     });
@@ -89,7 +95,7 @@ export async function GET(request: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
-    const { trainerId, intakeId, classTimeId, tokenExpiration ,multiSelectField } =
+    const { trainerId, intakeId, classTimeId, tokenExpiration ,tokenStartTime,multiSelectField } =
       await req.json();
 
     const feedback = await Feedback.findByPk(feedbackId);
@@ -109,13 +115,17 @@ export async function PUT(req: NextRequest, context: Context) {
 
     // Update feedback fields if the values are provided (null means no change)
     if (trainerId !== null) {
-      feedback.trainerId = trainerId;
+      feedback.courseTrainerId = trainerId;
     }
     if (intakeId !== null) {
       feedback.intakeId = intakeId;
     }
     if (classTimeId !== null) {
       feedback.classTimeId = classTimeId;
+    }
+
+    if (tokenStartTime) {
+      feedback.tokenStartTime = new Date(tokenStartTime);
     }
 
     if (tokenExpiration) {

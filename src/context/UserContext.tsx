@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 
 interface User {
     id: number;
+    username: string;
     email: string;
     role: string;
     permissions: string[];
@@ -33,7 +34,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, }}>
             {children}
         </UserContext.Provider>
     );

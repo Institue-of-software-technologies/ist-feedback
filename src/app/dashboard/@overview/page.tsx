@@ -1,42 +1,153 @@
-import { FaChartLine, FaClipboardList } from 'react-icons/fa';
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Use Next.js router for navigation
+import { FaGraduationCap, FaUsers, FaBook, FaClock } from "react-icons/fa";
+import axios from "axios";
+
+// Skeleton loader for cards
+const SkeletonCard = () => (
+  <div className="rounded-lg shadow-lg p-6 bg-gray-300 animate-pulse">
+    <div className="flex items-center justify-between">
+      <div className="h-3 w-3 bg-gray-400 rounded-full"></div>
+      <div className="text-right">
+        <div className="h-4 bg-gray-400 rounded w-32 mb-2"></div>
+        <div className="h-6 bg-gray-400 rounded w-24"></div>
+      </div>
+    </div>
+  </div>
+);
 
 const OverviewPage = () => {
-    return (
-        <div className="bg-white shadow-lg p-6 rounded-lg">
-            <h2 className="text-3xl font-bold mb-6">Overview</h2>
-            
-            {/* Key Metrics Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-gray-100 p-4 rounded flex items-center">
-                    <FaChartLine className="text-blue-500 text-3xl mr-4" />
-                    <div>
-                        <h3 className="text-lg font-semibold">Total Users</h3>
-                        <p className="text-xl font-bold">1,245</p>
-                    </div>
-                </div>
-                <div className="bg-gray-100 p-4 rounded flex items-center">
-                    <FaChartLine className="text-green-500 text-3xl mr-4" />
-                    <div>
-                        <h3 className="text-lg font-semibold">Courses Available</h3>
-                        <p className="text-xl font-bold">57</p>
-                    </div>
-                </div>
-            </div>
+  const [totalCourses, setTotalCourses] = useState<number | null>(null);
+  const [totalIntakes, setTotalIntakes] = useState<number | null>(null);
+  const [totalModules, setTotalModules] = useState<number | null>(null);
+  const [totalClassTimes, setTotalClassTimes] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [authorized, setAuthorized] = useState<boolean>(false); // Authorization state
+  const [userPermissions, setUserPermissions] = useState<string[]>([]); // Store user permissions
+  const router = useRouter(); // Next.js router
 
-            {/* Recent Activities Section */}
-            <div className="bg-gray-100 p-4 rounded">
-                <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <FaClipboardList className="text-orange-500 text-2xl mr-2" />
-                    Recent Activities
-                </h3>
-                <ul className="list-disc list-inside">
-                    <li>User John Doe enrolled in Web3 Course</li>
-                    <li>New course &quot;AI for Beginners &quot; added</li>
-                    <li>Feedback report submitted for July intake</li>
-                </ul>
+  useEffect(() => {
+    const checkAuthorization = () => {
+      try {
+        // Fetch the roles and permissions from localStorage
+        const userRolesPermissions = localStorage.getItem("userRolesPermissions");
+
+        if (userRolesPermissions) {
+          const parsedData = JSON.parse(userRolesPermissions);
+          const { permissions } = parsedData;
+
+          setUserPermissions(permissions || []);
+
+          // Check if the user has permission to view the dashboard
+          if (permissions.includes("view_dashboard")) {
+            setAuthorized(true);
+          } else {
+            router.push("/403"); // Redirect unauthorized users to a 403 page
+          }
+        } else {
+          throw new Error("Permissions not found in localStorage");
+        }
+      } catch (error) {
+        console.error("Authorization check failed:", error);
+        router.push("/403"); // Handle errors by redirecting
+      }
+    };
+
+    checkAuthorization();
+  }, [router]);
+
+  useEffect(() => {
+    if (!authorized) return;
+
+    const fetchCounts = async () => {
+      try {
+        // Fetch data from the dashboard API
+        const response = await axios.get("/api/dashboard");
+        setTotalCourses(response.data.totalCourses);
+        setTotalIntakes(response.data.totalIntakes);
+        setTotalModules(response.data.totalModules);
+        setTotalClassTimes(response.data.totalClassTimes);
+      } catch (error) {
+        console.error("Error fetching counts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCounts();
+  }, [authorized]);
+
+  // Card data configuration with permission-based visibility
+  const cards = [
+    {
+      title: "Total Courses",
+      value: totalCourses,
+      icon: <FaGraduationCap size={40} className="text-indigo-500" />,
+      bgColor: "bg-gradient-to-r from-indigo-200 via-indigo-400 to-indigo-600",
+      requiredPermission: "view_courses", // Permission required to view this card
+    },
+    {
+      title: "Total Intakes",
+      value: totalIntakes,
+      icon: <FaUsers size={40} className="text-green-500" />,
+      bgColor: "bg-gradient-to-r from-green-200 via-green-400 to-green-600",
+      requiredPermission: "view_intakes", // Permission required to view this card
+    },
+    {
+      title: "Total Modules",
+      value: totalModules,
+      icon: <FaBook size={40} className="text-yellow-500" />,
+      bgColor: "bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-600",
+      requiredPermission: "view_modules", // Permission required to view this card
+    },
+    {
+      title: "Total Class Times",
+      value: totalClassTimes,
+      icon: <FaClock size={40} className="text-red-500" />,
+      bgColor: "bg-gradient-to-r from-red-200 via-red-400 to-red-600",
+      requiredPermission: "view_class_times", // Permission required to view this card
+    },
+  ];
+
+  // Filter cards based on user permissions
+  const visibleCards = cards.filter((card) =>
+    userPermissions.includes(card.requiredPermission)
+  );
+
+  // Render nothing until authorization check is complete
+  if (!authorized) return null;
+
+  return (
+    <div className="container mx-auto px-6 py-10">
+      {/* <h1 className="text-4xl font-semibold mb-8 text-center">Dashboard Overview</h1> */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {visibleCards.map((card, index) => (
+          <div
+            key={index}
+            className={`rounded-lg shadow-lg p-12 ${card.bgColor} text-white transform hover:scale-105 transition-transform`}
+          >
+            <div className="flex-col items-center justify-between">
+              {card.icon}
+              <div className="text-right">
+                <h2 className="text-lg font-semibold">{card.title}</h2>
+                <p className="text-3xl font-bold">
+                  {loading ? (
+                    <SkeletonCard />
+                  ) : card.value !== null ? (
+                    card.value
+                  ) : (
+                    "No Data"
+                  )}
+                </p>
+              </div>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default OverviewPage;

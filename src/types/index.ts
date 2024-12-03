@@ -20,16 +20,9 @@ export interface Module {
   moduleName: string;
   courseId: string;
   course: {
-    id: number,
-    courseName: string
-  }
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ClassTime{
-  id: number;
-  classTime:string;
+    id: number;
+    courseName: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -41,27 +34,40 @@ export interface Feedback {
   classTimeId: number;
   moduleId: number;
   studentToken: string;
+  tokenStartTime: string;
   tokenExpiration: string;
   trainer: {
     id: number;
     trainerName: string;
     email: string;
     course: {
-      courseName: string
-    }
+      courseName: string;
+    };
   };
+  courseTrainer: {
+    id: number,
+    trainerId: number,
+    courseId: number,
+    trainers_users: {
+      username: string
+    }
+  },
   intake: {
     intakeYear: string;
     id: number;
     intakeName: string;
-  };  
+  };
   classTime: {
     id: number;
     classTime: string;
-  };  
+  };
   module: {
     id: number;
     moduleName: string;
+    course: {
+      id: number;
+      courseName:string;
+    }
   };
 }
 
@@ -73,21 +79,19 @@ export interface Intake {
 
 export interface Trainer {
   id: number;
-  trainerName:string;
-  email:string;
+  username: string;
+  email: string;
 }
 
 export interface ClassTime {
   id: number;
-  classTime:string;
-  classTimeStart:string;
-  classTimeEnd:string;
+  classTime: string;
 }
 
 export interface Module {
   id: number;
-  moduleName:string;
-  courseId:string;
+  moduleName: string;
+  courseId: string;
 }
 
 export interface User {
@@ -98,15 +102,41 @@ export interface User {
   roleId: number;
   createdAt: string;
   updatedAt: string;
-  role: Role; // Add role object here
+  roleUsers: {
+    id: number;
+    roleName: string;
+  }; // Add role object here
+  trainer_courses: [
+    {
+      id: number;
+      trainerId: number;
+      courseId: number;
+      course: {
+        id: number;
+        courseName: string;
+      }
+    }
+  ]
 }
+
 export interface FeedbackQuestion {
   feedbackQuestion: string;
   id: number;
   questionText: string;
   questionType: 'open-ended' | 'closed-ended' | 'rating';
+  minRating?: number;
+  maxRating?: number;
 }
 
+export interface trainer_courses {
+  id: number;
+  trainerId: number;
+  courseId: number;
+  Course: {
+    id: number;
+    courseName: string;
+  }
+}
 export interface FeedbackQuestionSelect {
   id: number;
   questionText: string;
@@ -115,11 +145,13 @@ export interface FeedbackQuestionSelect {
     id: number;
     questionText: string;
     questionType: string;
-    answerOption:[{
-      description: string;
-      id:number;
-      optionText:string;
-    }]
+    answerOption: [
+      {
+        description: string;
+        id: number;
+        optionText: string;
+      }
+    ];
   };
 }
 
@@ -128,6 +160,7 @@ export interface AnswerOptions {
   optionText: string;
   description?: string;
 }
+
 export interface Trainer {
   id: number;
   trainerName: string;
@@ -136,4 +169,11 @@ export interface Trainer {
     id: number;
     courseName: string;
   };
+}
+
+export interface RecentActivities {
+  id: number;
+  entityType: string;
+  activityType: string;
+  description: string;
 }

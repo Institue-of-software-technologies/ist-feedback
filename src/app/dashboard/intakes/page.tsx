@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
 import { Intake } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 
 const IntakeManagement: React.FC = () => {
@@ -31,7 +32,7 @@ const IntakeManagement: React.FC = () => {
                 setFilteredIntake(response.data.intake);
             } catch (err) {
                 console.log(err)
-                toast.error('Failed to fetch intakes', { position: "top-right", autoClose: 3000 });
+                showToast.error('Failed to fetch intakes');
             } finally {
                 setLoading(false);
             }
@@ -47,10 +48,10 @@ const IntakeManagement: React.FC = () => {
                 await api.delete(`/intakes/${confirmDelete.id}`);
                 setIntakes(intakes.filter(intake => intake.id !== confirmDelete.id));
                 setFilteredIntake(filteredIntake.filter(filteredIntake => filteredIntake.id !== confirmDelete.id));
-                toast.success('Intake deleted successfully', { position: "top-right", autoClose: 2000 });
+                showToast.success('Intake deleted successfully');
             } catch (err) {
                 console.log(err)
-                toast.error('Failed to delete intake', { position: "top-right", autoClose: 3000 });
+                showToast.error('Failed to delete intake');
             }
         }
     };
@@ -72,7 +73,7 @@ const IntakeManagement: React.FC = () => {
 
     // Handle intake editing
     const handleEdit = (intake: Intake) => {
-        toast.info('Redirecting to edit Intake...', { position: "top-right", autoClose: 1500 });
+        showToast.info('Redirecting to edit Intake...');
         router.push(`/dashboard/intakes/edit/${intake.id}`);
     };
 
@@ -80,7 +81,7 @@ const IntakeManagement: React.FC = () => {
 
     const columns = [
         { header: 'intakeName', accessor: 'intakeName' },
-        {header: "intakeYear", accessor: "intakeYear"}
+        { header: "intakeYear", accessor: "intakeYear" }
     ];
 
     return (

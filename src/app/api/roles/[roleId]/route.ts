@@ -47,27 +47,38 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { roleId } = context.params;
-    const { roleName,multiSelectField } = await req.json();
+    const { roleName, multiSelectField,Permissions } = await req.json();
+    console.log(roleName, multiSelectField);
 
+    // Fetch the role by ID
     const role = await Role.findByPk(roleId);
-    await RolePermission.destroy({
-      where: {
-        roleId: roleId
-      }
-    });
 
     if (!role) {
       return NextResponse.json({ message: 'Role not found' }, { status: 404 });
     }
 
-    role.roleName = roleName;
-    await role.save();
+    // Update the role name if provided
+    if (roleName) {
+      role.roleName = roleName;
+      await role.save();
+    }
 
-    for (const permission of multiSelectField) {
-      await RolePermission.create({
-        roleId: role.id,
-        permissionId: permission
+    // Update permissions only if provided
+    if (Permissions.length > 0) {
+      // Clear existing permissions
+      await RolePermission.destroy({
+        where: {
+          roleId: roleId
+        }
       });
+
+      // Add new permissions
+      for (const permission of multiSelectField) {
+        await RolePermission.create({
+          roleId: role.id,
+          permissionId: permission
+        });
+      }
     }
 
     return NextResponse.json({ message: 'Role updated successfully', role });
@@ -76,6 +87,7 @@ export async function PUT(req: NextRequest, context: Context) {
     return NextResponse.json({ message: 'Error updating role', error: errorMessage }, { status: 500 });
   }
 }
+
 
 // DELETE /api/roles/[roleId] - Delete a role by ID
 export async function DELETE(req: NextRequest, context: Context) {

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'; // App Router useRouter
 import { useUser } from '@/context/UserContext';
 import {
   RiDashboard2Fill,
+  RiUserLine,
 } from "react-icons/ri";
 import {
   FaUsers,
@@ -17,29 +18,33 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
-import { PiChalkboardTeacherFill } from "react-icons/pi";
+import { PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
-import { SiGoogleforms } from "react-icons/si";
 import api from '../../../lib/axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
 import istLogo from '../../../public/assets/image/cropedImag.png';
 import Image from 'next/image';
+import { showToast } from '@/components/ToastMessage';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
   overview: React.ReactNode;
-  reports: React.ReactNode;
+  analysis: React.ReactNode;
   analytics: React.ReactNode;
+  recentactivities: React.ReactNode;
 };
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, reports, analytics }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analysis, analytics, recentactivities }) => {
   const { user } = useUser();
   const router = useRouter(); // Router instance for programmatic navigation
   const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
   const [currentView, setCurrentView] = useState<string>('view'); // For toggling between view/create
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false); // State to manage sidebar visibility
+  const [menuOpen, setMenuOpen] = useState<boolean>(false); // State to menu visibility
+  const [loggedInUser] = useState<string | null>(user?.username ?? null);
+
 
   // Function to handle logout
   const handleLogout = async () => {
@@ -51,11 +56,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           router.push('/login');
         }, 3000);
 
-        toast.success('Logout successfully', { position: "top-right", autoClose: 3000 });
       }
     } catch (error) {
       console.log(error)
-      toast.error('Failed to logout', { position: "top-right", autoClose: 3000 });
+      showToast.error('Failed to logout');
     }
   };
 
@@ -139,19 +143,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       sideIcon: <FaUserLock size={'30px'} />,
       createLink: '/dashboard/permissions/create',
     },
-    {
-      name: 'Trainer',
-      permission: 'manage_trainers',
-      viewLabel: 'View Trainers',
-      createLabel: 'Create Trainer',
-      viewLink: '/dashboard/trainers',
-      icon: <FaUsers size={'40px'} />,
-      sideIcon: <FaUsers size={'30px'} />,
-      createLink: '/dashboard/trainers/create',
-    },
+    // {
+    //   name: 'Trainer',
+    //   permission: 'manage_trainers',
+    //   viewLabel: 'View Trainers',
+    //   createLabel: 'Create Trainer',
+    //   viewLink: '/dashboard/trainers',
+    //   icon: <FaUsers size={'40px'} />,
+    //   sideIcon: <FaUsers size={'30px'} />,
+    //   createLink: '/dashboard/trainers/create',
+    // },
     {
       name: "Feedback Questions",
-      permission: "manage_feedback",
+      permission: "manage_feedback_questions",
       viewLabel: "View Feedback Question",
       createLabel: "Create Feedback Question",
       viewLink: "/dashboard/feedback-questions",
@@ -169,17 +173,36 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
       sideIcon: <VscFeedback size={"30px"} />,
       createLink: "/dashboard/feedback/create",
     },
+    // {
+    //   name: 'Feedback Reports',
+    //   permission: 'send_feedback_reports',
+    //   viewLabel: 'View Feedback Reports',
+    //   createLabel: 'Send Feedback Report',
+    //   viewLink: '/dashboard/feedback-reports/',
+    //   icon: <SiGoogleforms size={'40px'} />,
+    //   sideIcon: <SiGoogleforms size={'30px'} />,
+    //   createLink: '/dashboard/feedback-reports/send',
+    // },
     {
-      name: 'Feedback Reports',
-      permission: 'send_feedback_reports',
-      viewLabel: 'View Feedback Reports',
-      createLabel: 'Send Feedback Report',
-      viewLink: '/dashboard/feedback-reports/',
-      icon: <SiGoogleforms size={'40px'} />,
-      sideIcon: <SiGoogleforms size={'30px'} />,
-      createLink: '/dashboard/feedback-reports/send',
-    },
+      name: 'My Profile',
+      permission: 'profile',
+      viewLabel: 'Manage Profile',
+      viewLink: `/dashboard/user-profile/${user?.id}`,
+      icon: <PiUserCircleGearDuotone size={'20px'} />,
+      sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
+    }
   ];
+
+  const menuItems = [
+    {
+      name: 'My Profile',
+      permission: 'manage_profile',
+      viewLabel: 'Manage Profile',
+      viewLink: `/dashboard/user-profile/${user?.id}`,
+      icon: <PiUserCircleGearDuotone size={'20px'} />,
+      sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
+    },
+  ]
 
   // Get the currently active tab details
   const activeTabDetails = tabs.find((tab) => tab.name === activeTab);
@@ -215,10 +238,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
   if (!user || !user.permissions.includes('view_dashboard')) {
     return <div className="text-red-600 text-center mt-20">You do not have access to this page.</div>;
   }
-
   return (
     <Suspense fallback={<Loading />}>
-      <div className="flex h-screen bg-background text-foreground overflow-x-hidden">
+      <div className="flex h-full min-h-screen bg-background text-foreground">
         <ToastContainer />
 
         {/* Sidebar for Mobile */}
@@ -328,12 +350,53 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
               ))}
               <li>
                 <button
-                  onClick={handleLogout}
-                  className="flex items-center p-2 rounded hover:bg-gray-700 transition-colors"
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="flex flex-col items-center p-2 rounded hover:bg-gray-700 transition-colors"
                 >
-                  <FaPowerOff size={20} />
-                  <span className="ml-2">Logout</span>
+                  <span><PiUserCircleDuotone size={40} /></span>
+                  <span className="ml-2">My Profile</span>
                 </button>
+                {menuOpen && (
+                  <div className="absolute z-10 mt-2 right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 m-4">
+                    <div
+                      className="py-1 flex flex-col justify-around" // Add flex-row for horizontal layout
+                      role="menu"
+                      aria-labelledby="options-menu"
+                    >
+                      <label
+                        className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
+                      >
+                        <div className="flex items-center">
+                          <span className="m-1"><RiUserLine size={20} /></span>
+                          <span className="m-1">{loggedInUser}</span>
+                        </div>
+                      </label>
+                      {menuItems.map((options) => (
+                        <label
+                          onClick={() => { handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen) }}
+                          key={options.name}
+                          className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
+                        >
+                          <div className="flex items-center">
+                            <span className="m-1">{options.icon}</span>
+                            <span className="m-1">{options.name}</span>
+                          </div>
+                        </label>
+                      ))}
+                      <label
+                        onClick={() => { handleLogout(); setMenuOpen(!menuOpen) }}
+                        className="flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      >
+                        <div className="flex items-center">
+                          <span className="m-1">
+                            <FaPowerOff size={20} />
+                          </span>
+                          <span className="m-1">Logout</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                )}
               </li>
             </ul>
           </nav>
@@ -362,24 +425,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, r
           )}
 
           {/* Main Content */}
-          <main className="flex-grow p-2 bg-background text-foreground overflow-x-auto">
+          <main className="flex-grow p-2 bg-background text-foreground">
             {currentView === 'view' && (
               <div>
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {analysis}
+                  </div>
+                )}
                 {activeTab === 'Dashboard' && (
                   <div>
                     {overview}
                   </div>
                 )}
 
-                {activeTab === 'Dashboard' && (
-                  <div>
-                    {reports}
-                  </div>
-                )}
 
                 {activeTab === 'Dashboard' && (
                   <div>
                     {analytics}
+                  </div>
+                )}                
+                {activeTab === 'Dashboard' && (
+                  <div>
+                    {recentactivities}
                   </div>
                 )}
                 {/* Render the content for viewing */}

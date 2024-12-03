@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
 import { Permission} from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from '@/context/UserContext';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 
 const PermissionManagement: React.FC = () => {
@@ -31,7 +32,7 @@ const PermissionManagement: React.FC = () => {
         setFilteredPermission(response.data.permission);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch users');
       } finally {
         setLoading(false);
       }
@@ -47,10 +48,10 @@ const PermissionManagement: React.FC = () => {
         await api.delete(`/permissions/${confirmDelete.id}`);
         setPermission(permission.filter(permission => permission.id !== confirmDelete.id));
         setFilteredPermission(filteredPermission.filter(filteredPermission => filteredPermission.id !== confirmDelete.id));
-        toast.success('Permission deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('Permission deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete permission', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete permission');
       }
     }
   };
@@ -72,7 +73,7 @@ const PermissionManagement: React.FC = () => {
   
   // Handle user editing
   const handleEdit = (permission: Permission) => {
-    toast.info('Redirecting to edit user...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit user...');
     router.push(`/dashboard/permissions/edit/${permission.id}`);
   };
 

@@ -1,13 +1,12 @@
-import { AnswerOption } from "@/db/models/AnswerOption";
 import { ClassTime } from "@/db/models/ClassTime";
-import { Course } from "@/db/models/Course";
-import { Feedback } from "@/db/models/Feedback";
 import { FeedbackAnswer } from "@/db/models/FeedbackAnswer";
-import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { Trainer } from "@/db/models/Trainer";
 import { NextRequest, NextResponse } from "next/server";
+import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
+import { AnswerOption } from "@/db/models/AnswerOption";
+import { Feedback } from "@/db/models/Feedback";
+import { Course, TrainerCourses, User } from "@/db/models/index";
 
 interface Context {
   params: { feedbackReportId: string };
@@ -24,21 +23,27 @@ export async function GET(req: NextRequest, context: Context) {
           attributes: ["id"],
           include: [
             {
-              model: Trainer,
-              as: "trainer",
-              attributes: ["trainerName","email"],
+              model: TrainerCourses,
+              as: "courseTrainer",
               include: [
                 {
-                  model: Course,
-                  as: "course",
-                  attributes: ["courseName"],
-                },
-              ],
+                  model: User,
+                  as: "trainers_users",
+                  attributes: ["username","email"],
+                }
+              ]
             },
             {
               model: Module,
               as: "module",
               attributes: ["moduleName"],
+              include: [
+                {
+                  model: Course,
+                  as: "course",
+                  attributes: ["id","courseName"],
+                },
+              ],
             },
             {
               model:Intake,

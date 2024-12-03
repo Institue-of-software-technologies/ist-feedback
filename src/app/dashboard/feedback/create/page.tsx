@@ -4,9 +4,12 @@ import React, { useEffect, useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { ClassTime, FeedbackQuestion, Intake, Module, Trainer } from "@/types";
+import { ClassTime, FeedbackQuestion, Intake, Module, User } from "@/types";
+import { showToast } from "@/components/ToastMessage";
+import { useUser } from "@/context/UserContext";
+import Loading from "@/app/loading";
 
 interface FormData {
   trainerId: number;
@@ -14,94 +17,96 @@ interface FormData {
   classTimeId: number;
   moduleId: number;
   questionId: number;
+  courseTrainerId: number;
+  tokenStartTime: Date;
   tokenExpiration: Date;
 }
 
 const NewFeedbackForm: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
-  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [trainers, setTrainers] = useState<User[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [questions, setQuestions] = useState<FeedbackQuestion[]>([]);
   const [step, setStep] = useState<number>(1);
+  const { user } = useUser();
 
   const onSubmit = async (data: FormData) => {
     try {
       await api.post("/feedback", data);
-      toast.success("Feedback created successfully!", { position: "top-right", autoClose: 3000 });
+      showToast.success("Feedback created successfully!");
       setTimeout(() => {
         router.push('/dashboard/feedback');
       }, 1000);
     } catch (error) {
       console.error("Failed to create feedback", error);
-      toast.error("Failed to create feedback", { position: "top-right", autoClose: 3000 });
+      showToast.error("Failed to create feedback");
     }
   };
 
   useEffect(() => {
-    const fetchTrainers = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await api.get(`/trainers`);
-        setTrainers(response.data.trainer);
+        const [
+          trainersResponse,
+          questionsResponse,
+          intakesResponse,
+          classTimesResponse,
+          modulesResponse,
+        ] = await Promise.all([
+          api.get(`/trainers`, {
+            headers: {
+              'user-role': `${user?.role}`,
+              'user-id': `${user?.id}`,
+            },
+          }),
+          api.get(`/feedback-questions`),
+          api.get(`/intakes`),
+          api.get(`/class-times`),
+          api.get(`/modules`, {
+            headers: {
+              'user-role': `${user?.role}`,
+              'user-id': `${user?.id}`,
+            },
+          }),
+        ]);
+    
+        setTrainers(
+          Array.isArray(trainersResponse.data.trainers)
+            ? trainersResponse.data.trainers
+            : [trainersResponse.data.trainers]
+        );
+        setQuestions(questionsResponse.data.questions);
+        setIntakes(intakesResponse.data.intake);
+        setClassTimes(classTimesResponse.data.classTime);
+        setModules(modulesResponse.data);
       } catch (err) {
-        console.log(err);
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
       }
     };
-    const fetchQuestions = async () => {
-      try {
-        const response = await api.get(`/feedback-questions`);
-        setQuestions(response.data.questions);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchIntakes = async () => {
-      try {
-        const response = await api.get(`/intakes`);
-        setIntakes(response.data.intake);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchClassTimes = async () => {
-      try {
-        const response = await api.get(`/class-times`);
-        setClassTimes(response.data.classTime);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    const fetchModules = async () => {
-      try {
-        const response = await api.get(`/modules`);
-        setModules(response.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+    
 
-    fetchTrainers();
-    fetchIntakes();
-    fetchClassTimes();
-    fetchModules();
-    fetchQuestions();
-    setLoading(false);
-  }, []);
+    fetchData();
+  }, [user?.id, user?.role]);
 
-  if (loading) {
-    return <div className="text-center">Loading...</div>;
-  }
+
+  if (loading) return <Loading/>;
 
   const step1Inputs = [
     {
       label: "trainerId",
       type: "select",
-      options: trainers.map((trainer) => ({
-        label: `${trainer.trainerName} - ${trainer.course.courseName}`,
-        value: trainer.id,
-      })),
+      options:  trainers.flatMap((trainer) =>
+        trainer.trainer_courses.map((course) => ({
+          label: `${trainer.username} - ${course.course.courseName}`,
+          value: course.id,
+        }))
+      )
     },
     {
       label: "moduleId",
@@ -139,6 +144,10 @@ const NewFeedbackForm: React.FC = () => {
       })),
     },
     {
+      label: "tokenStartTime",
+      type: "date",
+    },
+    {
       label: "tokenExpiration",
       type: "date",
     },
@@ -152,6 +161,7 @@ const NewFeedbackForm: React.FC = () => {
       <ToastContainer />
       <h2 className="text-2xl font-bold mb-4">Create New Feedback - Step {step}</h2>
       <Form<FormData>
+        buttonText={step === 1 ? "Next":"Submit"}
         Input={step === 1 ? step1Inputs : step2Inputs}
         onSubmit={step === 2 ? onSubmit : handleNextStep}
       />
@@ -159,11 +169,6 @@ const NewFeedbackForm: React.FC = () => {
         {step > 1 && (
           <button onClick={handlePrevStep} className="bg-gray-300 text-gray-800 px-4 py-2 rounded">
             Previous
-          </button>
-        )}
-        {step === 1 && (
-          <button onClick={handleNextStep} className="bg-blue-500 text-white px-4 py-2 rounded">
-            Next
           </button>
         )}
       </div>

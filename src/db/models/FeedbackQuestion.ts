@@ -5,7 +5,8 @@ export class FeedbackQuestion extends Model {
   id!: number;
   questionText!: string;
   questionType!: 'open-ended' | 'closed-ended' | 'rating';
-  responses!: { [answerText: string]: { count: number; percentage: string } }
+  minRating?: number;
+  maxRating?: number;
 }
 
 FeedbackQuestion.init({
@@ -22,7 +23,14 @@ FeedbackQuestion.init({
   questionType: {
     type: DataTypes.ENUM('open-ended', 'closed-ended', 'rating'),
     allowNull: false,
-    defaultValue: 'open-ended',
+  },
+  minRating: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  maxRating: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
   },
 }, {
   sequelize,

@@ -2,42 +2,43 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
-import { Course} from '@/types'; // Adjust this path to your User type definition
+import { Course } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 
 const CourseManagement: React.FC = () => {
   const { user } = useUser();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // State to handle delete confirmation
-  const [filteredcourse, setFilteredcourse] = useState<Course[]>([]);  // Holds the filtered users
+  const [filteredCourse, setFilteredCourse] = useState<Course[]>([]);  // Holds the filtered users
   const [search, setSearch] = useState<string>('');
   const router = useRouter();
 
   // Fetch course from your API
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchCourses = async () => {
       try {
         const response = await api.get('/courses', {
           method: 'GET',
         });
         console.log(response);
         setCourses(response.data.course);
-        setFilteredcourse(response.data.course);
+        setFilteredCourse(response.data.course);
       } catch (err) {
         console.log(err)
-        toast.error('Failed to fetch users', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch courses');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchCourses();
   }, []);
 
   // Handle course deletion
@@ -46,11 +47,11 @@ const CourseManagement: React.FC = () => {
       try {
         await api.delete(`/courses/${confirmDelete.id}`);
         setCourses(courses.filter(course => course.id !== confirmDelete.id));
-        setFilteredcourse(filteredcourse.filter(filteredcourse => filteredcourse.id !== confirmDelete.id));
-        toast.success('course deleted successfully', { position: "top-right", autoClose: 2000 });
+        setFilteredCourse(filteredCourse.filter(filteredCourse => filteredCourse.id !== confirmDelete.id));
+        showToast.success('course deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete course', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete course');
       }
     }
   };
@@ -61,38 +62,38 @@ const CourseManagement: React.FC = () => {
 
     // Filter the course based on the search query
     if (value.trim() === '') {
-      setFilteredcourse(courses);  // Show all if search is empty
+      setFilteredCourse(courses);  // Show all if search is empty
     } else {
       const filtered = courses.filter(course =>
         course.courseName.toLowerCase().includes(value.toLowerCase())
       );
-      setFilteredcourse(filtered);
+      setFilteredCourse(filtered);
     }
   };
-  
+
   // Handle course editing
   const handleEdit = (course: Course) => {
-    toast.info('Redirecting to edit user...', { position: "top-right", autoClose: 2000 });
+    showToast.info('Redirecting to edit course...');
     router.push(`/dashboard/courses/edit/${course.id}`);
   };
 
   if (loading) return <Loading />;
 
   const columns = [
-    { header: 'courseName', accessor: 'courseName' }
+    { header: 'courseName', accessor: 'courseName' },
   ];
 
   return (
     <div>
       <ToastContainer /> {/* Include ToastContainer for rendering toasts */}
-      {filteredcourse.length === 0 ? (
+      {filteredCourse.length === 0 ? (
         <div className="text-center p-4">
           <p>No courses available at the moment.</p>
         </div>
       ) : (
         <Table<Course>
           columns={columns}
-          data={filteredcourse}
+          data={filteredCourse}
           onSearch={handleSearch}
           onEdit={user && user.permissions.includes('update_courses') ? handleEdit : undefined}
           onDelete={user && user.permissions.includes('delete_courses') ? handleDelete : undefined}

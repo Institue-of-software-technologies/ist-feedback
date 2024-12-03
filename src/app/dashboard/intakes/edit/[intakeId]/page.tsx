@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios'; // Update path to your axios lib
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { Intake } from '@/types';
+import { showToast } from '@/components/ToastMessage';
 
 interface FormData {
     intakeName: string;
-    intakeYear:string
+    intakeYear: string
 }
 
 const EditIntake = () => {
@@ -43,21 +44,15 @@ const EditIntake = () => {
         console.log(data)
         try {
             await api.put(`/intakes/${intakeId}`, data);
-            toast.success('Intake updated successfully!', {
-                position: "top-right",
-                autoClose: 2000, 
-            });
+            showToast.success('Intake updated successfully!');
 
             // Delay the redirect to allow the toast to display
             setTimeout(() => {
-                router.push('/dashboard/intakes'); 
+                router.push('/dashboard/intakes');
             }, 1000);
         } catch (err) {
             console.log(err)
-            toast.error('Failed to update intake', {
-                position: "top-right",
-                autoClose: 3000, 
-            });
+            showToast.error('Failed to update intake',);
         }
     };
 
@@ -80,7 +75,7 @@ const EditIntake = () => {
         {
             label: "intakeYear",
             type: "select",
-            value:intake?.intakeYear,
+            value: intake?.intakeYear,
             options: generateYearOptions()
         }
     ];
@@ -98,4 +93,4 @@ const EditIntake = () => {
     );
 };
 
-export default EditIntake;
+export default EditIntake;

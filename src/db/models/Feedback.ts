@@ -1,21 +1,23 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from "../db_connection";
-import { Trainer } from './Trainer';
 import { ClassTime } from './ClassTime';
 import { Module } from './Module';
 import { Intake } from './Intake';
 import { FeedbackAnswer } from './FeedbackAnswer';
+import { User } from './User';
+import { TrainerCourses } from './TrainerCourses';
 
 export class Feedback extends Model {
   id!: number;
-  trainerId!: number;
   intakeId!: number;
   classTimeId!: number;
   moduleId!: number;
   studentToken!: string;
+  tokenStartTime!: Date;
   tokenExpiration!: Date;
+  courseTrainerId!: number;
   
-  trainer?: Trainer;
+  trainer?: User;
   // intake?: Intake; // Add this manually for TypeScript to recognize the association
   classTime?: ClassTime;
   module?: Module;
@@ -28,15 +30,6 @@ Feedback.init({
     autoIncrement: true,
     primaryKey: true,
     allowNull: false,
-  },
-  trainerId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: Trainer,
-      key: 'id',
-    },
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
   },
   classTimeId: {
     type: DataTypes.INTEGER,
@@ -65,10 +58,23 @@ Feedback.init({
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   },
+  courseTrainerId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: TrainerCourses,
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  },
   studentToken: {
     type: DataTypes.STRING,
     allowNull: false,
   },  
+  tokenStartTime: {
+    type: DataTypes.DATE,
+    allowNull: false, 
+  },
   tokenExpiration: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -78,11 +84,6 @@ Feedback.init({
   modelName: 'Feedback',
   tableName: 'Feedback',
   timestamps: true,
-});
-
-Feedback.belongsTo(Trainer, {
-  foreignKey: "trainerId",
-  as: "trainer", 
 });
 Feedback.belongsTo(Module, {
   foreignKey: "moduleId",
@@ -96,5 +97,9 @@ Feedback.belongsTo(ClassTime, {
 Feedback.belongsTo(Intake, {
   foreignKey: "intakeId",
   as: "intake",
+});
+Feedback.belongsTo(TrainerCourses, {
+  foreignKey: "courseTrainerId",
+  as: "courseTrainer",
 });
 

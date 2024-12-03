@@ -4,68 +4,135 @@ import { Feedback } from "@/db/models/Feedback";
 import { FeedbackSelectQuestions } from "@/db/models/FeedbackSelectQuestions";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { Trainer } from "@/db/models/Trainer";
-import { NextResponse } from "next/server";
+import { TrainerCourses, User } from "@/db/models/index";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Fetch feedbacks with associated trainer, module, course, classTime, and intake details
-    const feedbacks = await Feedback.findAll({
-      include: [
-        {
-          model: Trainer,
-          as: "trainer",
-          attributes: ["trainerName"],
-          include: [
-            {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
-        },
-        {
-          model: Module,
-          as: "module",
-          attributes: ["moduleName"],
-          include: [
-            {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
-        },
-        { model: ClassTime, as: "classTime", attributes: ["classTime"] },
-        {
-          model: Intake,
-          as: "intake",
-          attributes: ["intakeName", "intakeYear"],
-        },
-      ],
-    });
+    // Extract user information (e.g., role and ID) from request headers or a session token
+    const userRole = req.headers.get("user-role");
+    const userId = req.headers.get("user-id");
+
+    let feedbacks;
+
+    // Filter feedbacks based on the user's role
+    if (userRole === "trainer") {
+      // Fetch only feedbacks associated with the trainer
+      feedbacks = await Feedback.findAll({
+        include: [
+          {
+            model: TrainerCourses, // The model representing the trainer_courses table
+            as: 'courseTrainer',
+            where: { trainerId: userId }, // Filter where the trainerId matches the provided userId
+            required: true // This ensures that only feedbacks with a matching trainerId in the trainer_courses table are included
+          },
+          {
+            model: TrainerCourses,
+            as: "courseTrainer",
+            include: [
+              {
+                model: User,
+                as: "trainers_users",
+                attributes: ["username"],
+              }
+            ]
+          },
+          {
+            model: Module,
+            as: "module",
+            attributes: ["moduleName"],
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["courseName"],
+              },
+            ],
+          },
+          {
+            model: ClassTime,
+            as: "classTime",
+            attributes: ["classTime"]
+          },
+          {
+            model: Intake,
+            as: "intake",
+            attributes: ["intakeName", "intakeYear"],
+          },
+          {
+            model: Intake,
+            as: "intake",
+            attributes: ["intakeName", "intakeYear"],
+          },
+        ],
+      });
+    } else {
+      // Fetch all feedbacks for other roles
+      feedbacks = await Feedback.findAll({
+        include: [
+          {
+            model: TrainerCourses,
+            as: "courseTrainer",
+            include: [
+              {
+                model: User,
+                as: "trainers_users",
+                attributes: ["username"],
+              }
+            ]
+          },
+          {
+            model: Module,
+            as: "module",
+            attributes: ["moduleName"],
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["courseName"],
+              },
+            ],
+          },
+          { model: ClassTime, as: "classTime", attributes: ["classTime"] },
+          {
+            model: Intake,
+            as: "intake",
+            attributes: ["intakeName", "intakeYear"],
+          }
+        ],
+      });
+    }
 
     // Format the tokenExpiration dates and send formatted feedback data to the client
-    const formattedFeedbacks = feedbacks.map((feedback) => {
-      // Convert the tokenExpiration to a formatted string (e.g., using toLocaleString)
-      const formattedExpiration = new Date(
-        feedback.tokenExpiration
-      ).toLocaleString("en-KE", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-        timeZoneName: "short",
-      });
-
-      return {
-        ...feedback.toJSON(), // Spread the rest of the feedback fields
-        tokenExpiration: formattedExpiration, // Replace tokenExpiration with the formatted value
-      };
-    });
+    const formattedFeedbacks = feedbacks.map((feedback) => ({
+      ...feedback.toJSON(),
+      tokenStartTime: new Date(feedback.tokenStartTime).toLocaleString(
+        "en-KE",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZoneName: "short",
+        }
+      ),
+      tokenExpiration: new Date(feedback.tokenExpiration).toLocaleString(
+        "en-KE",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZoneName: "short",
+        }
+      ),
+    }));
 
     return NextResponse.json({
       message: "Feedback retrieved successfully",
@@ -112,6 +179,7 @@ export async function POST(req: Request) {
       intakeId,
       classTimeId,
       moduleId,
+      tokenStartTime,
       tokenExpiration,
       multiSelectField,
     } = await req.json();
@@ -123,6 +191,7 @@ export async function POST(req: Request) {
       !classTimeId ||
       !moduleId ||
       !tokenExpiration
+      // !tokenStartTime
     ) {
       return NextResponse.json(
         { error: "All fields are required" },
@@ -130,28 +199,38 @@ export async function POST(req: Request) {
       );
     }
 
-    // Parse tokenExpiration date from input
-    const Expiration = new Date(tokenExpiration);
+    // Parse and validate tokenStartTime and tokenExpiration
+    const startTime = new Date(tokenStartTime);
+    const expirationTime = new Date(tokenExpiration);
 
-    if (isNaN(Expiration.getTime())) {
+    if (isNaN(startTime.getTime()) || isNaN(expirationTime.getTime())) {
       return NextResponse.json(
-        { error: "Invalid token expiration date" },
+        { error: "Invalid date for tokenStartTime or tokenExpiration" },
         { status: 400 }
       );
     }
 
-    // Convert tokenExpiration to UTC
-    const utcExpiration = new Date(Expiration.toISOString()); // Converts to UTC
+    if (startTime >= expirationTime) {
+      return NextResponse.json(
+        { error: "tokenStartTime must be earlier than tokenExpiration" },
+        { status: 400 }
+      );
+    }
+
+    // Convert dates to UTC
+    const utcStartTime = new Date(startTime.toISOString());
+    const utcExpiration = new Date(expirationTime.toISOString());
 
     const studentToken = await generateUniqueToken();
 
     const feedback = await Feedback.create({
-      trainerId,
+      courseTrainerId: trainerId,
       intakeId,
       classTimeId,
       moduleId,
       studentToken,
-      tokenExpiration: utcExpiration, // Store in UTC
+      tokenStartTime: utcStartTime,
+      tokenExpiration: utcExpiration,
     });
 
     for (const feedbackSelectQuestion of multiSelectField) {
@@ -173,4 +252,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
 

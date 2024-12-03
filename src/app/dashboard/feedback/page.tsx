@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import api from '../../../../lib/axios'; // Adjust this path to your axios setup
 import { Feedback } from '@/types'; // Adjust this path to your User type definition
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import Loading from '../loading';  // Import the Loading component
+import { showToast } from '@/components/ToastMessage';
 
 const FeedBackManagement: React.FC = () => {
   const { user } = useUser();
@@ -22,8 +23,12 @@ const FeedBackManagement: React.FC = () => {
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
-        const response = await api.get('/feedback', {
+        const response = await api.get(`/feedback`, {
           method: 'GET',
+          headers: {
+            'user-role': `${user?.role}`, 
+            'user-id': `${user?.id}`,
+          },
         });
 
         // Ensure response contains 'feedbacks' array (plural)
@@ -35,14 +40,14 @@ const FeedBackManagement: React.FC = () => {
         }
       } catch (err) {
         console.error('Failed to fetch feedbacks:', err);
-        toast.error('Failed to fetch feedbacks', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to fetch feedbacks');
       } finally {
         setLoading(false);
       }
     };
 
     fetchFeedbacks();
-  }, []);
+  }, [user?.id, user?.role]);
 
   // Handle feedback deletion
   const handleDelete = async (confirmDelete: Feedback) => {
@@ -51,10 +56,10 @@ const FeedBackManagement: React.FC = () => {
         await api.delete(`/feedback/${confirmDelete.id}`);
         setFeedbacks(feedbacks.filter(feedback => feedback.id !== confirmDelete.id));
         setFilteredFeedback(filteredFeedback.filter(feedback => feedback.id !== confirmDelete.id));
-        toast.success('Feedback deleted successfully', { position: "top-right", autoClose: 2000 });
+        showToast.success('Feedback deleted successfully');
       } catch (err) {
         console.log(err)
-        toast.error('Failed to delete feedback', { position: "top-right", autoClose: 3000 });
+        showToast.error('Failed to delete feedback');
       }
     }
   };
@@ -74,9 +79,14 @@ const FeedBackManagement: React.FC = () => {
     }
   };
 
+  const handleView = (feedback: Feedback) => {
+    showToast.info('Redirecting to View Feedback Report...');
+    router.push(`/dashboard/feedback-reports/${feedback.id}`);
+  };
+
   // Handle feedback editing
   const handleEdit = (feedback: Feedback) => {
-    toast.info('Redirecting to edit Feedback...', { position: "top-right", autoClose: 1500 });
+    showToast.info('Redirecting to edit Feedback...');
     router.push(`/dashboard/feedback/edit/${feedback.id}`);
   };
 
@@ -84,28 +94,44 @@ const FeedBackManagement: React.FC = () => {
 
   const columns = [
     { header: 'Student Token', accessor: 'studentToken' },
-    { header: 'Trainer Name', accessor: 'trainer.trainerName' },
-    { header: 'Course', accessor: 'trainer.course.courseName' },
-    // { header: 'Module Name', accessor: 'module.moduleName' },
+    { header: 'Trainer Name', accessor: 'courseTrainer.trainers_users.username' },
+    { header: 'Course', accessor: 'module.course.courseName' },
+    { header: 'Module Name', accessor: 'module.moduleName' },
     // { header: 'Course Name', accessor: 'module.course.courseName' },
     { header: 'Class Time', accessor: 'classTime.classTime' },
     { header: 'Intake Name', accessor: 'intake.intakeName' },
     { header: 'Intake Year', accessor: 'intake.intakeYear' },
+    {
+      header: 'Token Start Time',
+      accessor: 'tokenStartTime',
+      Cell: ({ value }: { value: string }) => {
+        const date = new Date(value);
+        return date.toLocaleString('en-KE', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: '2-digit',
+          hour: '2-digit',
+          hour12: false,
+          timeZoneName: 'short',
+        });
+      },
+    },
     {
       header: 'Token Expiration',
       accessor: 'tokenExpiration',
       Cell: ({ value }: { value: string }) => {
         const date = new Date(value);
 
-       
-        return date.toLocaleString('en-KE', { 
+
+        return date.toLocaleString('en-KE', {
           weekday: 'long',
           year: 'numeric',
-          month: 'long', 
+          month: 'long',
           day: '2-digit',
           hour: '2-digit',
-          hour12: false, 
-          timeZoneName: 'short', 
+          hour12: false,
+          timeZoneName: 'short',
         });
       },
     }
@@ -125,6 +151,8 @@ const FeedBackManagement: React.FC = () => {
           onSearch={handleSearch}
           onEdit={user && user.permissions.includes('update_feedbacks') ? handleEdit : undefined}
           onDelete={user && user.permissions.includes('delete_feedbacks') ? handleDelete : undefined}
+          onView={user && user.permissions.includes('view_feedback_results') ? handleView : undefined}
+
         />
       )}
     </div>
