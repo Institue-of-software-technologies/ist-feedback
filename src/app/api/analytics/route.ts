@@ -1,3 +1,4 @@
+import { TrainerCourses } from "@/db/models/TrainerCourses";
 import { AnswerOption } from "@/db/models/AnswerOption";
 import { ClassTime } from "@/db/models/ClassTime";
 import { Course } from "@/db/models/Course";
@@ -6,8 +7,8 @@ import { FeedbackAnswer } from "@/db/models/FeedbackAnswer";
 import { FeedbackQuestion } from "@/db/models/FeedbackQuestion";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
-import { User } from "@/db/models/User";
 import { NextResponse } from "next/server";
+import { User } from "@/db/models/index";
 
 export async function GET() {
   try {
@@ -19,9 +20,21 @@ export async function GET() {
           attributes: ["id"],
           include: [
             {
-              model: User,
-              as: "trainer",
-              attributes: ["username", "email"],
+              model: TrainerCourses,
+              as: "courseTrainer",
+              include: [
+                {
+                  model: User,
+                  as: "trainers_users",
+                  attributes: ["username", "email"],
+                },
+              ],
+             
+            },
+            {
+              model: Module,
+              as: "module",
+              attributes: ["moduleName"],
               include: [
                 {
                   model: Course,
@@ -29,11 +42,6 @@ export async function GET() {
                   attributes: ["courseName"],
                 },
               ],
-            },
-            {
-              model: Module,
-              as: "module",
-              attributes: ["moduleName"],
             },
             {
               model: Intake,

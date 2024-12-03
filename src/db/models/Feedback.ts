@@ -4,7 +4,6 @@ import { ClassTime } from './ClassTime';
 import { Module } from './Module';
 import { Intake } from './Intake';
 import { FeedbackAnswer } from './FeedbackAnswer';
-import { User } from './User';
 import { TrainerCourses } from './TrainerCourses';
 
 export class Feedback extends Model {
@@ -16,8 +15,7 @@ export class Feedback extends Model {
   tokenStartTime!: Date;
   tokenExpiration!: Date;
   courseTrainerId!: number;
-  
-  trainer?: User;
+
   // intake?: Intake; // Add this manually for TypeScript to recognize the association
   classTime?: ClassTime;
   module?: Module;
