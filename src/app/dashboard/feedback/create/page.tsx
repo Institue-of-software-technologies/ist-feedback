@@ -66,7 +66,12 @@ const NewFeedbackForm: React.FC = () => {
           api.get(`/feedback-questions`),
           api.get(`/intakes`),
           api.get(`/class-times`),
-          api.get(`/modules`),
+          api.get(`/modules`, {
+            headers: {
+              'user-role': `${user?.role}`,
+              'user-id': `${user?.id}`,
+            },
+          }),
         ]);
     
         setTrainers(
