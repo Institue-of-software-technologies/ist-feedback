@@ -106,6 +106,16 @@ const NewUserForm: React.FC = () => {
         Input={inputs}
         onSubmit={onSubmit}
       />
+       {/* Password Guidelines Section */}
+       <div className="mt-8 bg-gray-100 p-4 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold mb-4">Password Requirements</h2>
+            <ul className="list-disc pl-5">
+              <li className="text-sm text-gray-700">At least 8 characters long</li>
+              <li className="text-sm text-gray-700">Includes both uppercase and lowercase letters</li>
+              <li className="text-sm text-gray-700">Includes at least one number</li>
+              <li className="text-sm text-gray-700">Includes at least one special character (e.g., !@#$%^&*)</li>
+            </ul>
+          </div>
     </div>
   );
 };

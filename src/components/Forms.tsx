@@ -102,13 +102,13 @@ const Form = <T extends FieldValues>({
       setValue("tokenStartTime" as Path<T>, date as PathValue<T, Path<T>>);
     }
   };
-  
+
   const handleExpirationDateChange = (date: Date | null) => {
     if (date) {
       setExpirationDate(date);
       setValue("tokenExpiration" as Path<T>, date as PathValue<T, Path<T>>);
     }
-  };  
+  };
 
   const togglePasswordVisibility = (id: string) => {
     setShowPasswordState((prev) => ({
@@ -166,7 +166,7 @@ const Form = <T extends FieldValues>({
             <div className="w-auto">
               <DatePicker
                 selected={startDate}
-                onChange={(date)=>handleStartDateChange(date)}
+                onChange={(date) => handleStartDateChange(date)}
                 customInput={<CustomInput />}
                 showTimeSelect
                 dateFormat="MMMM d, yyyy h:mm aa"
@@ -175,7 +175,7 @@ const Form = <T extends FieldValues>({
           ) : input.type === "date" && input.label === "tokenExpiration" ? (
             <DatePicker
               selected={expirationDate}
-              onChange={(date)=>handleExpirationDateChange(date)}
+              onChange={(date) => handleExpirationDateChange(date)}
               customInput={<CustomInput />}
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mm aa"
@@ -201,6 +201,10 @@ const Form = <T extends FieldValues>({
                 defaultValue={input.value}
                 {...register(input.label as Path<T>, {
                   required: input.require ? `${input.label} is required` : undefined,
+                  pattern: {
+                    value: /^(?!.*[.*\\\/ ])(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/,
+                    message: "Password must be at least 8 characters long, include uppercase and lowercase letters, at least one number, one special character (!@#$%^&), and must not contain ., space, *, /, or \\."
+                  }
                 })}
                 className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
@@ -266,10 +270,11 @@ const Form = <T extends FieldValues>({
               defaultValue={input.value}
               {...register(input.label as Path<T>, {
                 required: input.require ? `${input.label} is required` : undefined,
-                pattern: input.type === "text" ? /^[A-Za-z0-9\s_-]*$/ : undefined
+                pattern: input.type === "text" ? /^[A-Za-z0-9\s_.?-]*$/ : undefined
               })}
               className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
+
           )}
 
           {errors[input.label] && (
