@@ -95,14 +95,14 @@ export default function StudentFeedback() {
             <ToastContainer />
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg shadow-lg p-6">
                 <h1 className="text-center text-2xl font-bold text-red-600">
-                    STUDENT FEEDBACK QUESTIONS FOR <b>{feedback?.trainer.course.courseName} {feedback?.intake.intakeName}</b>
+                    STUDENT FEEDBACK QUESTIONS FOR <b>{feedback?.module.course.courseName} {feedback?.intake.intakeName}</b>
                 </h1>
 
                 <div className="border border-gray-200 shadow-lg rounded-lg p-6 bg-white w-full sm:max-w-3xl lg:max-w-5xl mx-auto mt-8">
                     <div className="flex flex-col sm:flex-row sm:justify-between mb-4 space-y-4 sm:space-y-0">
                         <div>
-                            <p className="text-lg font-semibold text-gray-800">Trainer Name: <span className="font-normal text-gray-600">{feedback?.trainer.trainerName}</span></p>
-                            <p className="text-md text-gray-700 mt-4">Course: <span className="font-normal">{feedback?.trainer.course.courseName}</span></p>
+                            <p className="text-lg font-semibold text-gray-800">Trainer Name: <span className="font-normal text-gray-600">{feedback?.courseTrainer.trainers_users.username}</span></p>
+                            <p className="text-md text-gray-700 mt-4">Course: <span className="font-normal">{feedback?.module.course.courseName}</span></p>
                             <p className="text-md text-gray-700 mt-1">Class Time: <span className="font-normal">{feedback?.classTime.classTime}</span></p>
                         </div>
                         <div className="text-left sm:text-right">
