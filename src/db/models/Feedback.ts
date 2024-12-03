@@ -9,13 +9,13 @@ import { TrainerCourses } from './TrainerCourses';
 
 export class Feedback extends Model {
   id!: number;
-  trainerId!: number;
   intakeId!: number;
   classTimeId!: number;
   moduleId!: number;
   studentToken!: string;
   tokenStartTime!: Date;
   tokenExpiration!: Date;
+  courseTrainerId!: number;
   
   trainer?: User;
   // intake?: Intake; // Add this manually for TypeScript to recognize the association
@@ -85,8 +85,6 @@ Feedback.init({
   tableName: 'Feedback',
   timestamps: true,
 });
-
-
 Feedback.belongsTo(Module, {
   foreignKey: "moduleId",
   as: "module",
