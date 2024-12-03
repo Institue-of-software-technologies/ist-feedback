@@ -270,10 +270,11 @@ const Form = <T extends FieldValues>({
               defaultValue={input.value}
               {...register(input.label as Path<T>, {
                 required: input.require ? `${input.label} is required` : undefined,
-                pattern: input.type === "text" ? /^[A-Za-z0-9\s_-]*$/ : undefined
+                pattern: input.type === "text" ? /^[A-Za-z0-9\s_.?-]*$/ : undefined
               })}
               className="mt-1 block w-full p-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
+
           )}
 
           {errors[input.label] && (

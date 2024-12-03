@@ -101,7 +101,7 @@ export async function POST(req: Request) {
     const options = {
       from: user,
       to: email,
-      subject: 'Invite user',
+      subject: 'Activate account',
       html: view,
     };
 
