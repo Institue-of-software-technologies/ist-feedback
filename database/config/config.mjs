@@ -12,7 +12,7 @@ export const options = {
     //   rejectUnauthorized: false,
     // },
   },
-  logging: process.env.NODE_ENV !== "test" ? console.log : false,
+  logging: process.env.NODE_ENV === "development" ? console.log : false,
   migrationStorageTableName: "migrations",
 };
 
