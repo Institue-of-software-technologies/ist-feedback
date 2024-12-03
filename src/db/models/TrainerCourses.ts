@@ -42,6 +42,6 @@ TrainerCourses.init({
 }, {
   sequelize,
   modelName: 'TrainerCourses',
-  tableName: 'trainer_courses',
+  tableName: 'Trainer_Courses',
   timestamps: false,
 });
