@@ -86,10 +86,7 @@ Feedback.init({
   timestamps: true,
 });
 
-Feedback.belongsTo(User, {
-  foreignKey: "trainerId",
-  as: "trainer", 
-});
+
 Feedback.belongsTo(Module, {
   foreignKey: "moduleId",
   as: "module",
