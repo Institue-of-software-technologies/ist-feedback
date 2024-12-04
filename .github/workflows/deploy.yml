@@ -27,6 +27,8 @@ jobs:
             echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
             echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env
+            echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" >> .env
+            echo "URL=${{ secrets.URL }}" >> .env
 
       - name: Build docker image
         run: docker build -t kirarwa/ist-feedback .
