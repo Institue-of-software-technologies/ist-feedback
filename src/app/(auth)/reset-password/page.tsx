@@ -30,9 +30,6 @@ export default function ResetPassword() {
         if (response.status === 200) {
           showToast.success(response.data.message);
           setTokenAuthenticated(true);
-          setTimeout(() => {
-            router.push('/login'); // Navigate only on success
-          }, 7000);
         }
       } catch (error) {
         console.log(error);

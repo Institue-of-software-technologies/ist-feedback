@@ -5,7 +5,6 @@ import api from "../../../../lib/axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from "next/navigation";
 import { showToast } from "@/components/ToastMessage";
-import Loading from '@/app/loading';
 
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false); // Add loading state
@@ -38,9 +37,6 @@ export default function ForgotPassword() {
       setIsLoading(false); // Stop loading once the request is done
     }
   };
-
-  if (isLoading) return <Loading />
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <ToastContainer />
