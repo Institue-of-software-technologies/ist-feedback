@@ -16,6 +16,7 @@
     "migration:create": "dotenv -- sequelize-cli migration:create --name",
     "seeder:create": "dotenv -- sequelize-cli seed:generate --name",
     "migrate": "dotenv -- sequelize-cli db:migrate",
+    "migrate": "dotenv -- sequelize-cli db:migrate --name",
     "migrate:rollback": "dotenv -- sequelize-cli db:migrate:undo",
     "migrate:rollback:all": "dotenv -- sequelize-cli db:migrate:undo:all",
     "email": "email dev"
