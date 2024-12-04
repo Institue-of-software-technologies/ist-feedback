@@ -58,12 +58,7 @@ export async function GET(req: NextRequest) {
             model: Intake,
             as: "intake",
             attributes: ["intakeName", "intakeYear"],
-          },
-          {
-            model: Intake,
-            as: "intake",
-            attributes: ["intakeName", "intakeYear"],
-          },
+          }
         ],
       });
     } else {

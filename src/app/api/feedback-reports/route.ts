@@ -4,7 +4,7 @@ import { Feedback } from "@/db/models/Feedback";
 import { Intake } from "@/db/models/Intake";
 import { Module } from "@/db/models/Module";
 import { NextResponse } from "next/server";
-import { User } from "@/db/models/User";
+import { TrainerCourses, User } from "@/db/models/index";
 
 export async function GET() {
   try {
@@ -14,16 +14,15 @@ export async function GET() {
 
       include: [
         {
-          model: User,
-          as: "trainer",
-          attributes: ["username"],
+          model: TrainerCourses,
+          as: "courseTrainer",
           include: [
             {
-              model: Course,
-              as: "course",
-              attributes: ["courseName"],
-            },
-          ],
+              model: User,
+              as: "trainers_users",
+              attributes: ["username"],
+            }
+          ]
         },
         {
           model: Module,
@@ -42,7 +41,7 @@ export async function GET() {
           model: Intake,
           as: "intake",
           attributes: ["intakeName", "intakeYear"],
-        },
+        }
       ],
     });
 
