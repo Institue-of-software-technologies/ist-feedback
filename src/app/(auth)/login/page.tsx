@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from '@/context/UserContext';
 import api from '../../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
+import Loading from '@/app/loading';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,6 +47,8 @@ export default function LoginPage() {
     }
   };
 
+  if (isLoading) return <Loading />
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <ToastContainer />

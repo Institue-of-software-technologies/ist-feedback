@@ -24,7 +24,7 @@ export default function Home() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [cookie, setCookie] = useState<boolean>(true);
-  const [formLoading, setformLoading] = useState<boolean>(false);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   const { setUser } = useUser();
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function Home() {
 
 
   const onSubmit = async (data: FormData) => {
-    setformLoading(true);
+    setFormLoading(true);
     try {
       const response = await api.get(`/feedback/token/${data.Token}`);
       const useRolesPermissions = response.data;
@@ -71,7 +71,7 @@ export default function Home() {
       showToast.error("Token expired.");
     }
     finally {
-      setformLoading(false);
+      setFormLoading(false);
     }
   };
 
