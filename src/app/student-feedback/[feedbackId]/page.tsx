@@ -202,9 +202,7 @@ export default function StudentFeedback() {
                                                 id={`description-${question.feedbackQuestion.id}`}
                                                 placeholder="Add your description"
                                                 className="w-full p-2 border rounded"
-                                                {...register(`description-${question.feedbackQuestion.id}`, {
-                                                    required: "Description is required for ratings.",
-                                                })}
+                                                {...register(`description-${question.feedbackQuestion.id}`,)}
                                             />
                                             {errors[`description-${question.feedbackQuestion.id}`] && (
                                                 <p className="text-red-500 text-sm mt-1">
