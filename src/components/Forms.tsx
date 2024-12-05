@@ -287,7 +287,7 @@ const Form = <T extends FieldValues>({
       {buttonVisible && (
         <button
           type="submit"
-          className={`${buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${hoverColor || defaultHoverColor}`}
+          className={`${buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${hoverColor || defaultHoverColor} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={loading} // Disable button while loading
         >
           {loading ? (

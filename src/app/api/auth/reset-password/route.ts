@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { token, newPassword, email } = body;
+  const { token, password, email } = body;
 
   try {
     // Find the token and check if it is still valid (not expired)
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     // Update the user's password
     user.password = hashedPassword;
     await user.save();

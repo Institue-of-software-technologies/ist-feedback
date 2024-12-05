@@ -61,7 +61,7 @@ export async function PUT(req: Request, { params }: { params: { userId: string }
     if (multiSelectField && multiSelectField.length > 0) {
       try {
           // Assuming `userId` is the ID of the user you're updating (e.g., `3`)
-          const userId = 3; // Replace with dynamic value as needed
+          const userId = params.userId; // Replace with dynamic value as needed
   
           // Delete existing trainer courses for this user
           await TrainerCourses.destroy({
