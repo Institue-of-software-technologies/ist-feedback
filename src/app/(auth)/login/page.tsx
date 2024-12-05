@@ -45,7 +45,7 @@ export default function LoginPage() {
       setIsLoading(false); // Stop loading once the request is done
     }
   };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <ToastContainer />
