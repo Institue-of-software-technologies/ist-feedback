@@ -137,7 +137,7 @@ export default function FeedbackQuestionID() {
         const questionFontSize = 15;
         const tableFontSize = 13;
         const descriptionFontSize = 11;
-        const lineSpacing = 20;
+        const lineSpacing = 25;
         const pageMargin = 50;
         const maxWidth = 650; // Max width for text before wrapping or breaking
 
