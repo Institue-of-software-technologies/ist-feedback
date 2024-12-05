@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { showToast } from '@/components/ToastMessage';
 import Form from '@/components/Forms';
+import Loading from '@/app/loading';
 import { ClassTime, Feedback, FeedbackQuestion, Intake, Module, User } from '@/types';
 
 interface FormData {
@@ -23,7 +24,6 @@ const EditFeedback = () => {
   const router = useRouter();
   const { feedbackId } = useParams();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [trainers, setTrainers] = useState<User[]>([]);
   const [intakes, setIntakes] = useState<Intake[]>([]);
@@ -49,7 +49,6 @@ const EditFeedback = () => {
           setTokenExpiration(new Date(feedback.tokenExpiration));
         } catch (err) {
           console.log('Failed to fetch feedback', err);
-          setError('Failed to fetch feedback');
         } finally {
           setLoading(false);
         }
@@ -83,12 +82,7 @@ const EditFeedback = () => {
 
   const handleFormSubmit = async (data:FormData) => {
     try {
-      await api.put(`/feedback/${feedbackId}`, {
-        ...data,
-        tokenStartTime,
-        tokenExpiration,
-        multiSelectField: selectedFeedbackQuestions,
-      });
+      await api.put(`/feedback/${feedbackId}`,data);
       showToast.success('Feedback updated successfully!');
       setTimeout(() => {
         router.push('/dashboard/feedback');
@@ -99,8 +93,7 @@ const EditFeedback = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (loading) return <Loading />;
 
   const inputs = [
     {
@@ -152,13 +145,11 @@ const EditFeedback = () => {
       label: 'tokenStartTime',
       type: 'date',
       valueDate: tokenStartTime,
-      onChange: setTokenStartTime,
     },
     {
       label: 'tokenExpiration',
       type: 'date',
       valueDate: tokenExpiration,
-      onChange: setTokenExpiration,
     },
   ];
 

@@ -10,6 +10,7 @@ export interface Input {
   label: string;
   type: string;
   require?: boolean;
+  readonly?:boolean;
   value?: string | number;
   valueDate?: Date | null;
   name?: string;
@@ -253,6 +254,7 @@ const Form = <T extends FieldValues>({
             <input
               id={input.label}
               type={input.type}
+              readOnly={input.readonly || false}
               defaultValue={input.value}
               {...register(input.label as Path<T>, {
                 required: input.require ? `${input.label} is required` : undefined,

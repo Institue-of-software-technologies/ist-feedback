@@ -30,7 +30,7 @@ const UserProfile = () => {
       const featchUserProfile = async () => {
         try {
           const user = await api.get(`/users/${userId}`);
-          setUser(user.data)
+          setUser(user.data.user)
         } catch (err) {
           console.log(err)
           setError('Failed to fetch user');
@@ -60,8 +60,8 @@ const UserProfile = () => {
 
   const inputs = [
     { label: "username", type: "text", value: user?.username },
-    { label: "email", type: "text", value: user?.email },
-    { label: "OldPassword", type: "password", },
+    { label: "email", type: "email", value: user?.email,readonly:true },
+    { label: "OldPassword", type: "text", },
     { label: "NewPassword", type: "password" },
     { label: "ConfirmNewPassword", type: "password" },
   ];
