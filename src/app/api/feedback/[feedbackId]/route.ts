@@ -95,16 +95,17 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { feedbackId } = context.params;
-    const { trainerId, intakeId, classTimeId, tokenExpiration ,tokenStartTime,multiSelectField } =
-      await req.json();
+    const {
+      trainerId,
+      intakeId,
+      classTimeId,
+      tokenExpiration,
+      tokenStartTime,
+      multiSelectField,
+    } = await req.json();
 
+    // Fetch feedback by ID
     const feedback = await Feedback.findByPk(feedbackId);
-    await FeedbackSelectQuestions.destroy({
-      where: {
-        feedbackId : feedbackId
-      }
-    });
-
 
     if (!feedback) {
       return NextResponse.json(
@@ -113,32 +114,59 @@ export async function PUT(req: NextRequest, context: Context) {
       );
     }
 
-    // Update feedback fields if the values are provided (null means no change)
-    if (trainerId !== null) {
+    // Remove existing select questions for the feedback
+    await FeedbackSelectQuestions.destroy({
+      where: { feedbackId },
+    });
+    const startTime = new Date(tokenStartTime);
+    const expirationTime = new Date(tokenExpiration);
+
+    if (isNaN(startTime.getTime()) || isNaN(expirationTime.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date for tokenStartTime or tokenExpiration" },
+        { status: 400 }
+      );
+    }
+
+    if (startTime >= expirationTime) {
+      return NextResponse.json(
+        { error: "tokenStartTime must be earlier than tokenExpiration" },
+        { status: 400 }
+      );
+    }
+
+    const utcStartTime = new Date(startTime.toISOString());
+    const utcExpiration = new Date(expirationTime.toISOString());
+
+    // Update feedback fields if values are provided
+    if (trainerId !== null && trainerId !== undefined) {
       feedback.courseTrainerId = trainerId;
     }
-    if (intakeId !== null) {
+    if (intakeId !== null && intakeId !== undefined) {
       feedback.intakeId = intakeId;
     }
-    if (classTimeId !== null) {
+    if (classTimeId !== null && classTimeId !== undefined) {
       feedback.classTimeId = classTimeId;
     }
-
-    if (tokenStartTime) {
-      feedback.tokenStartTime = new Date(tokenStartTime);
+    if (utcStartTime) {
+      feedback.tokenStartTime = utcStartTime;
+      console.log(utcStartTime);
     }
-
-    if (tokenExpiration) {
-      feedback.tokenExpiration = new Date(tokenExpiration);
+    if (utcExpiration) {
+      feedback.tokenExpiration = utcExpiration;
+      console.log(utcExpiration);
     }
 
     await feedback.save();
 
-    for(const feedbackQuestion of multiSelectField) {
-      await FeedbackSelectQuestions.create({
-        feedbackId : feedback.id,
-        feedbackQuestionsId : feedbackQuestion
-      })
+    // Create new select questions
+    if (Array.isArray(multiSelectField)) {
+      for (const feedbackQuestion of multiSelectField) {
+        await FeedbackSelectQuestions.create({
+          feedbackId: feedback.id,
+          feedbackQuestionsId: feedbackQuestion,
+        });
+      }
     }
 
     return NextResponse.json({
@@ -147,7 +175,7 @@ export async function PUT(req: NextRequest, context: Context) {
     });
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
       { message: "Error updating feedback", error: errorMessage },
       { status: 500 }
