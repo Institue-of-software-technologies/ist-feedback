@@ -203,7 +203,7 @@ const Form = <T extends FieldValues>({
                 {...register(input.label as Path<T>, {
                   required: input.require ? `${input.label} is required` : undefined,
                   pattern: {
-                    value: /^(?!.*[.*\\\/ ])(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/,
+                    value: /^(?!.*[.*\\\/ ])(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[^\s.*\\\/]{8,}$/,
                     message: "Password must be at least 8 characters long, include uppercase and lowercase letters, at least one number, one special character (!@#$%^&), and must not contain ., space, *, /, or \\."
                   }
                 })}

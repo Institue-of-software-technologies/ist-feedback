@@ -46,7 +46,7 @@ export default function ResetPassword() {
     console.log(data);
     setFormLoading(true);
 
-    const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
+    const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[^\s]{8,}$/);
 
     // Validate password strength
     if (!passwordRegex.test(data.NewPassword)) {
