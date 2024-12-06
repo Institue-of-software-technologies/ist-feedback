@@ -176,24 +176,45 @@ export default function StudentFeedback() {
                                     );
                                 })}
 
-
                                 {question.feedbackQuestion.questionType === "rating" && (
-                                    <div className="flex justify-center items-center mt-7 overflow-x-auto">
-                                        {numbers.map((number) => (
-                                            <button
-                                                key={number}
-                                                type="button"
-                                                className={`h-10 w-14 md:h-10 md:w-32 sm:h-12 sm:w-32 lg:h-14 lg:w-28 inline-flex items-center justify-center text-base lg:text-xl font-medium border border-gray-300 
-                            ${watch(questionKey) === number ? "bg-red-600 text-white" : "bg-white text-gray-800"} 
-                            focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 
-                            hover:bg-red-600 hover:text-white whitespace-nowrap`}
-                                                onClick={() => setValue(questionKey, number)}
-                                            >
-                                                {number}
-                                            </button>
-                                        ))}
+                                    <div className="mt-4">
+                                        <div className="flex justify-center items-center overflow-x-auto">
+                                            {numbers.map((number) => (
+                                                <button
+                                                    key={number}
+                                                    type="button"
+                                                    className={`h-10 w-14 md:h-10 md:w-32 sm:h-12 sm:w-32 lg:h-14 lg:w-28 inline-flex items-center justify-center text-base lg:text-xl font-medium border border-gray-300 
+                    ${watch(questionKey) === number ? "bg-red-600 text-white" : "bg-white text-gray-800"} 
+                    focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 
+                    hover:bg-red-600 hover:text-white whitespace-nowrap`}
+                                                    onClick={() => setValue(questionKey, number)}
+                                                >
+                                                    {number}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* render the description input if the uder selects 4,3,2,1*/}
+                                        {(watch(questionKey) === 4 || watch(questionKey) === 3 || watch(questionKey) === 2 || watch(questionKey) === 1) && (
+                                            <div className="mt-4">
+                                                <textarea
+                                                    rows={3}
+                                                    id={`description-${question.feedbackQuestion.id}`}
+                                                    placeholder="Add your description"
+                                                    className="w-full p-2 border rounded"
+                                                    {...register(`description-${question.feedbackQuestion.id}`)}
+                                                />
+                                                {errors[`description-${question.feedbackQuestion.id}`] && (
+                                                    <p className="text-red-500 text-sm mt-1">
+                                                        {errors[`description-${question.feedbackQuestion.id}`]?.message}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
+
+
 
                                 {errors[questionKey] && (
                                     <p className="text-red-500 text-sm mt-1">{errors[questionKey]?.message}</p>
