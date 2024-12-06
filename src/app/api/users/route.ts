@@ -118,7 +118,7 @@ export async function PUT(req: Request) {
   const { username, email, OldPassword, NewPassword, ConfirmNewPassword, userId } = body;
 
   // Define a regex for validating the password
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+  const passwordRegex = new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[^\s]{8,}$/);
 
   try {
     // Check if NewPassword meets the security criteria (only if NewPassword is provided)
