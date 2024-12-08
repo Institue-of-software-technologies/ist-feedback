@@ -28,6 +28,7 @@ export default function Home() {
   const { setUser } = useUser();
 
   useEffect(() => {
+
     const checkFeedBackAvailability = async () => {
       try {
         const response = await api.get('/feedback');

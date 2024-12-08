@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 interface FormData {
   permissionName: string;
@@ -21,6 +22,7 @@ const EditRoles = () => {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   // Fetch user data on mount
   useEffect(() => {
@@ -59,6 +61,7 @@ const EditRoles = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/roles/${roleId}`, data);
       showToast.success('role updated successfully!');
@@ -71,9 +74,12 @@ const EditRoles = () => {
       console.log(err);
       showToast.error('Failed to update roles');
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
   if (error) return <div className="text-red-500">{error}</div>;
 
   const inputs = [
@@ -88,6 +94,14 @@ const EditRoles = () => {
       })),
     },
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/roles'),
+    }
+  ];
+  
 
   return (
     <div className="p-6">
@@ -97,6 +111,8 @@ const EditRoles = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={handleSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

@@ -26,8 +26,10 @@ const FeedbackQuestionCreate: React.FC = () => {
     maxRating: 10,
   });
   const [showDetailsForm, setShowDetailsForm] = useState(false);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/feedback-questions", data);
       showToast.success("Feedback question created successfully!");
@@ -37,6 +39,9 @@ const FeedbackQuestionCreate: React.FC = () => {
     } catch (error) {
       console.error("Failed to create feedback question", error);
       showToast.error("Failed to create feedback question.");
+    }
+    finally {
+      setFormLoading(false);
     }
   };
 
@@ -108,6 +113,7 @@ const FeedbackQuestionCreate: React.FC = () => {
         <Form<{ questionType: 'open-ended' | 'closed-ended' | 'rating' }>
           Input={typeSelectionInputs}
           onSubmit={handleQuestionTypeSelection}
+          loading={formLoading}
         />
       )}
       {/* Second form based on selected question type */}
@@ -121,6 +127,7 @@ const FeedbackQuestionCreate: React.FC = () => {
           <Form<FormData>
             Input={openEndedInputs}
             onSubmit={onSubmit}
+            loading={formLoading}
           />
           <button
             onClick={handleGoBack}

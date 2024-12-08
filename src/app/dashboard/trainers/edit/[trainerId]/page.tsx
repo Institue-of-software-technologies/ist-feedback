@@ -23,6 +23,7 @@ const EditTrainer = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   // Fetch user data on mount
   useEffect(() => {
     if (trainerId) {
@@ -56,7 +57,7 @@ const EditTrainer = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
-    console.log(data);
+    setFormLoading(true);
     try {
       await api.put(`/trainers/${trainerId}`, data);
       showToast.success('Trainer updated successfully!');
@@ -67,6 +68,9 @@ const EditTrainer = () => {
     } catch (err) {
       console.log(err)
       showToast.error('Failed to update trainer');
+    }
+    finally {
+      setFormLoading(false);
     }
   };
 
@@ -95,11 +99,19 @@ const EditTrainer = () => {
     },
   ];
 
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/trainers'),
+    }
+  ];
+  
   return (
     <div className='p-6'>
       <ToastContainer />{' '}
       <h3 className='text-2xl font-bold mb-4'>Edit Trainer</h3>
-      <Form<FormData> Input={inputs} onSubmit={handleSubmit} />
+      <Form<FormData> Input={inputs} onSubmit={handleSubmit} loading={formLoading} addButton={extraButtons}/>
     </div>
   );
 };

@@ -9,6 +9,7 @@ import Form, { Input } from '@/components/Forms';
 import { FeedbackQuestion } from '@/db/models/FeedbackQuestion';
 import { AnswerOptions } from '@/types';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 interface FormData {
   questionText?: string;
@@ -29,6 +30,7 @@ const EditQuestion = () => {
   const [showDetailsForm, setShowDetailsForm] = useState(false); // Whether to show the second form
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   // Fetch feedback question data on mount
   useEffect(() => {
@@ -85,6 +87,7 @@ const EditQuestion = () => {
 
   // Handle the form submission for the second form (open-ended or closed-ended)
   const handleSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/feedback-questions/${questionId}`, {
         ...data,
@@ -102,6 +105,9 @@ const EditQuestion = () => {
       console.log(err)
       showToast.error('Failed to update feedback question');
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
   // Handle the first form submission for selecting the question type
@@ -115,7 +121,7 @@ const EditQuestion = () => {
     setShowDetailsForm(false); // Go back to the first form
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
   if (error) return <div className="text-red-500">{error}</div>;
 
   // First form for selecting the question type
@@ -160,6 +166,7 @@ const EditQuestion = () => {
           <Form<FormData>
             Input={openEndedInputs}
             onSubmit={handleSubmit}
+            loading={formLoading}
           />
           <button
             onClick={handleGoBack}

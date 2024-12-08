@@ -33,6 +33,7 @@ const EditFeedback = () => {
   const [selectedFeedbackQuestions, setSelectedFeedbackQuestions] = useState<number[]>([]);
   const [tokenStartTime, setTokenStartTime] = useState<Date | null>(null);
   const [tokenExpiration, setTokenExpiration] = useState<Date | null>(null);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (feedbackId) {
@@ -81,6 +82,7 @@ const EditFeedback = () => {
   }, []);
 
   const handleFormSubmit = async (data:FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/feedback/${feedbackId}`,data);
       showToast.success('Feedback updated successfully!');
@@ -90,6 +92,9 @@ const EditFeedback = () => {
     } catch (err) {
       console.log(err);
       showToast.error('Failed to update feedback');
+    }
+    finally {
+      setFormLoading(false);
     }
   };
 
@@ -152,14 +157,24 @@ const EditFeedback = () => {
       valueDate: tokenExpiration,
     },
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/feedback'),
+    }
+  ];
+  
 
   return (
-    <div className="p-6">
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
       <h3 className="text-2xl font-bold mb-4">Edit Feedback</h3>
       <Form<FormData>
         Input={inputs}
         onSubmit={handleFormSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

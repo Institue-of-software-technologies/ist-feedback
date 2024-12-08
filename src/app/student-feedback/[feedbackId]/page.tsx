@@ -209,7 +209,7 @@ export default function StudentFeedback() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="px-6 py-2 text-lg font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                        className={`px-6 py-2 text-lg font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isLoading ? (
                             <div className="flex items-center">
