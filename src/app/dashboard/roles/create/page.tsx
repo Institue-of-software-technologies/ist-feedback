@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Permission } from "@/types";
 import { showToast } from "@/components/ToastMessage";
+import Loading from "@/app/loading";
 
 interface FormData {
   roleName: string;
@@ -19,6 +20,7 @@ const CreateRole: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const router = useRouter();
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPermissions = async () => {
@@ -37,6 +39,7 @@ const CreateRole: React.FC = () => {
   }, []);
 
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       console.log("Form Data Submitted:", data);
       await api.post("/roles", data);
@@ -45,6 +48,9 @@ const CreateRole: React.FC = () => {
     } catch (error) {
       console.error("Failed to create role", error);
       showToast.error("Failed to create role");
+    }
+    finally {
+      setFormLoading(false);
     }
   };
 
@@ -61,9 +67,17 @@ const CreateRole: React.FC = () => {
       })),
     },
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/roles'),
+    }
+  ];
+  
 
   console.log(permissions);
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
 
 
   return (
@@ -74,6 +88,8 @@ const CreateRole: React.FC = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={onSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

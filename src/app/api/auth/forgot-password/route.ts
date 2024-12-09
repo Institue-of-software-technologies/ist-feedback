@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
          })
  
          // Send the email with reset link including the token
-        const customLink = `${URL}/reset-password?token=${resetToken}&email=${email}`;
+        const customLink = `${URL}/reset-forgot-password?token=${resetToken}&email=${email}`;
 
         // Create transport for Gmail
         const transporter = nodemailer.createTransport({

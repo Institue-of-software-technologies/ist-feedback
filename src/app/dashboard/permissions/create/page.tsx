@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
@@ -14,7 +14,9 @@ interface FormData {
 
 const NewPermissionForm: React.FC = () => {
   const router = useRouter();
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/permissions", data);
       showToast.success("Permission created successfully!");
@@ -26,11 +28,22 @@ const NewPermissionForm: React.FC = () => {
       console.error("Failed to create permissions", error);
       showToast.error("Failed to create permissions");
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
   const inputs = [
     { label: "permissionName", type: "text" },
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/permissions'),
+    }
+  ];
+ 
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
@@ -39,6 +52,8 @@ const NewPermissionForm: React.FC = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={onSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

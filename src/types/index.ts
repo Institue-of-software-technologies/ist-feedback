@@ -27,6 +27,14 @@ export interface Module {
   updatedAt: string;
 }
 
+export interface Notification {
+  id: number;
+  title: string;
+  message:string;
+  link:string;
+  status:string;
+}
+
 export interface Feedback {
   id: number;
   trainerId: number;
@@ -102,6 +110,7 @@ export interface User {
   roleId: number;
   createdAt: string;
   updatedAt: string;
+  acceptInvite: boolean;
   roleUsers: {
     id: number;
     roleName: string;
@@ -176,4 +185,11 @@ export interface RecentActivities {
   entityType: string;
   activityType: string;
   description: string;
+}
+
+export interface Button {
+  label: string;
+  type: string;
+  onClick: () => void;
+  buttonLoading?: boolean; // Add this property to make it valid
 }

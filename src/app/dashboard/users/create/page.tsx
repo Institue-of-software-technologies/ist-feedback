@@ -23,7 +23,7 @@ const NewUserForm: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [course, setCourse] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -60,6 +60,7 @@ const NewUserForm: React.FC = () => {
   }, []);
 
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/users", data);
       showToast.success("User created successfully!");
@@ -70,6 +71,9 @@ const NewUserForm: React.FC = () => {
     } catch (error) {
       console.error("Failed to create user", error);
       showToast.error("Failed to create user");
+    }
+    finally {
+      setFormLoading(false);
     }
   };
 
@@ -94,6 +98,13 @@ const NewUserForm: React.FC = () => {
       })),
     },
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/users'),
+    }
+  ];
 
   if (loading) return <Loading />
 
@@ -105,6 +116,8 @@ const NewUserForm: React.FC = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={onSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
        {/* Password Guidelines Section */}
        <div className="mt-8 bg-gray-100 p-4 rounded-lg shadow-md">

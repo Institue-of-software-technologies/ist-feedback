@@ -16,12 +16,14 @@ interface FormData {
 const NewCourseForm: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   useEffect(()=>{
     setLoading(false);
   },[])
 
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/courses", data);
       showToast.success("Course created successfully!");
@@ -34,8 +36,17 @@ const NewCourseForm: React.FC = () => {
       showToast.error("Failed to create courses");
     } finally {
       setLoading(false);
+      setFormLoading(false);
     }
   };
+  
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/courses'),
+    }
+  ];
   
   const inputs = [
     { label: "courseName", type: "text" }
@@ -49,6 +60,8 @@ const NewCourseForm: React.FC = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={onSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

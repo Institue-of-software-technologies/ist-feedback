@@ -9,6 +9,7 @@ import { useUser } from '@/context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from '@/components/Tables';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 const FeedBackManagement: React.FC = () => {
     const { user } = useUser();
@@ -69,9 +70,7 @@ const FeedBackManagement: React.FC = () => {
         router.push(`/dashboard/feedback-reports/${feedback.id}`);
     };
 
-    if (loading) {
-        return <div className="text-center">Loading...</div>;
-    }
+    if (loading) return <Loading />
 
     const columns = [
         { header: 'Student Token', accessor: 'studentToken' },

@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { ClassTime } from '@/types';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 interface FormData {
   classTimes: string;
@@ -18,6 +19,7 @@ const EditClassTime = () => {
   const { classTimesId } = useParams(); // Get the `userId` from the URL
   const [classTimes, setClassTimes] = useState<ClassTime | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch user data on mount
@@ -41,7 +43,7 @@ const EditClassTime = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
-    console.log(data)
+    setFormLoading(true);
     try {
       await api.put(`/class-times/${classTimesId}`, data);
       showToast.success('Class Time updated successfully!');
@@ -54,13 +56,23 @@ const EditClassTime = () => {
       console.log(err);
       showToast.error('Failed to update Class Times');
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
   if (error) return <div className="text-red-500">{error}</div>;
 
   const inputs = [
     { label: "classTime", type: "text", value: classTimes?.classTime },
+  ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/class-times'),
+    }
   ];
 
   return (
@@ -71,6 +83,8 @@ const EditClassTime = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={handleSubmit}
+        addButton={extraButtons}
+        loading={formLoading}
       />
     </div>
   );
