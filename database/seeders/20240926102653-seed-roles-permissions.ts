@@ -93,6 +93,9 @@ export default {
 
       MANAGE_PROFILE='manage_profile',//61
       MANAGE_FEEDBACK_QUESTIONS= 'manage_feedback_questions',//62
+
+      CREATE_FEEDBACKS='create_feedbacks', //63
+      CREATE_MODULES='create_modules' //64
     }
 
     // Hash passwords
@@ -244,6 +247,10 @@ export default {
       { roleId: 4, permissionId: 58, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 4, permissionId: 60, createdAt: new Date(), updatedAt: new Date() },
       { roleId: 4, permissionId: 61, createdAt: new Date(), updatedAt: new Date() },
+
+      //update_admin
+      { roleId: 2, permissionId: 63, createdAt: new Date(), updatedAt: new Date() },
+      { roleId: 2, permissionId: 64, createdAt: new Date(), updatedAt: new Date() },
 ]);
 
 
