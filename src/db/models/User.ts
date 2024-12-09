@@ -1,8 +1,6 @@
-import { DataTypes, Model} from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from "../db_connection";
 import { Role } from './Role';
-
-
 
 export class User extends Model {
   id!: number;
@@ -11,6 +9,7 @@ export class User extends Model {
   password!: string;
   roleId!: number;
   courseId!: number;
+  acceptInvite!: boolean; // Add this line to type-check the new property
 }
 
 User.init({
@@ -52,6 +51,11 @@ User.init({
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   },
+  acceptInvite: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false, // Default value to false
+    allowNull: false, // Ensure it's not nullable
+  },
 }, {
   sequelize,
   modelName: 'User',
@@ -61,5 +65,3 @@ User.init({
 
 User.belongsTo(Role, { as: 'roleUsers', foreignKey: 'roleId' });
 Role.hasMany(User, { foreignKey: 'roleId' });
-
-

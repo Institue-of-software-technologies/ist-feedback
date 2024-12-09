@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { Intake } from '@/types';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 interface FormData {
     intakeName: string;
@@ -20,6 +21,7 @@ const EditIntake = () => {
     const [intake, setIntake] = useState<Intake | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [formLoading, setFormLoading] = useState<boolean>(false);
 
     // Fetch intake data on mount
     useEffect(() => {
@@ -41,7 +43,7 @@ const EditIntake = () => {
 
     // Handle form submission
     const handleSubmit = async (data: FormData) => {
-        console.log(data)
+        setFormLoading(true);
         try {
             await api.put(`/intakes/${intakeId}`, data);
             showToast.success('Intake updated successfully!');
@@ -53,6 +55,9 @@ const EditIntake = () => {
         } catch (err) {
             console.log(err)
             showToast.error('Failed to update intake',);
+        }
+        finally {
+            setFormLoading(false);
         }
     };
 
@@ -67,7 +72,7 @@ const EditIntake = () => {
     };
 
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loading />
     if (error) return <div className="text-red-500">{error}</div>;
 
     const inputs = [
@@ -79,6 +84,14 @@ const EditIntake = () => {
             options: generateYearOptions()
         }
     ];
+    const extraButtons = [
+        {
+          label: 'Back',
+          type: 'button',
+          onClick: () => router.push('/dashboard/intakes'),
+        }
+      ];
+      
 
     return (
         <div className="p-6">
@@ -88,6 +101,8 @@ const EditIntake = () => {
             <Form<FormData>
                 Input={inputs}
                 onSubmit={handleSubmit}
+                loading={formLoading}
+                addButton={extraButtons}
             />
         </div>
     );

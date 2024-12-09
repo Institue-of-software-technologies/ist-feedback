@@ -9,6 +9,7 @@ import Form from '@/components/Forms';
 import { Module } from '@/db/models/Module';
 import { Course } from '@/types';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 interface FormData {
   moduleName: string;
@@ -22,7 +23,7 @@ const EditModule = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   // Fetch module data on mount
   useEffect(() => {
     if (moduleId) {
@@ -56,6 +57,7 @@ const EditModule = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/modules/${moduleId}`, data);
       showToast.success('Module updated successfully!');
@@ -68,9 +70,12 @@ const EditModule = () => {
       console.log(err)
       showToast.error('Failed to update module');
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
   if (error) return <div className="text-red-500">{error}</div>;
 
   // Form inputs for editing module
@@ -86,6 +91,14 @@ const EditModule = () => {
       }))
     },
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/modules'),
+    }
+  ];
+  
 
   return (
     <div className="p-6">
@@ -94,6 +107,8 @@ const EditModule = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={handleSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

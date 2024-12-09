@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
     // Update the user's password
     user.password = hashedPassword;
+    user.acceptInvite = true;
     await user.save();
 
     // Delete the password reset token once the password is updated

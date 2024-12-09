@@ -1,7 +1,6 @@
 import {
   Body,
   Container,
-  Column,
   Head,
   Html,
   Img,
@@ -34,13 +33,6 @@ export const ReportEmail = ({
         <Container style={container}>
           <Section style={logo}>
             <Img width={100} src={`https://raw.githubusercontent.com/Institue-of-software-technologies/ist-feedback/refs/heads/main/public/assets/image/logo.png`} />
-          </Section>
-          <Section style={sectionsBorders}>
-            <Row>
-              <Column style={sectionBorder} />
-              <Column style={sectionCenter} />
-              <Column style={sectionBorder} />
-            </Row>
           </Section>
           <Section style={content}>
             <Text style={paragraph}>Hello {trainerName},</Text>
@@ -118,16 +110,4 @@ const logo = {
   justifyContent: "center",
   alignItems: "center",
   padding: 20,
-};
-const sectionsBorders = {
-  width: "100%",
-  display: "flex",
-};
-const sectionBorder = {
-  borderBottom: "1px solid #82929",
-  width: "249px",
-};
-const sectionCenter = {
-  borderBottom: "1px solid #E82929",
-  width: "102px",
 };
