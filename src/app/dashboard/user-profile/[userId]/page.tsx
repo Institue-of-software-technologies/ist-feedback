@@ -62,7 +62,7 @@ const UserProfile = () => {
   const inputs = [
     { label: "username", type: "text", value: user?.username },
     { label: "email", type: "email", value: user?.email,readonly:true },
-    { label: "OldPassword", type: "text", },
+    { label: "OldPassword", type: "password", },
     { label: "NewPassword", type: "password" },
     { label: "ConfirmNewPassword", type: "password" },
   ];
