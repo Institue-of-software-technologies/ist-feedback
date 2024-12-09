@@ -107,6 +107,9 @@ export async function GET(req: NextRequest) {
          statusColor = "yellow";
         tokenStatus = `Will open on ${tokenStartTime.toLocaleString("en-KE", {
           weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
           hour12: true,
