@@ -42,7 +42,7 @@ FeedbackAnswer.init({
   },
   answerText: {
     type: DataTypes.TEXT,
-    allowNull: false,
+    allowNull: true,
   },
   description: {
     type: DataTypes.TEXT,

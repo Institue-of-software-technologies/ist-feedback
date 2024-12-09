@@ -44,14 +44,22 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { questionId } = context.params;
-    const { questionText, questionType, options, minRating, maxRating } = await req.json();
+    const {
+      questionText,
+      questionType,
+      options,
+      minRating,
+      maxRating,
+      required,
+    } = await req.json();
 
     // Validate questionType if provided
     const validTypes = ["open-ended", "closed-ended", "rating"];
     if (questionType && !validTypes.includes(questionType)) {
       return NextResponse.json(
         {
-          message: "Invalid questionType. Must be one of: open-ended, closed-ended, or rating.",
+          message:
+            "Invalid questionType. Must be one of: open-ended, closed-ended, or rating.",
         },
         { status: 400 }
       );
@@ -93,6 +101,7 @@ export async function PUT(req: NextRequest, context: Context) {
     question.questionType = questionType ?? question.questionType;
     question.minRating = questionType === "rating" ? minRating : null;
     question.maxRating = questionType === "rating" ? maxRating : null;
+    question.required = required ?? question.required; // Update the required field
 
     // If it's a closed-ended question, update the answer options
     if (questionType === "closed-ended" && Array.isArray(options)) {

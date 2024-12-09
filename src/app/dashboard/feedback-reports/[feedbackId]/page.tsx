@@ -552,7 +552,7 @@ export default function FeedbackQuestionID() {
                                             <strong>Open-Ended Responses:</strong>
                                             <ul>
                                                 {feedbackReport
-                                                    .filter(answer => answer.questionId === question.id)
+                                                    .filter(answer => answer.questionId === question.id && (answer.answerText.trim() || answer.description?.trim()))
                                                     .map((answer, index) => (
                                                         <li key={index}>
                                                             <strong>Response {index + 1}:</strong> {answer.answerText}
@@ -563,6 +563,7 @@ export default function FeedbackQuestionID() {
                                                             )}
                                                         </li>
                                                     ))}
+
                                             </ul>
                                         </div>
                                     )}

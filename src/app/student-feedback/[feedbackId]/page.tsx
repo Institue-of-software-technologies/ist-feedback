@@ -82,7 +82,6 @@ export default function StudentFeedback() {
         }
     };
 
-
     if (loading) return <Loading />;
     if (error) return <div className="text-red-500">{error}</div>;
 
@@ -116,16 +115,24 @@ export default function StudentFeedback() {
                 {feedbackQuestion && feedbackQuestion.length > 0 ? (
                     feedbackQuestion.map((question, index) => {
                         const questionKey = `question-${question.feedbackQuestion.id}`;
+                        const isRequired = question.feedbackQuestion.required; // Check if the value is 1 (required) or 0 (optional)
                         return (
                             <div key={question.feedbackQuestion.id} className="my-3">
-                                <h3 className="text-lg font-semibold">{index + 1}. {question.feedbackQuestion.questionText}</h3>
+                                <h3 className="text-lg font-semibold">
+                                    {index + 1}. {question.feedbackQuestion.questionText}
+                                    <span className={`text-sm ${isRequired ? 'text-red-500' : 'text-gray-600'}`}>
+                                        {isRequired ? '(Required)' : '(Optional)'}
+                                    </span>
+                                </h3>
 
                                 {question.feedbackQuestion.questionType === "open-ended" && (
                                     <textarea
                                         className="w-full mt-5 p-2 border rounded"
                                         placeholder="Type your response here..."
                                         rows={5}
-                                        {...register(questionKey, { required: "This field is required" })}
+                                        {...register(questionKey, {
+                                            required: isRequired && "This field is required", // Add required validation here
+                                        })}
                                     />
                                 )}
 
@@ -141,7 +148,7 @@ export default function StudentFeedback() {
                                                     id={`option-${question.feedbackQuestion.id}-${option.id}`}
                                                     value={option.optionText}
                                                     {...register(questionKey, {
-                                                        required: "This field is required",
+                                                        required: isRequired && "This field is required", // Add required validation here
                                                         onChange: () => {
                                                             // Clear the description field when a different option is selected
                                                             question.feedbackQuestion.answerOption.forEach((opt) => {
@@ -176,7 +183,6 @@ export default function StudentFeedback() {
                                     );
                                 })}
 
-
                                 {question.feedbackQuestion.questionType === "rating" && (
                                     <div className="flex justify-center items-center mt-7 overflow-x-auto">
                                         {numbers.map((number) => (
@@ -184,9 +190,9 @@ export default function StudentFeedback() {
                                                 key={number}
                                                 type="button"
                                                 className={`h-10 w-14 md:h-10 md:w-32 sm:h-12 sm:w-32 lg:h-14 lg:w-28 inline-flex items-center justify-center text-base lg:text-xl font-medium border border-gray-300 
-                            ${watch(questionKey) === number ? "bg-red-600 text-white" : "bg-white text-gray-800"} 
-                            focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 
-                            hover:bg-red-600 hover:text-white whitespace-nowrap`}
+                                ${watch(questionKey) === number ? "bg-red-600 text-white" : "bg-white text-gray-800"} 
+                                focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 
+                                hover:bg-red-600 hover:text-white whitespace-nowrap`}
                                                 onClick={() => setValue(questionKey, number)}
                                             >
                                                 {number}
@@ -239,7 +245,6 @@ export default function StudentFeedback() {
                             'Submit Feedback'
                         )}
                     </button>
-
                 </div>
             </form>
         </div>
