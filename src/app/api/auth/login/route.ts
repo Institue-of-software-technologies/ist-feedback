@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       );
     }
     if (!findUser.acceptInvite) {
-      return NextResponse.json({ message: 'User has not accepted the invite' }, { status: 400 });
+      return NextResponse.json({ message: 'Please accept the invitation sent to your email.' }, { status: 400 });
     }
 
     const passwordValidation = await bcrypt.compare(
