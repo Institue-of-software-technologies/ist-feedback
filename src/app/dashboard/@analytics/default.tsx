@@ -22,8 +22,10 @@ interface FeedbackReport {
         questionType: string;  // Type of the question (e.g., "Multiple Choice")
     };
     feedback: {
-        trainer: {
-            username: string;  // Trainer's username
+        courseTrainer: {
+            trainers_users: {
+                username: string;  // Trainer's username
+            };
         };
     };
 }
@@ -58,7 +60,7 @@ const FeedbackDashboard = () => {
             questionCounts[questionType] = (questionCounts[questionType] || 0) + 1;
 
             // Aggregate feedback per trainer
-            const trainerName = report.feedback.trainer.username;
+            const trainerName = report.feedback.courseTrainer.trainers_users.username;
             feedbackPerTrainer[trainerName] = (feedbackPerTrainer[trainerName] || 0) + 1;
         });
 

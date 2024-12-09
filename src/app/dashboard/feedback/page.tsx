@@ -26,7 +26,7 @@ const FeedBackManagement: React.FC = () => {
         const response = await api.get(`/feedback`, {
           method: 'GET',
           headers: {
-            'user-role': `${user?.role}`, 
+            'user-role': `${user?.role}`,
             'user-id': `${user?.id}`,
           },
         });
@@ -94,6 +94,10 @@ const FeedBackManagement: React.FC = () => {
 
   const columns = [
     { header: 'Student Token', accessor: 'studentToken' },
+    {
+      header: 'Token Status',
+      accessor: 'tokenStatus'
+    },
     { header: 'Trainer Name', accessor: 'courseTrainer.trainers_users.username' },
     { header: 'Course', accessor: 'module.course.courseName' },
     { header: 'Module Name', accessor: 'module.moduleName' },
@@ -134,7 +138,7 @@ const FeedBackManagement: React.FC = () => {
           timeZoneName: 'short',
         });
       },
-    }
+    },
   ];
 
   return (
