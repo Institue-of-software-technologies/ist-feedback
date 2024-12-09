@@ -9,22 +9,20 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    // Extract user information (e.g., role and ID) from request headers or a session token
+    // Extract user information
     const userRole = req.headers.get("user-role");
     const userId = req.headers.get("user-id");
 
     let feedbacks;
 
-    // Filter feedbacks based on the user's role
     if (userRole === "trainer") {
-      // Fetch only feedbacks associated with the trainer
       feedbacks = await Feedback.findAll({
         include: [
           {
-            model: TrainerCourses, // The model representing the trainer_courses table
-            as: 'courseTrainer',
-            where: { trainerId: userId }, // Filter where the trainerId matches the provided userId
-            required: true // This ensures that only feedbacks with a matching trainerId in the trainer_courses table are included
+            model: TrainerCourses,
+            as: "courseTrainer",
+            where: { trainerId: userId },
+            required: true,
           },
           {
             model: TrainerCourses,
@@ -34,8 +32,8 @@ export async function GET(req: NextRequest) {
                 model: User,
                 as: "trainers_users",
                 attributes: ["username"],
-              }
-            ]
+              },
+            ],
           },
           {
             model: Module,
@@ -52,17 +50,16 @@ export async function GET(req: NextRequest) {
           {
             model: ClassTime,
             as: "classTime",
-            attributes: ["classTime"]
+            attributes: ["classTime"],
           },
           {
             model: Intake,
             as: "intake",
             attributes: ["intakeName", "intakeYear"],
-          }
+          },
         ],
       });
     } else {
-      // Fetch all feedbacks for other roles
       feedbacks = await Feedback.findAll({
         include: [
           {
@@ -73,8 +70,8 @@ export async function GET(req: NextRequest) {
                 model: User,
                 as: "trainers_users",
                 attributes: ["username"],
-              }
-            ]
+              },
+            ],
           },
           {
             model: Module,
@@ -93,17 +90,39 @@ export async function GET(req: NextRequest) {
             model: Intake,
             as: "intake",
             attributes: ["intakeName", "intakeYear"],
-          }
+          },
         ],
       });
     }
 
-    // Format the tokenExpiration dates and send formatted feedback data to the client
-    const formattedFeedbacks = feedbacks.map((feedback) => ({
-      ...feedback.toJSON(),
-      tokenStartTime: new Date(feedback.tokenStartTime).toLocaleString(
-        "en-KE",
-        {
+    // Format the feedback data and determine token status
+    const now = new Date();
+    const formattedFeedbacks = feedbacks.map((feedback) => {
+      const tokenStartTime = new Date(feedback.tokenStartTime);
+      const tokenExpiration = new Date(feedback.tokenExpiration);
+
+      let tokenStatus;
+      let statusColor;
+      if (now < tokenStartTime) {
+         statusColor = "yellow";
+        tokenStatus = `Will open on ${tokenStartTime.toLocaleString("en-KE", {
+          weekday: "long",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZoneName: "short",
+        })}`;
+      } else if (now >= tokenStartTime && now <= tokenExpiration) {
+        tokenStatus = "Active";
+        statusColor = "green"; 
+      } else {
+        tokenStatus = "Expired";
+        statusColor = "red";
+      }
+
+      return {
+        ...feedback.toJSON(),
+        tokenStartTime: tokenStartTime.toLocaleString("en-KE", {
           weekday: "long",
           year: "numeric",
           month: "long",
@@ -112,11 +131,8 @@ export async function GET(req: NextRequest) {
           minute: "2-digit",
           hour12: true,
           timeZoneName: "short",
-        }
-      ),
-      tokenExpiration: new Date(feedback.tokenExpiration).toLocaleString(
-        "en-KE",
-        {
+        }),
+        tokenExpiration: tokenExpiration.toLocaleString("en-KE", {
           weekday: "long",
           year: "numeric",
           month: "long",
@@ -125,9 +141,11 @@ export async function GET(req: NextRequest) {
           minute: "2-digit",
           hour12: true,
           timeZoneName: "short",
-        }
-      ),
-    }));
+        }),
+        tokenStatus,
+        statusColor,
+      };
+    });
 
     return NextResponse.json({
       message: "Feedback retrieved successfully",
@@ -141,6 +159,7 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 
 async function generateUniqueToken() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
