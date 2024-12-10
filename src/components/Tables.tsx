@@ -251,12 +251,13 @@ const Table = <T,>({
                                                 <span>Edit</span>
                                             </button>
                                         )}
-                                        {onDelete && (row as unknown as { roleUsers: { roleName: string } }).roleUsers.roleName !== 'super_admin' && ( // Access the role name here
+                                        {onDelete && row && (row as unknown as { roleUsers?: { roleName?: string } }).roleUsers?.roleName !== 'super_admin' && (
                                             <button onClick={() => setConfirmDelete(row)} className="text-red-500 hover:underline">
                                                 <TrashIcon className="h-5 w-5 mr-1" />
                                                 <span>Delete</span>
                                             </button>
                                         )}
+
                                         {onView && (
                                             <button onClick={() => onView(row)} className="text-green-500 hover:underline">
                                                 <EyeIcon className="h-5 w-5 mr-1" />
