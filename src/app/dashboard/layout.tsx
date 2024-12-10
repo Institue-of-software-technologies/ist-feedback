@@ -449,16 +449,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                       </label>
                       {menuItems.map((options) => (
                         user.permissions.includes(options.permission) && (
-                          <label
-                            onClick={() => { handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen) }}
-                            key={options.name}
-                            className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
-                          >
-                            <div className="flex items-center">
-                              <span className="m-1">{options.icon}</span>
-                              <span className="m-1">{options.name}</span>
-                            </div>
-                          </label>
+                        <label
+                          onClick={() => { handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen) }}
+                          key={options.name}
+                          className={`flex flex-row items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer`}
+                        >
+                          <div className="flex items-center">
+                            <span className="m-1">{options.icon}</span>
+                            <span className="m-1">{options.name}</span>
+                          </div>
+                        </label>
                         )
                       ))}
                       <label
