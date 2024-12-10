@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { ReactNode, useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import { toast } from 'react-toastify';
+import { showToast } from './ToastMessage';
 
 interface Column {
     header: string;
@@ -104,10 +104,10 @@ const Table = <T,>({
         navigator.clipboard
             .writeText(token)
             .then(() => {
-                toast.info('Student Token copied!', { position: 'top-right', autoClose: 1000 });
+                showToast.info('Student Token copied!');
             })
             .catch((err) => {
-                toast.error('Failed to copy token', { position: 'top-right', autoClose: 1000 });
+                showToast.error('Failed to copy token');
                 console.error('Clipboard copy error:', err);
             });
     };

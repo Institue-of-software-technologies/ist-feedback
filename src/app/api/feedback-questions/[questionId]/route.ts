@@ -25,6 +25,7 @@ export async function GET(req: NextRequest, context: Context) {
         "questionType",
         "minRating",
         "maxRating",
+        "required",
       ],
     });
 
@@ -82,7 +83,7 @@ export async function PUT(req: NextRequest, context: Context) {
       if (minRating < 1 || maxRating > 10 || minRating >= maxRating) {
         return NextResponse.json(
           {
-            message:
+            message: 
               "Invalid rating range. minRating should be at least 1, maxRating should be up to 10, and minRating should be less than maxRating.",
           },
           { status: 400 }
