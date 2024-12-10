@@ -17,6 +17,7 @@ interface FormData {
   options?: { optionText: string; description?: boolean }[];
   minRating?: number;
   maxRating?: number;
+  required?: boolean;
 }
 
 const EditQuestion = () => {
@@ -26,6 +27,7 @@ const EditQuestion = () => {
   const [formData, setFormData] = useState<FormData>({
     questionType: null,
     options: [{ optionText: "", description: false }],
+    required: false,
   });
   const [showDetailsForm, setShowDetailsForm] = useState(false); // Whether to show the second form
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,9 +49,10 @@ const EditQuestion = () => {
               optionText: opt.optionText,
               description: opt.description || false,
             })) || [{ optionText: "", description: false }],
+            required: fetchedQuestion.required,
           });
         } catch (err) {
-          console.log(err)
+          console.log(err);
           setError('Failed to fetch feedback question');
         } finally {
           setLoading(false);
@@ -58,7 +61,6 @@ const EditQuestion = () => {
       fetchQuestion();
     }
   }, [questionId]);
-
   // Handle adding a new option for closed-ended questions
   const handleAddOption = () => {
     setFormData((prev) => ({
@@ -93,9 +95,10 @@ const EditQuestion = () => {
         ...data,
         options: formData.options?.map((option) => ({
           optionText: option.optionText,
-          description: option.description, // Send description status to backend
+          description: option.description, 
         })),
         minRating: 1,
+        required: formData.required,
       });
       showToast.success('Feedback question updated successfully!');
       setTimeout(() => {
@@ -157,17 +160,30 @@ const EditQuestion = () => {
         />
       )}
 
+
+
       {/* Second form based on selected question type */}
       {showDetailsForm && formData.questionType === 'open-ended' && (
         <>
           <div>
             <h1>Type the question below</h1>
           </div>
+          <div className="items-center mb-4">
+            <h1>Is this question required?</h1>
+            <input
+              type="checkbox"
+              checked={formData.required || false}
+              onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
+              className="mr-2"
+            />
+            <span>{formData.required ? "Required" : "Optional"}</span>
+          </div>
           <Form<FormData>
             Input={openEndedInputs}
             onSubmit={handleSubmit}
             loading={formLoading}
           />
+          
           <button
             onClick={handleGoBack}
             className="mt-4 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
@@ -190,7 +206,17 @@ const EditQuestion = () => {
               onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
               className="border p-2 w-full mb-2"
             />
-
+            
+            <div className="items-center mb-4">
+              <h1>Is this question required?</h1>
+              <input
+                type="checkbox"
+                checked={formData.required || false}
+                onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
+                className="mr-2"
+              />
+              <span>{formData.required ? "Required" : "Optional"}</span>
+            </div>
             {/* Render the options dynamically */}
             {formData.options?.map((option, index) => (
               <div key={index} className="flex items-center mb-2">
@@ -255,7 +281,16 @@ const EditQuestion = () => {
         <>
           <div>
             <h1>Type the rating question and specify the scale</h1>
-            
+            <div className="items-center mb-4">
+              <h1>Is this question required?</h1>
+              <input
+                type="checkbox"
+                checked={formData.required || false}
+                onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
+                className="mr-2"
+              />
+              <span>{formData.required ? "Required" : "Optional"}</span>
+            </div>
             <input
               type="text"
               placeholder="Enter your question"
@@ -270,7 +305,7 @@ const EditQuestion = () => {
                 type="number"
                 value={formData.maxRating || 10}
                 min={1}
-                max={5}
+                max={10}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -282,7 +317,7 @@ const EditQuestion = () => {
             </div>
 
             <div className="flex items-center mb-2 mx-auto">
-              <label className="mr-2">Max: 5</label>
+              <label className="mr-2">Max: 10</label>
             </div>
 
             <button
