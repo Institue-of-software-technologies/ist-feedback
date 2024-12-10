@@ -137,8 +137,8 @@ export default function FeedbackQuestionID() {
         const questionFontSize = 15;
         const tableFontSize = 13;
         const descriptionFontSize = 11;
-        const lineSpacing = 20;
-        const pageMargin = 40;
+        const lineSpacing = 25;
+        const pageMargin = 50;
         const maxWidth = 650; // Max width for text before wrapping or breaking
 
         const feedbackDetails = feedbackReport[0].feedback;
@@ -390,13 +390,71 @@ export default function FeedbackQuestionID() {
 
             // Table Data
             ratingCounts.forEach((count, idx) => {
+                const rating = ratings[idx];
                 const percentage = totalRatings ? ((count / totalRatings) * 100).toFixed(2) + "%" : "0%";
-                page.drawText(ratings[idx].toString(), { x: pageMargin, y: yPosition, size: tableFontSize, font });
-                page.drawText(count.toString(), { x: 300, y: yPosition, size: tableFontSize, font });
-                page.drawText(percentage, { x: 500, y: yPosition, size: tableFontSize, font });
-                yPosition -= lineSpacing;
+
+                // Add a colored background for the rating section
+                page.drawRectangle({
+                    x: pageMargin - 10,
+                    y: yPosition - lineSpacing - 0,
+                    width: maxWidth + 20,
+                    height: lineSpacing + 20,
+                    color: rgb(0.9, 0.9, 0.9),
+                    opacity: 0.8,
+                });
+
+                // Display Rating Details with a clear header
+                page.drawText(`Rating: ${rating}`, { x: pageMargin, y: yPosition, size: tableFontSize + 2, font: boldFont, color: rgb(0, 0.53, 0.7) });
+                page.drawText(`Count: ${count}`, { x: pageMargin + 200, y: yPosition, size: tableFontSize, font });
+                page.drawText(`Percentage: ${percentage}`, { x: pageMargin + 400, y: yPosition, size: tableFontSize, font });
+                yPosition -= lineSpacing * 2;
+
+                const descriptions = feedbackReport
+                    .filter(answer => parseInt(answer.answerText) === rating)
+                    .map(answer => answer.description)
+                    .filter(Boolean); // Remove empty descriptions
+
+                if (descriptions.length > 0) {
+                    // Add a header for descriptions
+                    page.drawText("Descriptions:", {
+                        x: pageMargin,
+                        y: yPosition,
+                        size: descriptionFontSize + 2,
+                        font: boldFont,
+                        color: rgb(0.2, 0.2, 0.2),
+                    });
+                    yPosition -= lineSpacing;
+
+                    descriptions.forEach((description) => {
+                        // Wrap and display the description
+                        const wrappedDescription = wrapText(description, font, descriptionFontSize, maxWidth - 40);
+                        wrappedDescription.forEach((line) => {
+                            page.drawText(`- ${line}`, {
+                                x: pageMargin + 20,
+                                y: yPosition,
+                                size: descriptionFontSize,
+                                font,
+                            });
+                            yPosition -= lineSpacing;
+                            addNewPageIfNeeded();
+                        });
+                    });
+                }
+
+                // Add a separator line between ratings
+                // page.drawLine({
+                //     start: { x: pageMargin, y: yPosition + lineSpacing },
+                //     end: { x: maxWidth, y: yPosition + lineSpacing },
+                //     thickness: 0,
+                //     color: rgb(0.8, 0.8, 0.8),
+                // });
+
+                // Add extra spacing between rating sections
+                yPosition -= lineSpacing * 2;
                 addNewPageIfNeeded();
             });
+
+
 
             // Add space after each question
             yPosition -= lineSpacing;
