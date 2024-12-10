@@ -135,6 +135,7 @@ export interface FeedbackQuestion {
   questionType: 'open-ended' | 'closed-ended' | 'rating';
   minRating?: number;
   maxRating?: number;
+  required?: string;
 }
 
 export interface trainer_courses {
@@ -154,6 +155,7 @@ export interface FeedbackQuestionSelect {
     id: number;
     questionText: string;
     questionType: string;
+    required: string;
     answerOption: [
       {
         description: string;

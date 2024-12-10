@@ -28,9 +28,24 @@ export async function GET() {
 // POST /api/feedback-questions - Create a new Feedback Question with options (if closed-ended) or custom rating range (if rating type)
 export async function POST(req: NextRequest) {
   try {
-    const { questionText, questionType, options, minRating, maxRating } = await req.json();
+    const {
+      questionText,
+      questionType,
+      options,
+      minRating,
+      maxRating,
+      required,
+    } = await req.json();
 
-    // Validate the questionType to ensure it's one of the valid options
+    // Validate required field
+    if (typeof required !== "boolean") {
+      return NextResponse.json(
+        { message: "'required' must be a boolean value." },
+        { status: 400 }
+      );
+    }
+
+    // Validate questionType
     const validTypes = ["open-ended", "closed-ended", "rating"];
     if (!validTypes.includes(questionType)) {
       return NextResponse.json(
@@ -42,7 +57,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate ratings if question type is 'rating'
+    // Validate ratings for 'rating' type
     if (questionType === "rating") {
       if (typeof minRating !== "number" || typeof maxRating !== "number") {
         return NextResponse.json(
@@ -64,11 +79,12 @@ export async function POST(req: NextRequest) {
     const question = await FeedbackQuestion.create({
       questionText,
       questionType,
+      required,
       minRating: questionType === "rating" ? minRating : null,
       maxRating: questionType === "rating" ? maxRating : null,
     });
 
-    // If the question type is 'closed-ended', handle answer options
+    // Handle answer options for 'closed-ended' questions
     if (
       questionType === "closed-ended" &&
       Array.isArray(options) &&
@@ -82,7 +98,7 @@ export async function POST(req: NextRequest) {
         })
       );
 
-      // Bulk create the answer options with description field
+      // Bulk create answer options
       await AnswerOption.bulkCreate(answerOptions);
     }
 
@@ -99,3 +115,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

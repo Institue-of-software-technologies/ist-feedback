@@ -7,6 +7,7 @@ export class FeedbackQuestion extends Model {
   questionType!: 'open-ended' | 'closed-ended' | 'rating';
   minRating?: number;
   maxRating?: number;
+  required?: string;
 }
 
 FeedbackQuestion.init({
@@ -32,6 +33,11 @@ FeedbackQuestion.init({
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  required: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  }
 }, {
   sequelize,
   modelName: 'FeedbackQuestion',
