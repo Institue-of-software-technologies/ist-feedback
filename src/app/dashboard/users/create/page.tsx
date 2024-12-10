@@ -85,9 +85,6 @@ const NewUserForm: React.FC = () => {
     finally {
       setFormLoading(false);
     }
-    finally {
-      setFormLoading(false);
-    }
   };
 
   const inputs = [
