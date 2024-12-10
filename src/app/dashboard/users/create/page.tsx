@@ -10,6 +10,7 @@ import { Role } from "@/types";
 import { Course } from "@/types";
 import Loading from "@/app/loading";
 import { showToast } from "@/components/ToastMessage";
+import axios from "axios";
 
 interface FormData {
   username: string;
@@ -69,8 +70,17 @@ const NewUserForm: React.FC = () => {
         router.push('/dashboard/users'); // Redirect to the user list
       }, 2000);
     } catch (error) {
-      console.error("Failed to create user", error);
-      showToast.error("Failed to create user");
+      if (axios.isAxiosError(error)) {
+        // Extract and display the error message if it's an AxiosError
+        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+        showToast.error(`${errorMessage}`);
+      } else if (error instanceof Error) {
+        // Handle other types of errors
+        showToast.error(`${error.message}`);
+      } else {
+        // Handle unexpected error types
+        showToast.error('An unexpected error occurred');
+      }
     }
     finally {
       setFormLoading(false);

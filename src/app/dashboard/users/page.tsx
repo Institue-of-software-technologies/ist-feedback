@@ -86,7 +86,6 @@ const UserManagement: React.FC = () => {
     { header: 'Username', accessor: 'username' },
     { header: 'Email', accessor: 'email' },
     { header: 'Role', accessor: 'roleUsers.roleName' },
-    // { header: 'Course', accessor: 'trainer_courses' }
   ];
 
   return (
@@ -97,7 +96,7 @@ const UserManagement: React.FC = () => {
         data={filteredUsers}
         onSearch={handleSearch}
         onEdit={user && user.permissions.includes('update_users') ? handleEdit : undefined}
-        onDelete={user && user.permissions.includes('update_users') ? handleDelete : undefined}
+        onDelete={user && user.permissions.includes('delete_users') ? handleDelete : undefined}
       />
     </div>
   );
