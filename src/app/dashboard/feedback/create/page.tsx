@@ -30,10 +30,12 @@ const NewFeedbackForm: React.FC = () => {
   const [classTimes, setClassTimes] = useState<ClassTime[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [questions, setQuestions] = useState<FeedbackQuestion[]>([]);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const { user } = useUser();
 
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/feedback", data);
       showToast.success("Feedback created successfully!");
@@ -43,6 +45,9 @@ const NewFeedbackForm: React.FC = () => {
     } catch (error) {
       console.error("Failed to create feedback", error);
       showToast.error("Failed to create feedback");
+    }
+    finally {
+      setFormLoading(false);
     }
   };
 
@@ -153,6 +158,15 @@ const NewFeedbackForm: React.FC = () => {
     },
   ];
 
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/feedback'),
+    }
+  ];
+  
+
   const handleNextStep = () => setStep((prev) => prev + 1);
   const handlePrevStep = () => setStep((prev) => prev - 1);
 
@@ -162,8 +176,10 @@ const NewFeedbackForm: React.FC = () => {
       <h2 className="text-2xl font-bold mb-4">Create New Feedback - Step {step}</h2>
       <Form<FormData>
         buttonText={step === 1 ? "Next":"Submit"}
+        addButton={step === 1 ?extraButtons: []}
         Input={step === 1 ? step1Inputs : step2Inputs}
         onSubmit={step === 2 ? onSubmit : handleNextStep}
+        loading={formLoading}
       />
       <div className="flex justify-between mt-4">
         {step > 1 && (

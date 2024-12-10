@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { Course } from '@/types';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 interface FormData {
   permissionName: string;
 }
@@ -18,6 +19,7 @@ const EditCourse = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   // Fetch user data on mount
   useEffect(() => {
@@ -39,6 +41,7 @@ const EditCourse = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/courses/${courseId}`, data);
       showToast.success('course updated successfully!');
@@ -51,11 +54,22 @@ const EditCourse = () => {
       console.log(err)
       showToast.error('Failed to update course',);
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
   if (error) return <div className="text-red-500">{error}</div>;
 
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/courses'),
+    }
+  ];
+  
   const inputs = [
     { label: "courseName", type: "text", value: course?.courseName || "" }
   ];
@@ -68,6 +82,8 @@ const EditCourse = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={handleSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

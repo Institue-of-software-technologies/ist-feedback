@@ -28,12 +28,10 @@ export default function ResetPassword() {
       try {
         const response = await api.get(`/auth/reset-password/${token}`);
         if (response.status === 200) {
-          showToast.success(response.data.message);
           setTokenAuthenticated(true);
         }
       } catch (error) {
         console.log(error);
-        showToast.error('Reset token is invalid');
         setTokenAuthenticated(false);
       } finally {
         setIsLoading(false);

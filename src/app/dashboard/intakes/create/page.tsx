@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
@@ -15,7 +15,9 @@ interface FormData {
 
 const NewIntakeForm: React.FC = () => {
     const router = useRouter();
+    const [formLoading, setFormLoading] = useState<boolean>(false);
     const onSubmit = async (data: FormData) => {
+        setFormLoading(true);
         try {
             await api.post("/intakes", data);
             showToast.success("Intake created successfully!");
@@ -25,6 +27,9 @@ const NewIntakeForm: React.FC = () => {
         } catch (error) {
             console.error("Failed to create intake", error);
             showToast.error("Failed to create intake");
+        }
+        finally {
+            setFormLoading(false);
         }
     };
 
@@ -46,6 +51,14 @@ const NewIntakeForm: React.FC = () => {
             options: generateYearOptions()
         }
     ];
+    const extraButtons = [
+        {
+          label: 'Back',
+          type: 'button',
+          onClick: () => router.push('/dashboard/intakes'),
+        }
+      ];
+      
 
 
     return (
@@ -55,6 +68,8 @@ const NewIntakeForm: React.FC = () => {
             <Form<FormData>
                 Input={inputs}
                 onSubmit={onSubmit}
+                loading={formLoading}
+                addButton={extraButtons}
             />
         </div>
     );

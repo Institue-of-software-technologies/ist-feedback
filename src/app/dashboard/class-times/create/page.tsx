@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
@@ -14,7 +14,9 @@ interface FormData {
 
 const NewClassTimeForm: React.FC = () => {
   const router = useRouter();
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/class-times", data);
       showToast.success("class time created successfully!");
@@ -26,8 +28,18 @@ const NewClassTimeForm: React.FC = () => {
       console.error("Failed to create class time", error);
       showToast.error("Failed to create class time");
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/class-times'),
+    }
+  ];
   const inputs = [
     { label: "classTime", type: "text" },
   ];
@@ -39,6 +51,8 @@ const NewClassTimeForm: React.FC = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={onSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

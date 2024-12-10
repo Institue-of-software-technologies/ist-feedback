@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       expires: tokenExpiration
     })
 
-    const customLink = `${URL}/reset-password?token=${resetToken}&email=${email}`;
+    const customLink = `${URL}/reset-password-invite?token=${resetToken}&email=${email}`;
 
     // Create transport for Gmail
     const transporter = nodemailer.createTransport({

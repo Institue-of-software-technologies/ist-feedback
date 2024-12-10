@@ -18,6 +18,7 @@ const NewModuleForm: React.FC = () => {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
@@ -32,6 +33,7 @@ const NewModuleForm: React.FC = () => {
   }, []);
 
   const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.post("/modules", data); // Updated to post to the modules endpoint
       showToast.success("Module created successfully!");
@@ -43,6 +45,9 @@ const NewModuleForm: React.FC = () => {
     } catch (error) {
       console.error("Failed to create module", error);
       showToast.error("Failed to create module");
+    }
+    finally {
+      setFormLoading(false);
     }
   };
   if (loading) return <div>Loading...</div>;
@@ -59,6 +64,14 @@ const NewModuleForm: React.FC = () => {
     }, // Assuming you link the module to a course
   ];
 
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/modules'),
+    }
+  ];
+ 
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
@@ -67,6 +80,8 @@ const NewModuleForm: React.FC = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={onSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

@@ -47,7 +47,7 @@ export async function GET(req: NextRequest, context: Context) {
 export async function PUT(req: NextRequest, context: Context) {
   try {
     const { roleId } = context.params;
-    const { roleName, multiSelectField,Permissions } = await req.json();
+    const { roleName, multiSelectField } = await req.json();
     console.log(roleName, multiSelectField);
 
     // Fetch the role by ID
@@ -64,7 +64,7 @@ export async function PUT(req: NextRequest, context: Context) {
     }
 
     // Update permissions only if provided
-    if (Permissions.length > 0) {
+    if (multiSelectField.length > 0) {
       // Clear existing permissions
       await RolePermission.destroy({
         where: {

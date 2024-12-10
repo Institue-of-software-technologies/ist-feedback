@@ -18,7 +18,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
-import { PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
+import { PiBellSimpleDuotone, PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
 import api from '../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
@@ -190,7 +190,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
       viewLink: `/dashboard/user-profile/${user?.id}`,
       icon: <PiUserCircleGearDuotone size={'20px'} />,
       sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
-    }
+    },
+    {
+      name: 'Notification',
+      permission: 'profile',
+      viewLabel: 'Notification',
+      viewLink: `/dashboard/notifications`,
+      icon: <PiBellSimpleDuotone size={'20px'} />,
+      sideIcon: <PiBellSimpleDuotone size={'30px'} />,
+    },
   ];
 
   const menuItems = [
@@ -201,6 +209,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
       viewLink: `/dashboard/user-profile/${user?.id}`,
       icon: <PiUserCircleGearDuotone size={'20px'} />,
       sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
+    },
+    {
+      name: 'Notification',
+      permission: 'receive_notifications',
+      viewLabel: 'Notification',
+      viewLink: `/dashboard/notifications`,
+      icon: <PiBellSimpleDuotone size={'20px'} />,
+      sideIcon: <PiBellSimpleDuotone size={'30px'} />,
     },
   ]
 
@@ -280,6 +296,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
             <div className="max-h-[calc(100vh-4rem)] overflow-y-auto overflow-scroll">  {/* Allows vertical scroll */}
               <ul className="space-y-2">
                 {tabs.map((tab) => (
+                  user.permissions.includes(tab.permission) && (
+                    <li key={tab.name}>
+                      <button
+                        onClick={() => handleTabChange(tab.name, 'view')}
+                        className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''} transition-colors`}
+                      >
+                        <span>{tab.sideIcon}</span>
+                        <span className="ml-2">{tab.name}</span>
+                      </button>
+                    </li>
+                  )
+                ))}
+                {menuItems.map((tab) => (
                   user.permissions.includes(tab.permission) && (
                     <li key={tab.name}>
                       <button
@@ -372,6 +401,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                         </div>
                       </label>
                       {menuItems.map((options) => (
+                        user.permissions.includes(options.permission) && (
                         <label
                           onClick={() => { handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen) }}
                           key={options.name}
@@ -382,6 +412,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                             <span className="m-1">{options.name}</span>
                           </div>
                         </label>
+                        )
                       ))}
                       <label
                         onClick={() => { handleLogout(); setMenuOpen(!menuOpen) }}
@@ -444,7 +475,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                   <div>
                     {analytics}
                   </div>
-                )}                
+                )}
                 {activeTab === 'Dashboard' && (
                   <div>
                     {recentactivities}

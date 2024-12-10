@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { useUser } from '@/context/UserContext';
 import api from '../../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
+import { showToast } from '@/components/ToastMessage';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,27 +27,38 @@ export default function LoginPage() {
       const response = await api.post('/auth/login', {
         email: email,
         password: password,
-        rememberMe: rememberMe
+        rememberMe: rememberMe,
       });
-
+  
       const useRolesPermissions = response.data.client;
-
+  
       router.push('/dashboard');
       localStorage.setItem('userRolesPermissions', JSON.stringify(useRolesPermissions));
       setUser(useRolesPermissions);
-
-
+  
       if (response.status !== 200) {
         throw new Error(`error: ${response.data.message}`);
       }
-
-    } catch (error) {
+  
+    } catch (error: unknown) {
       console.error('Login failed', error);
-      alert('Invalid credentials');
+  
+      if (axios.isAxiosError(error)) {
+        // Extract and display the error message if it's an AxiosError
+        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+        showToast.error(`${errorMessage}`);
+      } else if (error instanceof Error) {
+        // Handle other types of errors
+        showToast.error(`${error.message}`);
+      } else {
+        // Handle unexpected error types
+        showToast.error('An unexpected error occurred');
+      }
     } finally {
       setIsLoading(false); // Stop loading once the request is done
     }
   };
+  
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

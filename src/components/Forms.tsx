@@ -10,7 +10,7 @@ export interface Input {
   label: string;
   type: string;
   require?: boolean;
-  readonly?:boolean;
+  readonly?: boolean;
   value?: string | number;
   valueDate?: Date | null;
   name?: string;
@@ -18,11 +18,22 @@ export interface Input {
   options?: { label: string; value: number | string }[];
 }
 
+export interface Buttons {
+  label: string;
+  type: string;
+  buttonLoading?: boolean;
+  buttonColor?: string;
+  buttonText?: string;
+  hoverColor?: string;
+  onClick: () => void;
+}
+
 interface FormProps<T extends FieldValues> {
   Input: Input[];
   buttonColor?: string;
   buttonText?: string;
   hoverColor?: string;
+  addButton?: Buttons[];
   loading?: boolean;
   buttonVisible?: boolean;
   onSubmit: (data: T) => void;
@@ -35,6 +46,7 @@ interface CustomInputProps {
 const Form = <T extends FieldValues>({
   Input,
   onSubmit,
+  addButton,
   buttonColor,
   buttonText,
   hoverColor,
@@ -286,42 +298,82 @@ const Form = <T extends FieldValues>({
       )
       )}
 
-      {buttonVisible && (
-        <button
-          type="submit"
-          className={`${buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${hoverColor || defaultHoverColor} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={loading} // Disable button while loading
-        >
-          {loading ? (
-            <div className="flex items-center">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                ></path>
-              </svg>
-              Submitting...
-            </div>
+      <div className="flex space-x-4">
+        {buttonVisible && (
+          <button
+            type="submit"
+            className={`${buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${hoverColor || defaultHoverColor} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading} // Disable button while loading
+          >
+            {loading ? (
+              <div className="flex items-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Submitting...
+              </div>
+            ) : (
+              buttonText || defaultButtonText
+            )}
+          </button>
+        )}
 
-          ) : (
-            buttonText || defaultButtonText
-          )}
-        </button>
-      )}
+        {addButton?.map((button, index) => (
+          <button
+            key={index} // Use a unique key for each button
+            type="button"
+            className={`${button.buttonColor || buttonColor || defaultButtonColor} text-white px-4 py-2 rounded ${button.hoverColor || hoverColor || defaultHoverColor} ${button.buttonLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={button.onClick} // Attach the onClick handler provided in the Buttons object
+            disabled={button.buttonLoading} // Disable button while loading
+          >
+            {button.buttonLoading ? (
+              <div className="flex items-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Submitting...
+              </div>
+            ) : (
+              button.label || buttonText || defaultButtonText // Use button-specific label if available
+            )}
+          </button>
+        ))}
+      </div>
+
 
     </form>
   );

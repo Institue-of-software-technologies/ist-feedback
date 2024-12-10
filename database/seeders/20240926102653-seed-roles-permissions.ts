@@ -139,6 +139,7 @@ export default {
         email: 'sam@example.com',
         password: hashedPasswordSam, // Hashed password for Sam
         roleId: 2, // Assuming the ID for ADMIN is automatically set to 2
+        acceptInvite:true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -147,6 +148,7 @@ export default {
         email: 'admin@example.com',
         password: hashedPasswordAdmin, // Hashed password for Admin
         roleId: 1, // Assuming the ID for SUPER_ADMIN is automatically set to 1
+        acceptInvite:true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
