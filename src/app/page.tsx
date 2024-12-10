@@ -10,9 +10,9 @@ import { Feedback } from "@/types";
 import { useUser } from "@/context/UserContext";
 import Image from 'next/image';
 import istLogo from '../../public/assets/image/cropedImag.png';
-// public/assets/image/cropedImag.png
 import Loading from './loading';  // Import the Loading component
 import { showToast } from "@/components/ToastMessage";
+import { AxiosError } from "axios";
 
 interface FormData {
   Token: string;
@@ -58,22 +58,31 @@ export default function Home() {
     setFormLoading(true);
     try {
       const response = await api.get(`/feedback/token/${data.Token}`);
-      const useRolesPermissions = response.data;
-      localStorage.setItem('userRolesPermissions', JSON.stringify(response.data));
+      const { status, message, token } = response.data;
 
-      setUser(useRolesPermissions);
-      showToast.success("Token found! Redirecting...");
-      setTimeout(() => {
-        router.push(`/student-feedback/${response.data.token.id}`);
-      }, 2000);
+      if (status === "active") {
+        localStorage.setItem('userRolesPermissions', JSON.stringify(response.data));
+        setUser(response.data);
+        showToast.success("Token Active! Redirecting...");
+
+        setTimeout(() => {
+          router.push(`/student-feedback/${token.id}`);
+        }, 2000);
+      } else {
+        showToast.error(message);
+      }
     } catch (error) {
-      console.error("Failed to get token", error);
-      showToast.error("Token expired.");
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        showToast.error(error.response.data.message);
+      } else {
+        showToast.error("An unexpected error occurred. Please try again.");
+      }
     }
-    finally {
+ finally {
       setFormLoading(false);
     }
   };
+
 
 
   if (loading) return <Loading />;

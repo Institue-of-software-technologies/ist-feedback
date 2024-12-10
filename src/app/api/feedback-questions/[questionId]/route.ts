@@ -19,7 +19,13 @@ export async function GET(req: NextRequest, context: Context) {
           attributes: ["id", "optionText", "description"],
         },
       ],
-      attributes: ["id", "questionText", "questionType", "minRating", "maxRating"],
+      attributes: [
+        "id",
+        "questionText",
+        "questionType",
+        "minRating",
+        "maxRating",
+      ],
     });
 
     if (!question) {
