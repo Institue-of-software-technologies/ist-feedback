@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import "react-toastify/dist/ReactToastify.css";
 import Form from "@/components/Forms";
 import api from "../../../../../lib/axios";
 import { ToastContainer } from "react-toastify";
