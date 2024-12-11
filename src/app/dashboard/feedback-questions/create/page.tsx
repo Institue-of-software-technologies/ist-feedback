@@ -40,8 +40,7 @@ const FeedbackQuestionCreate: React.FC = () => {
     } catch (error) {
       console.error("Failed to create feedback question", error);
       showToast.error("Failed to create feedback question.");
-    }
-    finally {
+    } finally {
       setFormLoading(false);
     }
   };
@@ -163,7 +162,7 @@ const FeedbackQuestionCreate: React.FC = () => {
                   </div>
                 </div>
               ))}
-              
+
               <button
                 onClick={handleAddOption}
                 className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
@@ -210,13 +209,15 @@ const FeedbackQuestionCreate: React.FC = () => {
 
           <button
             onClick={() => onSubmit(formData)}
-            className="bg-green-500 text-white px-4 py-2 rounded mt-4"
+            className={`bg-green-500 text-white px-4 py-2 rounded mt-4 ${formLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={formLoading}
           >
-            Submit
+            {formLoading ? "Submitting..." : "Submit"}
           </button>
           <button
             onClick={handleGoBack}
             className="bg-gray-500 text-white px-4 py-2 rounded mt-4 ml-2"
+            disabled={formLoading}
           >
             Back
           </button>
