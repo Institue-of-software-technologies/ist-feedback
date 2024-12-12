@@ -30,9 +30,9 @@ export interface Module {
 export interface Notification {
   id: number;
   title: string;
-  message:string;
-  link:string;
-  status:string;
+  message: string;
+  link: string;
+  status: string;
 }
 
 export interface Feedback {
@@ -74,7 +74,7 @@ export interface Feedback {
     moduleName: string;
     course: {
       id: number;
-      courseName:string;
+      courseName: string;
     }
   };
 }
@@ -107,9 +107,11 @@ export interface User {
   username: string;
   email: string;
   password: string;
+  role: string;
   roleId: number;
   createdAt: string;
   updatedAt: string;
+  permissions: string[];
   acceptInvite: boolean;
   roleUsers: {
     id: number;
@@ -194,4 +196,12 @@ export interface Button {
   type: string;
   onClick: () => void;
   buttonLoading?: boolean; // Add this property to make it valid
+}
+
+export interface UserSession {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  permissions: string[];
 }

@@ -20,7 +20,6 @@ import {
 import { VscFeedback } from "react-icons/vsc";
 import { PiBellSimpleDuotone, PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
-import api from '../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
@@ -28,6 +27,7 @@ import istLogo from '../../../public/assets/image/cropedImag.png';
 import Image from 'next/image';
 import { showToast } from '@/components/ToastMessage';
 import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -52,13 +52,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
   const handleLogout = async () => {
     try {
       localStorage.clear();
-      const response = await api.post('/auth/logout');
-      if (response.status === 200) {
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
-
-      }
+      signOut({ callbackUrl: '/login' })
     } catch (error) {
       console.log(error)
       showToast.error('Failed to logout');

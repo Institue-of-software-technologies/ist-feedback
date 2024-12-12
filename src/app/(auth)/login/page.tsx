@@ -2,13 +2,14 @@
 import istLogo from '../../../../public/assets/image/cropedImag.png';
 import Link from 'next/link';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import { useUser } from '@/context/UserContext';
-import api from '../../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
 import { showToast } from '@/components/ToastMessage';
 import 'react-toastify/dist/ReactToastify.css';
+import { signIn } from 'next-auth/react';
+import api from '../../../../lib/axios';
 import axios from 'axios';
 
 export default function LoginPage() {
@@ -20,45 +21,78 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false); // Add loading state
   const { setUser } = useUser();
 
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const sessionResponse = await api.get("/auth/session", {
+          withCredentials: true,
+        });
+  
+        if (sessionResponse.status !== 200) {
+          console.error("Failed to fetch session:", sessionResponse.data);
+          // Handle error, e.g., display an error message to the user
+          return;
+        }
+  
+        router.push("/dashboard");
+      } catch (error) {
+        console.error("Error fetching session:", error);
+        // Handle error, e.g., display a generic error message to the user
+      }
+    };
+  
+    fetchSession();
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading when the form is submitted
+    setIsLoading(true);
+  
     try {
-      const response = await api.post('/auth/login', {
-        email: email,
-        password: password,
-        rememberMe: rememberMe,
+      console.log("Attempting to sign in...");
+      const response = await signIn("credentials", {
+        email,
+        password,
+        redirect: false, // Prevent automatic redirect from NextAuth
       });
   
-      const useRolesPermissions = response.data.client;
-  
-      router.push('/dashboard');
-      localStorage.setItem('userRolesPermissions', JSON.stringify(useRolesPermissions));
-      setUser(useRolesPermissions);
-  
-      if (response.status !== 200) {
-        throw new Error(`error: ${response.data.message}`);
+      if (!response?.ok) {
+        console.error("Login failed: ", response?.error);
+        showToast.error(response?.error || "Invalid login credentials");
+        return;
       }
   
-    } catch (error: unknown) {
-      console.error('Login failed', error);
+      console.log("SignIn successful, now fetching session...");
+      const sessionResponse = await api.get("/auth/session");
   
+      if (sessionResponse.status !== 200) {
+        console.error("Failed to fetch session");
+        showToast.error("Failed to fetch session");
+        return;
+      }
+  
+      const userRolesPermissions = sessionResponse.data?.session.user|| {};
+  
+      // Set the user in the UserContext directly
+      setUser(userRolesPermissions);
+  
+      // Check if session data is correct
+      console.log("Session data: ", userRolesPermissions);
+  
+      // Navigate to the dashboard
+      router.push("/dashboard");
+      showToast.success("Login successful!");
+    } catch (error) {
+      console.error("Error during login: ", error);
       if (axios.isAxiosError(error)) {
-        // Extract and display the error message if it's an AxiosError
-        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-        showToast.error(`${errorMessage}`);
-      } else if (error instanceof Error) {
-        // Handle other types of errors
-        showToast.error(`${error.message}`);
+        showToast.error(error.response?.data?.message || "An error occurred during login.");
       } else {
-        // Handle unexpected error types
-        showToast.error('An unexpected error occurred');
+        showToast.error("An unexpected error occurred.");
       }
     } finally {
-      setIsLoading(false); // Stop loading once the request is done
+      setIsLoading(false);
     }
   };
-  
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

@@ -54,6 +54,29 @@ export default function Home() {
     getClientCookie();
   }, []);
 
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const sessionResponse = await api.get("/auth/session", {
+          withCredentials: true,
+        });
+  
+        if (sessionResponse.status !== 200) {
+          console.error("Failed to fetch session:", sessionResponse.data);
+          // Handle error, e.g., display an error message to the user
+          return;
+        }
+  
+        router.push("/dashboard");
+      } catch (error) {
+        console.error("Error fetching session:", error);
+        // Handle error, e.g., display a generic error message to the user
+      }
+    };
+  
+    fetchSession();
+  }, [router]);
+
 
   const onSubmit = async (data: FormData) => {
     setFormLoading(true);
