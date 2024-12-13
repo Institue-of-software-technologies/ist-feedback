@@ -34,7 +34,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "migrations/**/*.ts"
+    "migrations/**/*.ts",
+    "src/types/next-auth.d.ts"
 , "database/data/permissionsSuperAdmin.js"  ], // Include migration files
   "exclude": [
     "node_modules"
