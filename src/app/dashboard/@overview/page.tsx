@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Use Next.js router for navigation
 import { FaGraduationCap, FaUsers, FaBook, FaClock } from "react-icons/fa";
 import axios from "axios";
+import { useUser } from "@/context/UserContext";
 
 // Skeleton loader for cards
 const SkeletonCard = () => (
@@ -26,37 +27,22 @@ const OverviewPage = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [authorized, setAuthorized] = useState<boolean>(false); // Authorization state
   const [userPermissions, setUserPermissions] = useState<string[]>([]); // Store user permissions
+  const { user } = useUser();
   const router = useRouter(); // Next.js router
 
   useEffect(() => {
     const checkAuthorization = () => {
-      try {
-        // Fetch the roles and permissions from localStorage
-        const userRolesPermissions = localStorage.getItem("userRolesPermissions");
-
-        if (userRolesPermissions) {
-          const parsedData = JSON.parse(userRolesPermissions);
-          const { permissions } = parsedData;
-
-          setUserPermissions(permissions || []);
-
-          // Check if the user has permission to view the dashboard
-          if (permissions.includes("view_dashboard")) {
-            setAuthorized(true);
-          } else {
-            router.push("/403"); // Redirect unauthorized users to a 403 page
-          }
-        } else {
-          throw new Error("Permissions not found in localStorage");
-        }
-      } catch (error) {
-        console.error("Authorization check failed:", error);
-        router.push("/403"); // Handle errors by redirecting
+      // Fetch the roles and permissions from localStorage
+      if (user?.permissions.includes("view_dashboard")) {
+        setUserPermissions(user.permissions);
+        setAuthorized(true);
+      } else {
+        router.push("/403"); // Redirect unauthorized users to a 403 page
       }
     };
 
     checkAuthorization();
-  }, [router]);
+  }, [router, user?.permissions]);
 
   useEffect(() => {
     if (!authorized) return;

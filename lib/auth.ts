@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
       strategy: "jwt", // Use JWT for stateless sessions
     },
     pages: {
-      signIn: '/(auth)/login', // Define custom login page if needed
+      signIn: '/login', // Define custom login page if needed
     },
     callbacks: {
       async jwt({ token, user }) {
