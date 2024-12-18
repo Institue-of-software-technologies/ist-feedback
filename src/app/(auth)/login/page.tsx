@@ -49,7 +49,6 @@ export default function LoginPage() {
     setIsLoading(true);
   
     try {
-      console.log("Attempting to sign in...");
       const response = await signIn("credentials", {
         email,
         password,
@@ -61,27 +60,15 @@ export default function LoginPage() {
         showToast.error(response?.error || "Invalid login credentials");
         return;
       }
-  
-      console.log("SignIn successful, now fetching session...");
       const sessionResponse = await api.get("/auth/session");
-  
       if (sessionResponse.status !== 200) {
         console.error("Failed to fetch session");
         showToast.error("Failed to fetch session");
         return;
       }
-  
       const userRolesPermissions = sessionResponse.data?.session.user|| {};
-  
-      // Set the user in the UserContext directly
       setUser(userRolesPermissions);
-  
-      // Check if session data is correct
-      console.log("Session data: ", userRolesPermissions);
-  
-      // Navigate to the dashboard
       router.push("/dashboard");
-      showToast.success("Login successful!");
     } catch (error) {
       console.error("Error during login: ", error);
       if (axios.isAxiosError(error)) {
