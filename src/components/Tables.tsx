@@ -1,13 +1,22 @@
-import { ClipboardIcon, ExclamationTriangleIcon, EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import {
+    ClipboardIcon,
+    ExclamationTriangleIcon,
+    EyeIcon,
+    PencilSquareIcon,
+    TrashIcon,
+} from '@heroicons/react/24/outline';
 import React, { ReactNode, useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import { toast } from 'react-toastify';
+import { showToast } from './ToastMessage';
 
 interface Column {
     header: string;
     accessor: string;
 }
-
+interface Row {
+    statusColor: string;
+    // Add other properties of the row object here
+}
 interface TableProps<T> {
     columns: Column[];
     data: T[];
@@ -17,7 +26,14 @@ interface TableProps<T> {
     onSearch?: (value: string) => void;
 }
 
-const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableProps<T>): JSX.Element => {
+const Table = <T,>({
+    columns,
+    data,
+    onEdit,
+    onDelete,
+    onSearch,
+    onView,
+}: TableProps<T>): JSX.Element => {
     const [confirmDelete, setConfirmDelete] = useState<T | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -37,24 +53,23 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
 
     const handleColumnToggle = (accessor: string) => {
         if (isMobile) {
-          const newSelectedColumns = [...selectedColumns];
-          const index = newSelectedColumns.indexOf(accessor);
-          if (index !== -1) {
-            newSelectedColumns.splice(index, 1); // Remove column if selected
-          } else {
-            // Only add if it's less than 3 columns selected
-            if (newSelectedColumns.length < 3) {
-              newSelectedColumns.push(accessor);
+            const newSelectedColumns = [...selectedColumns];
+            const index = newSelectedColumns.indexOf(accessor);
+            if (index !== -1) {
+                newSelectedColumns.splice(index, 1); // Remove column if selected
+            } else {
+                // Only add if it's less than 3 columns selected
+                if (newSelectedColumns.length < 3) {
+                    newSelectedColumns.push(accessor);
+                }
             }
-          }
-          setSelectedColumns(newSelectedColumns);
+            setSelectedColumns(newSelectedColumns);
         } else {
-          // Logic for non-mobile devices (unchanged)
-          setSelectedColumns((prev) =>
-            prev.includes(accessor) ? prev.filter((col) => col !== accessor) : [...prev, accessor]
-          );
+            setSelectedColumns((prev) =>
+                prev.includes(accessor) ? prev.filter((col) => col !== accessor) : [...prev, accessor]
+            );
         }
-      };   
+    };
 
     const getNestedValue = (obj: T, path: string): ReactNode => {
         const value = path.split('.').reduce<unknown>((acc, key) => {
@@ -86,12 +101,14 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
     };
 
     const handleCopy = (token: string) => {
-        navigator.clipboard.writeText(token)
+        navigator.clipboard
+            .writeText(token)
             .then(() => {
-                toast.info('Student Token copied!', { position: 'top-right', autoClose: 1000 });
+                showToast.info('Student Token copied!');
             })
             .catch((err) => {
-                toast.error('Failed to copy token: ', err);
+                showToast.error('Failed to copy token');
+                console.error('Clipboard copy error:', err);
             });
     };
 
@@ -100,32 +117,32 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
             const isMobileView = window.innerWidth <= 768; // Mobile threshold (adjust as needed)
             setIsMobile(isMobileView);
         };
-    
-        // Run check on mount
+
         checkMobileView();
-    
-        // Add event listener for window resize
+
         window.addEventListener('resize', checkMobileView);
         return () => window.removeEventListener('resize', checkMobileView);
-    }, []);    
+    }, []);
 
     useEffect(() => {
         if (isMobile) {
-          setSelectedColumns(columns.slice(0, 2).map((col) => col.accessor));
+            setSelectedColumns(columns.slice(0, 2).map((col) => col.accessor));
         }
-      }, [isMobile, columns]); 
-        
+    }, [isMobile, columns]);
+
     const paginatedData = data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
 
     return (
         <div className="border overflow-x-auto shadow rounded-lg divide-y outline-gray-100 divide-gray-200 w-full">
-            {/* Column Selection Dropdown */}
             <div className="flex flex-col lg:justify-between sm:flex-row justify-between items-center p-4 space-y-4 sm:space-y-0 sm:space-x-4 w-auto">
                 <div className="relative inline-block text-left w-full sm:w-auto">
-                    <button onClick={() => setToggeled(!toggeled)} className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
+                    <button
+                        onClick={() => setToggeled(!toggeled)}
+                        className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                    >
                         Select Columns
                     </button>
-                    {toggeled && ( // Only show dropdown if isOpen is true
+                    {toggeled && (
                         <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                 {columns.map((column) => (
@@ -148,18 +165,17 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                 </div>
 
                 <div className="relative w-full sm:w-auto flex items-center space-x-2">
-                        <label className="sr-only">Search</label>
-                        <input
-                            type="text"
-                            name="hs-table-with-pagination-search"
-                            id="hs-table-with-pagination-search"
-                            className="py-2 px-3 ps-9 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="Search for items"
-                            onChange={handleSearchChange}
-                        />
+                    <label className="sr-only">Search</label>
+                    <input
+                        type="text"
+                        name="hs-table-with-pagination-search"
+                        id="hs-table-with-pagination-search"
+                        className="py-2 px-3 ps-9 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Search for items"
+                        onChange={handleSearchChange}
+                    />
                 </div>
 
-                {/* Search and Rows per Page */}
                 <div className="flex flex-col sm:flex-row w-full sm:w-auto space-y-4 sm:space-y-0 sm:space-x-4">
                     <div className="w-full sm:w-auto">
                         <label htmlFor="rowsPerPage" className="mr-2">
@@ -180,7 +196,6 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                 </div>
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto w-full">
                 <table className="min-w-full divide-y divide-gray-200 w-full">
                     <thead className="bg-stone-100">
@@ -202,14 +217,25 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                                     .filter((column) => selectedColumns.includes(column.accessor))
                                     .map((column) => (
                                         <td key={column.accessor} className="px-4 py-2">
-                                            {typeof column.accessor === 'string' && column.accessor === 'studentToken' ? (
+                                            {column.accessor === 'tokenStatus' ? (
+                                                <span
+                                                    className={`px-2 py-2 p-5 rounded text-white ${(row as Row).statusColor === 'green'
+                                                        ? 'bg-green-500'
+                                                        : (row as Row).statusColor === 'yellow'
+                                                            ? 'bg-yellow-600'
+                                                            : 'bg-red-500'
+                                                        }`}
+                                                >
+                                                    {getNestedValue(row, column.accessor)}
+                                                </span>
+                                            ) : column.accessor === 'studentToken' ? (
                                                 <div className="flex items-center">
                                                     <span>{getNestedValue(row, column.accessor)}</span>
                                                     <button
                                                         onClick={() => handleCopy(String(getNestedValue(row, column.accessor)))}
                                                         className="text-blue-500 hover:underline ml-5 inline-flex items-center"
                                                     >
-                                                        <ClipboardIcon className="h-8 w-7 mr-1" />
+                                                        <ClipboardIcon className="h-6 w-6" />
                                                     </button>
                                                 </div>
                                             ) : (
@@ -225,12 +251,13 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                                                 <span>Edit</span>
                                             </button>
                                         )}
-                                        {onDelete && (
+                                        {onDelete && row && (row as unknown as { roleUsers?: { roleName?: string } }).roleUsers?.roleName !== 'super_admin' && (
                                             <button onClick={() => setConfirmDelete(row)} className="text-red-500 hover:underline">
                                                 <TrashIcon className="h-5 w-5 mr-1" />
                                                 <span>Delete</span>
                                             </button>
                                         )}
+
                                         {onView && (
                                             <button onClick={() => onView(row)} className="text-green-500 hover:underline">
                                                 <EyeIcon className="h-5 w-5 mr-1" />
@@ -245,7 +272,6 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                 </table>
             </div>
 
-            {/* Pagination Controls */}
             <div className="border py-1 px-4 flex justify-between items-center">
                 <button
                     type="button"
@@ -270,7 +296,6 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
                 </button>
             </div>
 
-            {/* Confirmation Modal */}
             {confirmDelete && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full">
@@ -300,7 +325,6 @@ const Table = <T,>({ columns, data, onEdit, onDelete, onSearch, onView }: TableP
             )}
         </div>
     );
-
 };
 
 export default Table;

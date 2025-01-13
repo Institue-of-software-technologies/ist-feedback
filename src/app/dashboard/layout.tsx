@@ -18,15 +18,16 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
-import { PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
+import { PiBellSimpleDuotone, PiChalkboardTeacherFill, PiUserCircleDuotone, PiUserCircleGearDuotone } from "react-icons/pi";
 import { TbUserQuestion } from "react-icons/tb";
-import api from '../../../lib/axios';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from './loading';
 import istLogo from '../../../public/assets/image/cropedImag.png';
 import Image from 'next/image';
 import { showToast } from '@/components/ToastMessage';
+import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -38,36 +39,71 @@ type DashboardLayoutProps = {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, analysis, analytics, recentactivities }) => {
   const { user } = useUser();
+  const path = usePathname();
   const router = useRouter(); // Router instance for programmatic navigation
-  const [activeTab, setActiveTab] = useState<string>('Dashboard'); // Default to 'Dashboard' tab
-  const [currentView, setCurrentView] = useState<string>('view'); // For toggling between view/create
+  const [activeTab, setActiveTab] = useState<string>(''); // Default to 'Dashboard' tab
+  const [currentView, setCurrentView] = useState<string>(''); // For toggling between view/create
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false); // State to manage sidebar visibility
   const [menuOpen, setMenuOpen] = useState<boolean>(false); // State to menu visibility
   const [loggedInUser] = useState<string | null>(user?.username ?? null);
-
+  const [currentPath, setCurrentPath] = useState<string>('');
 
   // Function to handle logout
   const handleLogout = async () => {
     try {
       localStorage.clear();
-      const response = await api.post('/auth/logout');
-      if (response.status === 200) {
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
-
-      }
+      signOut({ callbackUrl: '/login' });
     } catch (error) {
       console.log(error)
       showToast.error('Failed to logout');
     }
   };
 
+  useEffect(() => {
+    const savedTab = localStorage.getItem("activeTab");
+    const savedView = localStorage.getItem("currentView");
+    const savedPath = localStorage.getItem("currentPath");
+  
+    if (savedTab && savedView && savedPath) {
+      // All required values are in localStorage
+      setActiveTab(savedTab);
+      setCurrentView(savedView);
+      router.push(savedPath);
+    } else if (user && user.permissions.includes("view_dashboard")) {
+      // Defaults to Dashboard if permissions allow
+      const defaultTab = "Dashboard";
+      const defaultView = "view";
+      const defaultPath = "/dashboard"; // Adjust this to your default path
+  
+      setActiveTab(defaultTab);
+      setCurrentView(defaultView);
+  
+      localStorage.setItem("activeTab", defaultTab);
+      localStorage.setItem("currentView", defaultView);
+      localStorage.setItem("currentPath", defaultPath);
+    } else {
+      // Optional: Handle other cases if needed
+      console.log("No saved state and no permissions for default view");
+    }
+  }, [router, user]);
+
+  useEffect(() => {
+      setCurrentPath(path);
+      // Save to localStorage if activeTab, currentView, and currentPath exist
+      if (activeTab && currentView && currentPath) {
+        localStorage.setItem("activeTab", activeTab);
+        localStorage.setItem("currentView", currentView);
+        localStorage.setItem("currentPath", currentPath);
+      }
+  }, [activeTab, currentView, currentPath, path]);
+  
   // Main tabs data with view/create links
   const tabs = [
     {
       name: 'Dashboard',
       permission: 'view_dashboard', // A common permission for all users
+      viewPermission: "view_dashboard",
+      createPermission: "view_dashboard",
       viewLabel: 'Dashboard',
       icon: <RiDashboard2Fill size={'40px'} />,
       sideIcon: <RiDashboard2Fill size={'30px'} />,
@@ -76,6 +112,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: 'User',
       permission: 'manage_users',
+      viewPermission: "view_users",
+      createPermission: "create_users",
       viewLabel: 'View Users',
       createLabel: 'Create User',
       viewLink: '/dashboard/users',
@@ -86,6 +124,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: 'Course',
       permission: 'manage_courses',
+      viewPermission: "view_courses",
+      createPermission: "create_courses",
       viewLabel: 'View Courses',
       createLabel: 'Create Course',
       viewLink: '/dashboard/courses',
@@ -96,6 +136,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: "Module ",
       permission: "manage_modules",
+      viewPermission: "view_modules",
+      createPermission: "create_modules",
       viewLabel: "View Modules",
       createLabel: "Create Module",
       viewLink: "/dashboard/modules",
@@ -106,6 +148,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: "Intake ",
       permission: "manage_intakes",
+      viewPermission: "view_intakes",
+      createPermission: "create_intakes",
       viewLabel: "View Intakes",
       createLabel: "Create Intake",
       viewLink: "/dashboard/intakes",
@@ -116,6 +160,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: "Class Time",
       permission: "manage_class_time",
+      viewPermission: "view_class_times",
+      createPermission: "create_class_times",
       viewLabel: "View Class Times",
       createLabel: "Create Class Time",
       viewLink: "/dashboard/class-times",
@@ -126,6 +172,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: 'Role',
       permission: 'manage_roles',
+      viewPermission: "view_roles",
+      createPermission: "create_roles",
       viewLabel: 'View Roles',
       createLabel: 'Create Role',
       viewLink: '/dashboard/roles',
@@ -136,6 +184,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     {
       name: 'Permission',
       permission: 'manage_permissions',
+      viewPermission: "view_permissions",
+      createPermission: "create_permissions",
       viewLabel: 'View Permissions',
       createLabel: 'Create Permission',
       viewLink: '/dashboard/permissions',
@@ -157,6 +207,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
       name: "Feedback Questions",
       permission: "manage_feedback_questions",
       viewLabel: "View Feedback Question",
+      viewPermission: "view_feedback_questions",
+      createPermission: "create_feedback_questions",
       createLabel: "Create Feedback Question",
       viewLink: "/dashboard/feedback-questions",
       icon: <TbUserQuestion size={"40px"} />,
@@ -167,6 +219,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
       name: "Feedback",
       permission: "manage_feedback",
       viewLabel: "View Feedback",
+      viewPermission: "view_feedbacks",
+      createPermission: "create_feedbacks",
       createLabel: "Create Feedback",
       viewLink: "/dashboard/feedback",
       icon: <VscFeedback size={"40px"} />,
@@ -190,7 +244,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
       viewLink: `/dashboard/user-profile/${user?.id}`,
       icon: <PiUserCircleGearDuotone size={'20px'} />,
       sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
-    }
+    },
+    {
+      name: 'Notification',
+      permission: 'profile',
+      viewLabel: 'Notification',
+      viewLink: `/dashboard/notifications`,
+      icon: <PiBellSimpleDuotone size={'20px'} />,
+      sideIcon: <PiBellSimpleDuotone size={'30px'} />,
+    },
   ];
 
   const menuItems = [
@@ -201,6 +263,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
       viewLink: `/dashboard/user-profile/${user?.id}`,
       icon: <PiUserCircleGearDuotone size={'20px'} />,
       sideIcon: <PiUserCircleGearDuotone size={'30px'} />,
+    },
+    {
+      name: 'Notification',
+      permission: 'receive_notifications',
+      viewLabel: 'Notification',
+      viewLink: `/dashboard/notifications`,
+      icon: <PiBellSimpleDuotone size={'20px'} />,
+      sideIcon: <PiBellSimpleDuotone size={'30px'} />,
     },
   ]
 
@@ -213,28 +283,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
     if (tab) {
       setActiveTab(tab.name); // Set the active tab
       setCurrentView(view); // Set the view mode (view/create)
-
+  
       const newPath: string | undefined = view === 'view' ? tab.viewLink : tab.createLink;
       if (newPath) {
-        router.push(newPath); // Only push if newPath is defined
+        router.push(newPath); // Navigate to the new path
         setSidebarOpen(false); // Close sidebar on navigation
-      } else {
-        console.error("newPath is undefined"); // Handle the undefined case (optional)
       }
     }
   };
-
-  // Set the default tab based on user permissions
-  useEffect(() => {
-    if (user) {
-      if (user.permissions.includes('view_dashboard')) {
-        setActiveTab('Dashboard');
-        setCurrentView('view');
-        router.push('/dashboard'); // Ensure URL is set to dashboard on load
-      }
-    }
-  }, [router, user]);
-
+  
   if (!user || !user.permissions.includes('view_dashboard')) {
     return <div className="text-red-600 text-center mt-20">You do not have access to this page.</div>;
   }
@@ -280,6 +337,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
             <div className="max-h-[calc(100vh-4rem)] overflow-y-auto overflow-scroll">  {/* Allows vertical scroll */}
               <ul className="space-y-2">
                 {tabs.map((tab) => (
+                  user.permissions.includes(tab.permission) && (
+                    <li key={tab.name}>
+                      <button
+                        onClick={() => handleTabChange(tab.name, 'view')}
+                        className={`flex items-center w-full p-2 rounded hover:bg-gray-700 ${activeTab === tab.name ? 'bg-gray-700' : ''} transition-colors`}
+                      >
+                        <span>{tab.sideIcon}</span>
+                        <span className="ml-2">{tab.name}</span>
+                      </button>
+                    </li>
+                  )
+                ))}
+                {menuItems.map((tab) => (
                   user.permissions.includes(tab.permission) && (
                     <li key={tab.name}>
                       <button
@@ -372,6 +442,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                         </div>
                       </label>
                       {menuItems.map((options) => (
+                        user.permissions.includes(options.permission) && (
                         <label
                           onClick={() => { handleTabChange(options.name, 'view'); setMenuOpen(!menuOpen) }}
                           key={options.name}
@@ -382,6 +453,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                             <span className="m-1">{options.name}</span>
                           </div>
                         </label>
+                        )
                       ))}
                       <label
                         onClick={() => { handleLogout(); setMenuOpen(!menuOpen) }}
@@ -405,7 +477,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
           {/* Sub-tabs for View/Create */}
           {activeTabDetails && (
             <div className="bg-gray-200 p-4 flex space-x-2">
-              {activeTabDetails.viewLabel && (
+              {user.permissions.includes(activeTabDetails?.viewPermission ?? '') && activeTabDetails.viewLabel && (
                 <button
                   onClick={() => handleTabChange(activeTab, 'view')} // Switch to view mode
                   className={`p-2 rounded ${currentView === 'view' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
@@ -413,7 +485,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                   {activeTabDetails.viewLabel}
                 </button>
               )}
-              {activeTabDetails.createLabel && (
+              {user.permissions.includes(activeTabDetails?.createPermission ?? '') && activeTabDetails.createLabel && (
                 <button
                   onClick={() => handleTabChange(activeTab, 'create')} // Switch to create mode
                   className={`p-2 rounded ${currentView === 'create' ? 'bg-gray-600 text-white' : 'bg-gray-300 hover:bg-gray-400'} transition-colors`}
@@ -444,7 +516,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
                   <div>
                     {analytics}
                   </div>
-                )}                
+                )}
                 {activeTab === 'Dashboard' && (
                   <div>
                     {recentactivities}

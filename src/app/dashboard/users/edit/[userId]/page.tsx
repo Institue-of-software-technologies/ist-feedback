@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../../lib/axios'; // Update path to your axios lib
-import { Course, Role, trainer_courses, User,  } from '@/types'; // Update path to your User type
+import { Button, Course, Role, trainer_courses, User } from '@/types'; // Update path to your User type
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loading from '@/app/loading';
@@ -14,7 +14,7 @@ interface FormData {
   username: string;
   email: string;
   roleId: string;
-  courseId:[];
+  courseId: [];
 }
 
 const EditUser = () => {
@@ -23,11 +23,12 @@ const EditUser = () => {
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [, setFilteredRoles] = useState<Role[]>([]);
-  // const [, setFormData] = useState({ username: '', email: '', roleId: '' });
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   // Fetch user data on mount
   useEffect(() => {
@@ -38,12 +39,12 @@ const EditUser = () => {
           setUser(response.data.user);
           console.log(response.data.user);
           const coursesId = response.data.user.trainer_courses.map(
-            (trainerCourse:trainer_courses) => trainerCourse.courseId
+            (trainerCourse: trainer_courses) => trainerCourse.courseId
           );
-          console.log(coursesId)
+          console.log(coursesId);
           setSelectedCourses(coursesId);
         } catch (err) {
-          console.log(err)
+          console.log(err);
           setError('Failed to fetch user');
         } finally {
           setLoading(false);
@@ -59,13 +60,13 @@ const EditUser = () => {
           console.log(response);
           setCourses(response.data.course);
         } catch (err) {
-          console.log(err)
+          console.log(err);
           showToast.error('Failed to fetch courses');
         } finally {
           setLoading(false);
         }
       };
-  
+
       fetchUsers();
     }
   }, [userId]);
@@ -89,6 +90,7 @@ const EditUser = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/users/${userId}`, data);
       showToast.success('User updated successfully!');
@@ -99,9 +101,32 @@ const EditUser = () => {
     } catch (err) {
       console.log(err);
       showToast.error('Failed to update user');
+    } finally {
+      setFormLoading(false);
     }
   };
 
+  const resendInvite = async () => {
+    setButtonLoading(true);
+    try {
+      const response = await api.post(`/users/resend-invite`, {
+        email: user?.email,
+      });
+
+      // Check if the response status is 200
+      if (response.status === 200) {
+        showToast.success('Invite resent successfully!');
+      } else {
+        showToast.error('Failed to resend invite');
+        console.log('Unexpected response status:', response.status);
+      }
+    } catch (err) {
+      showToast.error('Failed to resend invite');
+      console.error(err);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
   if (loading) return <Loading />;
   if (error) return <div className="text-red-500">{error}</div>;
 
@@ -128,6 +153,24 @@ const EditUser = () => {
     },
   ];
 
+  // Only show the button if the user has not accepted the invite
+  const extraButtons: Button[] = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/users'),
+    }
+  ];
+  
+  if (user && !user.acceptInvite) {
+    extraButtons.push({
+      label: 'Resend Invite',
+      type: 'button',
+      buttonLoading: buttonLoading, // Now this property is valid
+      onClick: resendInvite,
+    });
+  }
+
   return (
     <div className="p-6">
       <ToastContainer /> {/* Add the ToastContainer to render toast notifications */}
@@ -136,6 +179,8 @@ const EditUser = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={handleSubmit}
+        addButton={extraButtons}
+        loading={formLoading}
       />
     </div>
   );

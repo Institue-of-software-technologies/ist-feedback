@@ -50,11 +50,18 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { username, email, password, roleId,multiSelectField } = body;
+    const { username, email, password, roleId, multiSelectField } = body;
+
+    // Check if the email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return NextResponse.json({ message: 'Email already in use' }, { status: 400 });
+    }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create the new user
     const newUser = await User.create({
       username,
       email,
@@ -62,11 +69,14 @@ export async function POST(req: Request) {
       roleId,
     });
 
-    for (const courses of multiSelectField) {
-      await TrainerCourses.create({
-        trainerId: newUser.id,
-        courseId: courses
-      });
+    // Associate courses if multiSelectField is provided
+    if (Array.isArray(multiSelectField) && multiSelectField.length > 0) {
+      for (const course of multiSelectField) {
+        await TrainerCourses.create({
+          trainerId: newUser.id,
+          courseId: course,
+        });
+      }
     }
 
     // Generate a secure reset token
@@ -75,10 +85,10 @@ export async function POST(req: Request) {
     await PasswordReset.create({
       email: email,
       token: resetToken,
-      expires: tokenExpiration
-    })
+      expires: tokenExpiration,
+    });
 
-    const customLink = `${URL}/reset-password?token=${resetToken}&email=${email}`;
+    const customLink = `${URL}/reset-password-invite?token=${resetToken}&email=${email}`;
 
     // Create transport for Gmail
     const transporter = nodemailer.createTransport({
@@ -93,10 +103,12 @@ export async function POST(req: Request) {
         rejectUnauthorized: false, // Allows self-signed certificates (use with caution)
       },
     });
-    const view = await render(InviteUserEmail({
-      username: username,
-      inviteLink: customLink
-    }));
+    const view = await render(
+      InviteUserEmail({
+        username: username,
+        inviteLink: customLink,
+      })
+    );
 
     const options = {
       from: user,
@@ -111,6 +123,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'Error creating user', error }, { status: 500 });
   }
 }
+
+
 
 export async function PUT(req: Request) {
   const body = await req.json();

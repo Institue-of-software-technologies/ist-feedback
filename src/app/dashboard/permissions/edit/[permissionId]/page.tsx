@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Form from '@/components/Forms';
 import { showToast } from '@/components/ToastMessage';
+import Loading from "@/app/loading";
 
 interface FormData {
   permissionName: string;
@@ -19,6 +20,7 @@ const EditPermission = () => {
   const [permission, setPermission] = useState<Permission | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [formLoading, setFormLoading] = useState<boolean>(false);
 
   // Fetch user data on mount
   useEffect(() => {
@@ -40,6 +42,7 @@ const EditPermission = () => {
 
   // Handle form submission
   const handleSubmit = async (data: FormData) => {
+    setFormLoading(true);
     try {
       await api.put(`/permissions/${permissionId}`, data);
       showToast.success('permissions updated successfully!');
@@ -52,14 +55,25 @@ const EditPermission = () => {
       console.log(err)
       showToast.error('Failed to update user');
     }
+    finally {
+      setFormLoading(false);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />
   if (error) return <div className="text-red-500">{error}</div>;
 
   const inputs = [
     { label: "permissionName", type: "text", value: permission?.permissionName }
   ];
+  const extraButtons = [
+    {
+      label: 'Back',
+      type: 'button',
+      onClick: () => router.push('/dashboard/permissions'),
+    }
+  ];
+  
 
   return (
     <div className="p-6">
@@ -69,6 +83,8 @@ const EditPermission = () => {
       <Form<FormData>
         Input={inputs}
         onSubmit={handleSubmit}
+        loading={formLoading}
+        addButton={extraButtons}
       />
     </div>
   );

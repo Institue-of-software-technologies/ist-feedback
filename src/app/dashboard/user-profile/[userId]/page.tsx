@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from 'next/navigation';
+import { useParams,useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import api from '../../../../../lib/axios';
 import Form from '@/components/Forms';
@@ -24,6 +24,7 @@ const UserProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [formLoading, setformLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (userId) {
@@ -65,17 +66,25 @@ const UserProfile = () => {
     { label: "NewPassword", type: "password" },
     { label: "ConfirmNewPassword", type: "password" },
   ];
+  const extraButtons = [
+    {
+      label: 'Clear',
+      type: 'button',
+      onClick: () => router.push('/dashboard'),
+    }
+  ];
+  
   return (
-    <div className="flex flex-col min-h-screen p-1 sm:p-3">
+    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
       <ToastContainer />
       <div className="flex flex-col min-h-screen p-3 ">
         <h1 className='text-xl'>Update User Profile</h1>
-        <div className="bg-white shadow-md rounded-lg p-6">
           <Form<FormData>
             Input={inputs}
             onSubmit={handleSubmit}
             buttonText="Update"
             loading={formLoading}
+            addButton={extraButtons}
           />
           {/* Password Guidelines Section */}
           <div className="mt-8 bg-gray-100 p-4 rounded-lg shadow-md">
@@ -88,7 +97,6 @@ const UserProfile = () => {
             </ul>
           </div>
 
-        </div>
       </div>
     </div>
 

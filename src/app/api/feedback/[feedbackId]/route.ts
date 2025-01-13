@@ -62,7 +62,7 @@ export async function GET(req: NextRequest, context: Context) {
         {
           model: FeedbackQuestion,
           as: "feedbackQuestion",
-          attributes: ["id", "questionText", "questionType"],
+          attributes: ["id", "questionText", "questionType", "required"],
           include: [
             {
               model: AnswerOption,

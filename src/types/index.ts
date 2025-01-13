@@ -27,6 +27,14 @@ export interface Module {
   updatedAt: string;
 }
 
+export interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  link: string;
+  status: string;
+}
+
 export interface Feedback {
   id: number;
   trainerId: number;
@@ -66,7 +74,7 @@ export interface Feedback {
     moduleName: string;
     course: {
       id: number;
-      courseName:string;
+      courseName: string;
     }
   };
 }
@@ -99,9 +107,12 @@ export interface User {
   username: string;
   email: string;
   password: string;
+  role: string;
   roleId: number;
   createdAt: string;
   updatedAt: string;
+  permissions: string[];
+  acceptInvite: boolean;
   roleUsers: {
     id: number;
     roleName: string;
@@ -126,6 +137,7 @@ export interface FeedbackQuestion {
   questionType: 'open-ended' | 'closed-ended' | 'rating';
   minRating?: number;
   maxRating?: number;
+  required?: string;
 }
 
 export interface trainer_courses {
@@ -145,6 +157,7 @@ export interface FeedbackQuestionSelect {
     id: number;
     questionText: string;
     questionType: string;
+    required: string;
     answerOption: [
       {
         description: string;
@@ -176,4 +189,19 @@ export interface RecentActivities {
   entityType: string;
   activityType: string;
   description: string;
+}
+
+export interface Button {
+  label: string;
+  type: string;
+  onClick: () => void;
+  buttonLoading?: boolean; // Add this property to make it valid
+}
+
+export interface UserSession {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  permissions: string[];
 }

@@ -15,7 +15,7 @@ export class Feedback extends Model {
   tokenStartTime!: Date;
   tokenExpiration!: Date;
   courseTrainerId!: number;
-
+  tokenStatus! : string;
   // intake?: Intake; // Add this manually for TypeScript to recognize the association
   classTime?: ClassTime;
   module?: Module;
