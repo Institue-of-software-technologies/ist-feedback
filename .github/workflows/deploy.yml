@@ -29,6 +29,7 @@ jobs:
             echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env
             echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" >> .env
             echo "URL=${{ secrets.URL }}" >> .env
+            echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
 
       - name: Build docker image
         run: docker build -t kirarwa/ist-feedback .
@@ -61,3 +62,5 @@ jobs:
   #       run: docker exec nextjs-app-container npm run migrate
   #     - name: Run seeders
   #       run: docker exec nextjs-app-container npm run seed 
+
+  # sudo docker run -d -p 3000:3000 --name nextjs-app-container --restart always kirarwa/ist-feedback
