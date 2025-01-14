@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
           const { email, password, rememberMe } = credentials;
   
           try {
-            const response = await api.post('/ /login', {
+            const response = await api.post('/auth/login', {
               email: email,
               password: password,
               rememberMe: rememberMe,
