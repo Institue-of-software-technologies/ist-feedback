@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import api from './axios';
 
 export const authOptions: NextAuthOptions = {
-    debug: true,
     providers: [
       CredentialsProvider({
         name: "Credentials",
@@ -18,7 +17,7 @@ export const authOptions: NextAuthOptions = {
           const { email, password, rememberMe } = credentials;
   
           try {
-            const response = await api.post('/auth/login', {
+            const response = await api.post('/ /login', {
               email: email,
               password: password,
               rememberMe: rememberMe,
