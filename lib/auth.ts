@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import api from './axios';
 
 export const authOptions: NextAuthOptions = {
-    debug: true,
     providers: [
       CredentialsProvider({
         name: "Credentials",

@@ -52,7 +52,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, overview, a
   const handleLogout = async () => {
     try {
       localStorage.clear();
-      signOut({ callbackUrl: '/login' });
+      const callbackUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://feedback.isteducation.com/login'
+        : 'http://localhost:3000/login';
+      signOut({ callbackUrl});
     } catch (error) {
       console.log(error)
       showToast.error('Failed to logout');
