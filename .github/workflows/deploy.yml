@@ -30,7 +30,7 @@ jobs:
             echo "NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" >> .env
             echo "URL=${{ secrets.URL }}" >> .env
             echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
-
+            echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
       - name: Build docker image
         run: docker build -t kirarwa/ist-feedback .
       - name: Login to docker hub
@@ -64,3 +64,5 @@ jobs:
   #       run: docker exec nextjs-app-container npm run seed 
 
   # sudo docker run -d -p 3000:3000 --name nextjs-app-container --restart always kirarwa/ist-feedback
+
+  # sudo docker run -d -p 3000:3000 --name nextjs-app-container --restart always --memory=600m --memory-swap=600m kirarwa/ist-feedback
